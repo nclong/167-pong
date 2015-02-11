@@ -396,6 +396,7 @@
 		function disconnect(){
 			 console.log("Disconnecting from server.");
 			 Server.send("close");
+			 connected = false;
 
 			}
 
