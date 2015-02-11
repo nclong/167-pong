@@ -86,28 +86,13 @@ void messageHandler(int clientID, string message){
 void sendPlayerInfo()
 {
 	vector<int> clientIDs = server.getClientIDs();
-	std::string paddleString = "pp";
-	std::string ballPosString = "bp";
-	std::string ballVelString = "bv";
+	std::string paddleString = "pp" + to_string(paddle1.position.y);
+	std::string ballPosString = "bp" + to_string(ball.position.x) + "," + to_string(ball.position.y);
+	std::string ballVelString = "bv" + to_string(ball.velocity.x) + "," + to_string(ball.velocity.y);
 	std::string consecScoreString = "cs" + to_string(PlayerManager::consecutive_hits);
 	std::string totalScoreString = "ts" + to_string(PlayerManager::score);
 	std::string totalOppString = "to" + to_string(PlayerManager::score + PlayerManager::failures);
 	//SEND PADDLE POS
-	for (int i = 0; i < EntityManager::AllEntities.size(); ++i)
-	{
-		Entity* current = &EntityManager::AllEntities[i];
-		if (EntityManager::AllEntities[i].name.compare("Paddle1") == 0)
-		{
-			paddleString += to_string(current->position.y);
-		}
-
-		if (EntityManager::AllEntities[i].name.compare("Ball") == 0)
-		{
-			Ball* ball = (Ball*)current;
-			ballPosString += to_string(current->position.x) + "," + to_string(current->position.y);
-			ballVelString += to_string(ball->velocity.x) + "," + to_string(ball->velocity.y);
-		}
-	}
 
 	for (int i = 0; i < clientIDs.size(); ++i)
 	{
