@@ -37,6 +37,9 @@
 		var player1; // reference to player1 sprite.
 		var paddleOffset; // offset for the paddle sprite.
 
+		var paddleMoving; // paddle moving
+		var paddleDirection; // paddle direction.  0 = up 1 = down.
+
 		var ballVelocityX; // Velocity of the ball
 		var ballVelocityY; // Velocity of the ball
 		var ballX; // Ball location X
@@ -81,7 +84,7 @@
 	 	ctx = display.getContext("2d"); // 2D, display.
 
 		// Set stepsize here.
-		stepsize = 30; // change as necessary.
+		stepsize = 10; // change as necessary.
 		player1Position = cHeight/2;// always starts at the center.
 
 		// initialize stats variables
@@ -109,6 +112,10 @@
  		ballVelocityY = 10;
  		ballX = cWidth/2;
  		ballY = cHeight/2;
+
+ 		// Paddle stuff.
+ 		paddleMoving = false; // set to false while not moving.
+		paddleDirection = 0; // initially 0, but paddle moving is not true.
 	
 		// Draw the game board.
 		drawGameBoard(); 
@@ -134,27 +141,41 @@
 		ctx.drawImage(player1, 20, player1Position, 30, 100);
 	}
 
-	function movePaddleUp()
+	function movePaddle(i) // takes in an integer. 0 for up, 1 for down.
 	{
-		console.log("Paddle Up");
-		 
-		if(player1Position-stepsize > 0)
-		{
-			player1Position-=stepsize;
-			send("up");
-		}
+			if (i == 0)
+			{
+				console.log("Paddle moving up");
+				paddleDirection = 0; // set Paddle direction to up.
+				send("up"); // send up message to server
+				
+			}
+
+			else if (i == 1)
+			{
+				console.log("Paddle moving down");
+				paddleDirection = 1; // set Padle direction do down.
+				send("down"); // send down message to server
+
+			}
 	}
 
-	function movePaddleDown()
+	function paddleMoveUpDown()
 	{
-		console.log("Paddle Down");
-
-		if(player1Position+stepsize+100 < cHeight) // 500
+		if(paddleMoving) // while this is true.
 		{
-			player1Position+=stepsize;
-			send("down");
-		}
-	}
+			if(player1Position-stepsize > 0 
+				&& paddleDirection == 0)
+			{
+				player1Position-=stepsize;
+			}
+			else if(player1Position+stepsize+100 < cHeight 
+				&& paddleDirection == 1) 
+			{
+				player1Position+=stepsize;
+			}
+		}	
+	}	
 
 	function drawBall() // draw da ball.
 	{
@@ -165,12 +186,13 @@
 	{
 		ballX += ballVelocityX;
 		ballY -= ballVelocityY;
+		paddleMoveUpDown();
 	}
 
 	$(document).ready(function(){
 		initialize();
 		window.onkeydown = keyPress;
-		//window.onkeyup = release;
+		window.onkeyup = release;
 		window.setInterval(update, 33);
 		window.setInterval(drawGameBoard, 33); // draw the board.
 		window.setInterval(drawPaddle, 33);
@@ -187,14 +209,24 @@
 	    }
 
 		if(e.keyCode == 38) {
-	        movePaddleUp();
+	        //movePaddleUp();
+	        paddleMoving = true;
+	        movePaddle(0); // 0 is up.
 	       
 	    }
 	    else if(e.keyCode == 40) {
-	        movePaddleDown();
+	        //movePaddleDown();
+	        paddleMoving = true;
+	        movePaddle(1); // 1 is down.
 	    }
 	}
 
+	function release(e) // on key release.
+	{
+		paddleMoving = false; 
+		console.log("key release");
+		send("stop"); // send stop message to server
+	}
 
 	function setConsecutiveHits(i)
 	{
@@ -219,14 +251,14 @@
 
 	function incrementScore()
 	{
-		console.log("Function: increment score.");
+		//console.log("Function: increment score.");
 		var oppSet = document.getElementById("opp");
 		oppSet.innerHTML = score; 
 	}
 
 	function incrementOpportunity()
 	{
-		console.log("Function: increment opportunity.");
+		//console.log("Function: increment opportunity.");
 		var oppSet = document.getElementById("opp");
 		oppSet.innerHTML++; 
 	}
