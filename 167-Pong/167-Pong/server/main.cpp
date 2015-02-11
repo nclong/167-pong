@@ -63,7 +63,7 @@ void messageHandler(int clientID, string message){
     //for (int i = 0; i < clientIDs.size(); i++){
     //    if (clientIDs[i] != clientID)
     //        server.wsSend(clientIDs[i], os.str());
-
+	cout << "Received Message: " << message << endl;
 
 	if (message.compare("up") == 0 )
 	{
@@ -107,19 +107,17 @@ void sendPlayerInfo()
 
 /* called once per select() loop */
 void periodicHandler(){
-	PlayerManager::consecutive_hits++;
-	static time_t next = time(NULL) +REFRESH_RATE;
-	time_t current = time(NULL);
+	static clock_t baseClock = clock();
+	clock_t t = clock();
 	if (gameStarted)
 	{
-		if (current >= next){
+		if (((int)t - (int)baseClock) % REFRESH_RATE == 0 ){
 			paddle1.Update();
 			ball.Update();
 			sendPlayerInfo();
+
 		}
 	}
-
-	next = time(NULL) +REFRESH_RATE;
 }
 
 void startGame()

@@ -198,21 +198,21 @@
 
 	function setConsecutiveHits(i)
 	{
-		console.log("Function: set consecutive hits.");
+		//console.log("Function: set consecutive hits.");
 		var consecHitsSet = document.getElementById("hit");
 		consecHitsSet.innerHTML = i; 
 	}
 
 	function setScore(s)
 	{
-		console.log("Function: set score.");
+		//console.log("Function: set score.");
 		var scoreSet = document.getElementById("score");
 		scoreSet.innerHTML = s;
 	}
 
 	function setOpportunity(o)
 	{
-		console.log("Function: set opportunity.");
+		//console.log("Function: set opportunity.");
 		var oppSet = document.getElementById("opp");
 		opp.innerHTML = o;
 	}
@@ -397,7 +397,7 @@
 			 console.log("Disconnecting from server.");
 			 Server.send("close");
 			 connected = false;
-
+			 Server.disconnect();
 			}
 
        	 function connect(){
@@ -428,13 +428,13 @@
 			    if( typeStr === "pp")
 			    {
                     // Set paddle position.
-                    console.log("Message: Paddle Position Update");
+                    //console.log("Message: Paddle Position Update");
                     player1Position = dataStr;
 			    }
 			    else if( typeStr === "bp" )
 			    {	
 			    	// Set the ball position.
-			    	console.log("Message: Ball Position Update");
+			    	//console.log("Message: Ball Position Update");
 			        var xStr = dataStr.substring(0, dataStr.indexOf(","));
 			        var yStr = dataStr.substring(dataStr.indexOf(",")+1);
 			        ballX = xStr;
@@ -443,7 +443,7 @@
 			    else if( typeStr === "bv" )
 			    {
 			    	// Set the ball velocity.
-			    	console.log("Message: Ball Velocity Update");
+			    	//console.log("Message: Ball Velocity Update");
 			        var xStr = dataStr.substring(0, dataStr.indexOf(","));
 			        var yStr = dataStr.substring(dataStr.indexOf(",")+1);
 			        ballVelocityX = xStr;
