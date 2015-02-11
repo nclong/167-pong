@@ -7,6 +7,6 @@ public:
 	EntityManager();
 	~EntityManager();
 	static std::vector<Entity> AllEntities;
-	static void AddEntity(Entity toAdd);
+	static void AddEntity(Entity* toAdd);
 };
 

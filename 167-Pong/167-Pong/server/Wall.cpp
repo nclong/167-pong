@@ -1,5 +1,14 @@
+#pragma once
 #include "Wall.h"
+Wall::Wall()
+{
 
+}
+
+Wall::~Wall()
+{
+
+}
 Vector2 Wall::GetPos()
 {
 	return position;

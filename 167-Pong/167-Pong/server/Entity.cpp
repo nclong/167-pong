@@ -30,3 +30,8 @@ int Entity::Right()
 {
 	return position.x + width;
 }
+
+void Entity::Update()
+{
+
+}

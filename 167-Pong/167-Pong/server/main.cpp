@@ -1,4 +1,5 @@
 #define _CRT_SECURE_NO_WARNINGS
+#pragma once
 #include <stdlib.h>
 #include <iostream>
 #include <string>
@@ -23,7 +24,7 @@ Wall topWall;
 Wall bottomWall;
 Wall rightWall;
 
-
+void startGame();
 /* called when a client connects */
 void openHandler(int clientID){
     //ostringstream os;
@@ -63,8 +64,8 @@ void messageHandler(int clientID, string message){
     //    if (clientIDs[i] != clientID)
     //        server.wsSend(clientIDs[i], os.str());
 
-	Paddle* paddle;
-	for (int i = 0; i < EntityManager::AllEntities.size; ++i)
+	Paddle* paddle = NULL;
+	for (int i = 0; i < EntityManager::AllEntities.size(); ++i)
 	{
 		if (EntityManager::AllEntities[i].name.compare("Paddle1") == 0)
 		{
@@ -95,7 +96,7 @@ void sendPlayerInfo()
 	std::string totalScoreString = "ts" + to_string(PlayerManager::score);
 	std::string totalOppString = "to" + to_string(PlayerManager::score + PlayerManager::failures);
 	//SEND PADDLE POS
-	for (int i = 0; EntityManager::AllEntities.size; ++i)
+	for (int i = 0; EntityManager::AllEntities.size(); ++i)
 	{
 		Entity* current = &EntityManager::AllEntities[i];
 		if (EntityManager::AllEntities[i].name.compare("Paddle1") == 0)
@@ -129,7 +130,7 @@ void periodicHandler(){
 	if (gameStarted)
 	{
 		if (current >= next){
-			for (int i = 0; i < EntityManager::AllEntities.size; ++i)
+			for (int i = 0; i < EntityManager::AllEntities.size(); ++i)
 			{
 				EntityManager::AllEntities[i].Update();
 			}
@@ -161,11 +162,11 @@ void startGame()
 	rightWall.SetPos(SCREEN_WIDTH - VERT_WALL_WIDTH, 0);
 	rightWall.SetHeight(VERT_WALL_HEIGHT);
 	rightWall.SetWidth(VERT_WALL_WIDTH);
-	EntityManager::AddEntity(ball);
-	EntityManager::AddEntity(paddle1);
-	EntityManager::AddEntity(topWall);
-	EntityManager::AddEntity(bottomWall);
-	EntityManager::AddEntity(rightWall);
+	EntityManager::AddEntity((Entity*)&ball);
+	EntityManager::AddEntity((Entity*)&paddle1);
+	EntityManager::AddEntity((Entity*)&topWall);
+	EntityManager::AddEntity((Entity*)&bottomWall);
+	EntityManager::AddEntity((Entity*)&rightWall);
 	PlayerManager::consecutive_hits = 0;
 	PlayerManager::failures = 0;
 	PlayerManager::score;

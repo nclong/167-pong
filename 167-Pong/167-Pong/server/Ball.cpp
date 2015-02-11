@@ -1,3 +1,4 @@
+#pragma once
 #include "Ball.h"
 #include "EntityManager.h"
 
@@ -38,7 +39,7 @@ void Ball::SetPos(int x, int y)
 void Ball::Update()
 {
 	position += velocity;
-	for (int i = 0; i < EntityManager::AllEntities.size; ++i)
+	for (int i = 0; i < EntityManager::AllEntities.size(); ++i)
 	{
 		Entity* currentEnt = &EntityManager::AllEntities[i];
 		if (currentEnt->name.compare(name) != 0)
