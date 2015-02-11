@@ -370,16 +370,16 @@
 			    else if( typeStr === "bp" )
 			    {	
 			    	// Set the ball position.
-			        var xStr = dataStr(0, dataStr.indexOf(","));
-			        var yStr = dataStr(dataStr.indexOf(",")+1);
+			        var xStr = dataStr.substring(0, dataStr.indexOf(","));
+			        var yStr = dataStr.substring(dataStr.indexOf(",")+1);
 			        ballX = xStr;
                     ballY = yStr;
 			    }
 			    else if( typeStr === "bv" )
 			    {
 			    	// Set the ball velocity.
-			        var xStr = dataStr(0, dataStr.indexOf(","));
-			        var yStr = dataStr(dataStr.indexOf(",")+1);
+			        var xStr = dataStr.substring(0, dataStr.indexOf(","));
+			        var yStr = dataStr.substring(dataStr.indexOf(",")+1);
 			        ballVelocityX = xStr;
                     ballVelocityY = yStr;
 			    }

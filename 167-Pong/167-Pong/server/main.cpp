@@ -64,25 +64,18 @@ void messageHandler(int clientID, string message){
     //    if (clientIDs[i] != clientID)
     //        server.wsSend(clientIDs[i], os.str());
 
-	Paddle* paddle = NULL;
-	for (int i = 0; i < EntityManager::AllEntities.size(); ++i)
-	{
-		if (EntityManager::AllEntities[i].name.compare("Paddle1") == 0)
-		{
-			paddle = (Paddle*)&(EntityManager::AllEntities[i]);
-		}
-	}
+
 	if (message.compare("up") == 0 )
 	{
-		paddle->dir = paddle->MOVING_UP;
+		paddle1.dir = paddle1.MOVING_UP;
     }
 	else if (message.compare("down") == 0)
 	{
-		paddle->dir = paddle->MOVING_DOWN;
+		paddle1.dir = paddle1.MOVING_DOWN;
 	}
 	else if (message.compare("stop") == 0)
 	{
-		paddle->dir = paddle->NOT_MOVING;
+		paddle1.dir = paddle1.NOT_MOVING;
 	}
 	else if (message.substr(0, 5).compare("Name:") == 0)
 	{
@@ -130,20 +123,18 @@ void sendPlayerInfo()
 /* called once per select() loop */
 void periodicHandler(){
 	PlayerManager::consecutive_hits++;
-	static time_t next = time(NULL) + 10;// +REFRESH_RATE;
+	static time_t next = time(NULL) +REFRESH_RATE;
 	time_t current = time(NULL);
 	if (gameStarted)
 	{
 		if (current >= next){
-			for (int i = 0; i < EntityManager::AllEntities.size(); ++i)
-			{
-				EntityManager::AllEntities[i].Update();
-			}
+			paddle1.Update();
+			ball.Update();
 			sendPlayerInfo();
 		}
 	}
 
-	next = time(NULL) + 10;// +REFRESH_RATE;
+	next = time(NULL) +REFRESH_RATE;
 }
 
 void startGame()
@@ -156,17 +147,24 @@ void startGame()
 	ball.startingVel.y = 1;
 	ball.velocity.x = -2;
 	ball.velocity.y = 1;
+	ball.name = "Ball";
 	paddle1.SetPos(0, SCREEN_HEIGHT / 2);
 	paddle1.dir = paddle1.NOT_MOVING;
+	paddle1.SetHeight(PADDLE_HEIGHT);
+	paddle1.SetWidth(PADDLE_WIDTH);
+	paddle1.name = "Paddle1";
 	topWall.SetPos(PADDLE_WIDTH, 0);
 	topWall.SetHeight(HORIZ_WALL_WIDTH);
 	topWall.SetWidth(HORIZ_WALL_HEIGHT);
+	topWall.name = "TopWall";
 	bottomWall.SetPos(PADDLE_WIDTH, SCREEN_HEIGHT - HORIZ_WALL_HEIGHT);
 	bottomWall.SetHeight(HORIZ_WALL_HEIGHT);
 	bottomWall.SetWidth(HORIZ_WALL_WIDTH);
+	bottomWall.name = "BottomWall";
 	rightWall.SetPos(SCREEN_WIDTH - VERT_WALL_WIDTH, 0);
 	rightWall.SetHeight(VERT_WALL_HEIGHT);
 	rightWall.SetWidth(VERT_WALL_WIDTH);
+	rightWall.name = "RightWall";
 	EntityManager::AddEntity((Entity*)&ball);
 	EntityManager::AddEntity((Entity*)&paddle1);
 	EntityManager::AddEntity((Entity*)&topWall);

@@ -2,7 +2,7 @@
 
 void Paddle::moveUp()
 {
-	int next_pos = position.y - speed;
+	int next_pos = position.y - PADDLE_SPEED;
 
 	if (next_pos < 0)
 		position.y = 0;
@@ -12,7 +12,7 @@ void Paddle::moveUp()
 
 void Paddle::moveDown()
 {
-	int next_pos = position.y + speed;
+	int next_pos = position.y + PADDLE_SPEED;
 
 	if (next_pos + height > SCREEN_HEIGHT)
 		position.y = SCREEN_HEIGHT - height;
@@ -29,6 +29,16 @@ void Paddle::Update()
 	else if (dir == MOVING_DOWN)
 	{
 		moveDown();
+	}
+
+	if (position.y < 0)
+	{
+		position.y = 0;
+	}
+
+	if (position.y + PADDLE_HEIGHT > SCREEN_HEIGHT)
+	{
+		position.y = SCREEN_HEIGHT - PADDLE_HEIGHT;
 	}
 }
 
