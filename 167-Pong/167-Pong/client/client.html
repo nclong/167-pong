@@ -39,6 +39,7 @@
 
 		var paddleMoving; // paddle moving
 		var paddleDirection; // paddle direction.  0 = up 1 = down.
+		var keyDown; // paddle needs to know this
 
 		var ballVelocityX; // Velocity of the ball
 		var ballVelocityY; // Velocity of the ball
@@ -116,7 +117,8 @@
  		// Paddle stuff.
  		paddleMoving = false; // set to false while not moving.
 		paddleDirection = 0; // initially 0, but paddle moving is not true.
-	
+		keyDown = false;
+
 		// Draw the game board.
 		drawGameBoard(); 
 
@@ -210,21 +212,29 @@
 
 		if(e.keyCode == 38) {
 	        //movePaddleUp();
-	        paddleMoving = true;
-	        movePaddle(0); // 0 is up.
-	       
+	        if (!keyDown)
+	        {
+	        	paddleMoving = true;
+	        	movePaddle(0); // 0 is up.
+	        	keyDown = true;
+	    	}      
 	    }
 	    else if(e.keyCode == 40) {
 	        //movePaddleDown();
-	        paddleMoving = true;
-	        movePaddle(1); // 1 is down.
+	        if (!keyDown)
+	        {
+	        	paddleMoving = true;
+	        	movePaddle(1); // 1 is down.
+	        	keyDown = true;
+	   		}
 	    }
 	}
 
 	function release(e) // on key release.
 	{
 		paddleMoving = false; 
-		console.log("key release");
+		keyDown = false;
+		console.log("key release dskjfsldkjfsl");
 		send("stop"); // send stop message to server
 	}
 
