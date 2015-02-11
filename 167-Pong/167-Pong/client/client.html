@@ -1,4 +1,4 @@
-<!doctype html>
+	<!doctype html>
 <html>
 <head>
 	<meta charset='UTF-8' />
@@ -23,8 +23,6 @@
 		var display; // reference to the canvas.
 		var ctx; // brush.
 
-
-		
 		// game variables
 
 		var stepsize; // The distance the paddle travels.
@@ -158,6 +156,32 @@
 	        movePaddleDown();
 	    }
 	}
+
+
+	function setConsecutiveHits(i)
+	{
+		var consecHits = document.getElementById("hit");
+		consecHits.innerHTML = i; 
+	}
+
+	function setScore(s)
+	{
+		var score = document.getElementById("score");
+		score.innerHTML = s;
+	}
+
+	function setOpportunity(o)
+	{
+		var opp = document.getElementById("opp");
+		opp.innerHTML = o;
+	}
+
+	function incrementOpportunity()
+	{
+		var opp = document.getElementById("opp");
+		opp.innerHTML++;
+	}
+
 </script>
 </head>
 
@@ -191,19 +215,25 @@
 	<div class="row">
 	  <form class="col s12">
 	    <div class="row">
-	      <div class="input-field col s4">
+	      <div class="input-field col s3">
 	        <i class="mdi-action-account-circle prefix"></i>
 	        <input id='ip' name='ip' id="icon_prefix" type="text" class="validate">
 	        <label for="icon_prefix">Server IP:</label>
 	      </div>
 
-	      <div class="input-field col s4">
+	      <div class="input-field col s3">
 	        <i class="mdi-communication-phone prefix"></i>
 	        <input id='port' name='port' id="icon_telephone" type="text" class="validate">
 	        <label for="icon_telephone">Server Port:</label>
 	      </div>
 
-		<div class="col s4">
+	      <div class="input-field col s3">
+	        <i class="mdi-communication-phone prefix"></i>
+	        <input id='port' name='port' id="icon_telephone" type="text" class="validate">
+	        <label for="icon_telephone">User Name: (!)</label>
+	      </div>
+
+		<div class="col s3">
 	       <a onClick="connect()" class="waves-effect waves-light btn"><i class="mdi-file-cloud left"></i>Connect</a>
 
 
@@ -216,9 +246,23 @@
 
 <!-- Hit the button to "begin" -->
 <div class="container valign-wrapper"> <!-- Valign wrapper auto-centers -->
- <button class="btn red waves-effect waves-light" onclick="" type="submit" name="action">LET US PLAY PONG! <i class="mdi-content-send right"></i> 
+ <button class="btn red waves-effect waves-light" onclick="incrementOpportunity()" type="submit" name="action">LET US PLAY PONG! <i class="mdi-content-send right"></i> 
   </button> 
 </div>
+
+<div class="container grey lighten-2">
+
+<div id="game" class="row">
+	<div class="col s4">
+	<a>Consecutive Hits<span id="hit" class="badge">1</span></a></div>
+	<div class="col s4">
+	<a>Score<span id="score" class="badge">1</span></a></div>
+	<div class="col s4">
+	<a>Opportunities<span id="opp" class="new badge">9000</span></a></div>
+</div>
+</div>
+
+
 
 <div class="container valign-wrapper">
 	<canvas id="myCanvas"  width="1200" height="500" style="border:4px solid #000000;">
