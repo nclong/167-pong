@@ -1,0 +1,141 @@
+<!doctype html>
+<html>
+<head>
+	<meta charset='UTF-8' />
+
+	<meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
+  	<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1.0, user-scalable=no"/>
+  	<title>Space Pong : By VGDC</title>
+  	<!-- MATERIALIZE CSS  -->
+  	<link href="css/materialize.css" type="text/css" rel="stylesheet" media="screen,projection"/>
+  	<link href="css/style.css" type="text/css" rel="stylesheet" media="screen,projection"/>
+  	<link rel="icon" type="image/png" href="favicon.ico"/> 
+  	<!-- REPLACE WITH YOUR OWN-->
+
+
+  	<script> // Drawing script! 
+function myCanvas() { // Draw stuff.
+    var c = document.getElementById("myCanvas");
+    var ctx = c.getContext("2d");
+    var img = document.getElementById("pongTemp");
+    ctx.drawImage(img,10,10);
+}
+</script>
+
+	<script src="fancywebsocket.js"></script> <!-- NEED THIS -->
+	<script>
+		var Server;
+
+		function log( text ) {
+			$log = $('#log');
+			//Add text to log
+			$log.append(($log.val()?"\n":'')+text);
+			//Autoscroll
+			$log[0].scrollTop = $log[0].scrollHeight - $log[0].clientHeight;
+		}
+
+		function send( text ) {
+			Server.send( 'message', text );
+		}
+
+        function connect(){
+            log('Connecting...');
+			Server = new FancyWebSocket('ws://' + document.getElementById('ip').value + ':' + document.getElementById('port').value);
+
+			$('#message').keypress(function(e) {
+				if ( e.keyCode == 13 && this.value ) {
+					log( 'You: ' + this.value );
+					send( this.value );
+
+					$(this).val('');
+				}
+			});
+
+			//Let the user know we're connected
+			Server.bind('open', function() {
+                document.getElementById("cntBtn").disabled = true;
+				log( "Connected." );
+			});
+
+			//OH NOES! Disconnection occurred.
+			Server.bind('close', function( data ) {
+                document.getElementById("cntBtn").disabled = false;
+				log( "Disconnected." );
+			});
+
+			//Log any messages sent from server
+			Server.bind('message', function( payload ) {
+				log( payload );
+			});
+
+			Server.connect();
+        }
+
+	</script>
+</head>
+
+<body>
+
+
+<h1 class="center"> Space Pong </h1> <!-- Header -->
+
+<!-- Input client IP and other things here -->
+<div class="container valign-wrapper">
+	<div class="row">
+	  <form class="col s12">
+	    <div class="row">
+	      <div class="input-field col s6">
+	        <i class="mdi-action-account-circle prefix"></i>
+	        <input id='ip' name='ip' id="icon_prefix" type="text" class="validate">
+	        <label for="icon_prefix">Server IP:</label>
+	      </div>
+
+	      <div class="input-field col s6">
+	        <i class="mdi-communication-phone prefix"></i>
+	        <input id='port' name='port' id="icon_telephone" type="text" class="validate">
+	        <label for="icon_telephone">Server Port:</label>
+	      </div>
+	    </div>
+	  </form>
+	</div>
+</div>
+
+<!-- Hit the button to "begin" -->
+<div class="container valign-wrapper"> <!-- Valign wrapper auto-centers -->
+ <button class="btn red waves-effect waves-light" onclick="myCanvas()" type="submit" name="action">LET US PLAY PONG! <i class="mdi-content-send right"></i> 
+  </button> 
+</div>
+
+<div class="container valign-wrapper">
+<canvas id="myCanvas"  width="1200" height="400"
+style="border:4px solid #000000;">
+Your browser does not support the HTML5 canvas tag.
+</canvas>
+</div>
+
+
+<!-- Footer -->
+  <footer class="grey darken-4">
+    <div class="container">
+      <div class="row"> 
+      <p class="flow-text white-text">Made with love from VGDC</p>
+      </div>
+    </div>
+    <div class="footer-copyright">
+      <div class="container">
+      This site was made with <a class="orange-text lighten-3" href="http://materializecss.com">Materialize.</a> Please check out their work!
+      </div>
+    </div>
+  </footer>
+
+  <!--OTHER Scripts-->
+  <script src="https://code.jquery.com/jquery-2.1.1.min.js"></script>
+  <script src="js/materialize.js"></script>
+  <script src="js/init.js"></script>
+
+     
+
+
+</body>
+
+</html>
