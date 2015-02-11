@@ -11,15 +11,27 @@
     </ProjectConfiguration>
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="server\Ball.cpp" />
     <ClCompile Include="server\base64.cpp" />
+    <ClCompile Include="server\Entity.cpp" />
+    <ClCompile Include="server\EntityManager.cpp" />
     <ClCompile Include="server\main.cpp" />
     <ClCompile Include="server\sha1.cpp" />
+    <ClCompile Include="server\Vector2.cpp" />
     <ClCompile Include="server\websocket.cpp" />
+    <ClCompile Include="Paddle.cpp" />
+    <ClCompile Include="Wall.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="Paddle.h" />
+    <ClInclude Include="server\Ball.h" />
     <ClInclude Include="server\base64.h" />
+    <ClInclude Include="server\Entity.h" />
+    <ClInclude Include="server\EntityManager.h" />
     <ClInclude Include="server\sha1.h" />
+    <ClInclude Include="server\Vector2.h" />
     <ClInclude Include="server\websocket.h" />
+    <ClInclude Include="Wall.h" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <ProjectGuid>{3134E9C3-9B8C-40C9-8709-F6E125F5BFEC}</ProjectGuid>
