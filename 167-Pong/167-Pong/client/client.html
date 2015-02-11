@@ -30,7 +30,8 @@
 		var player1; // reference to player1 sprite.
 		var paddleOffset; // offset for the paddle sprite.
 
-		var ballVelocity; // Velocity of the ball
+		var ballVelocityX; // Velocity of the ball
+		var ballVelocityY; // Velocity of the ball
 		var ballX; // Ball location X
 		var ballY; // Ball location Y
 		var ballOffsetX; // Offset for ball sprite X
@@ -88,7 +89,8 @@
  		ballOffsetY = 10;
 
  		// Specify ball starting position and velocity
- 		ballVelocity = 10;
+ 		ballVelocityX = 10;
+ 		ballVelocityY = 10;
  		ballX = cWidth/2;
  		ballY = cHeight/2;
 	
@@ -120,6 +122,7 @@
 		if(player1Position-stepsize > 0)
 		{
 			player1Position-=stepsize;
+			send("up");
 		}
 	}
 
@@ -128,7 +131,10 @@
 		console.log("Paddle Down");
 
 		if(player1Position+stepsize+100 < cHeight) // 500
+		{
 			player1Position+=stepsize;
+			send("down");
+		}
 	}
 
 	function drawBall() // draw da ball.
@@ -138,8 +144,8 @@
 
 	function update()
 	{
-		ballX += ballVelocity;
-		ballY -= ballVelocity;
+		ballX += ballVelocityX;
+		ballY -= ballVelocityY;
 	}
 
 	$(document).ready(function(){
@@ -357,21 +363,24 @@
 			    dataStr = payload.substring(2);
 			    if( typeStr === "pp")
 			    {
-                    //paddlePositionY = dataStr
+                    // Set paddle position.
+                    player1Position = dataStr;
 			    }
 			    else if( typeStr === "bp" )
-			    {
-			        //xStr = dataStr(0, dataStr.indexOf(","));
-			        //yStr = dataStr(dataStr.indexOf(",")+1);
-			        //ballX = xStr;
-                    //ballY = yStr;
+			    {	
+			    	// Set the ball position.
+			        var xStr = dataStr(0, dataStr.indexOf(","));
+			        var yStr = dataStr(dataStr.indexOf(",")+1);
+			        ballX = xStr;
+                    ballY = yStr;
 			    }
 			    else if( typeStr === "bv" )
 			    {
-			        //xStr = dataStr(0, dataStr.indexOf(","));
-			        //yStr = dataStr(dataStr.indexOf(",")+1);
-			        //ballVelX = xStr;
-                    //ballVelY = yStr;
+			    	// Set the ball velocity.
+			        var xStr = dataStr(0, dataStr.indexOf(","));
+			        var yStr = dataStr(dataStr.indexOf(",")+1);
+			        ballVelocityX = xStr;
+                    ballVelocityY = yStr;
 			    }
 			    else if (typeStr === "cs")
 			    {
