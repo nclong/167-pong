@@ -80,6 +80,10 @@ void messageHandler(int clientID, string message){
 	{
 		paddle->dir = paddle->MOVING_DOWN;
 	}
+	else if (message.compare("stop") == 0)
+	{
+		paddle->dir = paddle->NOT_MOVING;
+	}
 	else if (message.substr(0, 5).compare("Name:") == 0)
 	{
 		PlayerManager::id = message.substr(5);
@@ -96,7 +100,7 @@ void sendPlayerInfo()
 	std::string totalScoreString = "ts" + to_string(PlayerManager::score);
 	std::string totalOppString = "to" + to_string(PlayerManager::score + PlayerManager::failures);
 	//SEND PADDLE POS
-	for (int i = 0; EntityManager::AllEntities.size(); ++i)
+	for (int i = 0; i < EntityManager::AllEntities.size(); ++i)
 	{
 		Entity* current = &EntityManager::AllEntities[i];
 		if (EntityManager::AllEntities[i].name.compare("Paddle1") == 0)
@@ -112,7 +116,7 @@ void sendPlayerInfo()
 		}
 	}
 
-	for (int i = 0; clientIDs.size(); ++i)
+	for (int i = 0; i < clientIDs.size(); ++i)
 	{
 		server.wsSend(clientIDs[i], paddleString);
 		server.wsSend(clientIDs[i], ballPosString);
@@ -125,6 +129,7 @@ void sendPlayerInfo()
 
 /* called once per select() loop */
 void periodicHandler(){
+	PlayerManager::consecutive_hits++;
     static time_t next = time(NULL) + REFRESH_RATE;
 	time_t current = time(NULL);
 	if (gameStarted)
