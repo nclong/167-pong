@@ -166,6 +166,9 @@ void startGame()
 	EntityManager::AddEntity(topWall);
 	EntityManager::AddEntity(bottomWall);
 	EntityManager::AddEntity(rightWall);
+	PlayerManager::consecutive_hits = 0;
+	PlayerManager::failures = 0;
+	PlayerManager::score;
 	gameStarted = true;
 }
 

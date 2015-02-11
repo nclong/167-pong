@@ -94,5 +94,8 @@
     <None Include="client\chatroom_client.html">
       <Filter>Client</Filter>
     </None>
+    <None Include="client\client.html">
+      <Filter>Client</Filter>
+    </None>
   </ItemGroup>
 </Project>

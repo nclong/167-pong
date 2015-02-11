@@ -38,6 +38,7 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="client\chatroom_client.html" />
+    <None Include="client\client.html" />
     <None Include="client\fancywebsocket.js" />
   </ItemGroup>
   <PropertyGroup Label="Globals">

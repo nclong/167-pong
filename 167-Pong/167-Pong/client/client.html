@@ -1,4 +1,4 @@
-	<!doctype html>
+﻿	<!doctype html>
 <html>
 <head>
 	<meta charset='UTF-8' />
@@ -229,7 +229,7 @@
 
 	      <div class="input-field col s3">
 	        <i class="mdi-communication-phone prefix"></i>
-	        <input id='port' name='port' id="icon_telephone" type="text" class="validate">
+	        <input id='name' name='name' id="icon_telephone" type="text" class="validate">
 	        <label for="icon_telephone">User Name: (!)</label>
 	      </div>
 
@@ -309,33 +309,49 @@
             console.log("Connecting...");
 			Server = new FancyWebSocket('ws://' + document.getElementById('ip').value + ':' + document.getElementById('port').value);
 
-			$('#message').keypress(function(e) {
-				if ( e.keyCode == 13 && this.value ) {
-					log( 'You: ' + this.value );
-					send( this.value );
-
-					$(this).val('');
-				}
-			});
-
 			//Let the user know we're connected
 			Server.bind('open', function() {
-                document.getElementById("cntBtn").disabled = true;
-				log( "Connected." );
+				console.log( "Connected." );
 			});
 
 			//OH NOES! Disconnection occurred.
 			Server.bind('close', function( data ) {
-                document.getElementById("cntBtn").disabled = false;
-				log( "Disconnected." );
+				console.log( "Disconnected." );
 			});
 
 			//Log any messages sent from server
 			Server.bind('message', function( payload ) {
-				log( payload );
+			    typeStr = payload.substring(0, 2);
+			    dataStr = payload.substring(2);
+			    if( typeStr === "pp")
+			    {
+                    //Paddle Position
+			    }
+			    else if( typeStr === "bp" )
+			    {
+                    //ball position
+			    }
+			    else if( typeStr === "bv" )
+			    {
+                    //ball velocity
+			    }
+			    else if (typeStr === "cs")
+			    {
+			        consecHits = dataStr;
+			    }
+			    else if (typeStr === "ts")
+			    {
+			        score = dataStr;
+			    }
+			    else if (typeStr === "to")
+			    {
+			        opportunity = dataStr;
+			    }
+
 			});
 
 			Server.connect();
+			send("Name:" + document.getElementById('name').val);
         }
 
 	</script>
