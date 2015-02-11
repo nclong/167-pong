@@ -1,5 +1,6 @@
 #include "Vector2.h"
 #include "Entity.h"
+#include "PlayerManager.h"
 
 class Ball : public Entity
 {

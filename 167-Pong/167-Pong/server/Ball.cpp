@@ -81,6 +81,8 @@ void Ball::Update()
 	{
 		position = startingPos;
 		velocity = startingVel;
+		PlayerManager::consecutive_hits = 0;
+		PlayerManager::failures++;
 	}
 
 	
@@ -90,6 +92,7 @@ void Ball::addScore(Entity* collider)
 {
 	if (collider->name.compare("Paddle1") == 0)
 	{
-		//Do Score Adding!
+		PlayerManager::score++;
+		PlayerManager::consecutive_hits++;
 	}
 }

@@ -40,14 +40,17 @@ void openHandler(int clientID){
 
 /* called when a client disconnects */
 void closeHandler(int clientID){
-    ostringstream os;
-    os << "Stranger " << clientID << " has leaved.";
+    //ostringstream os;
+    //os << "Stranger " << clientID << " has leaved.";
 
-    vector<int> clientIDs = server.getClientIDs();
-    for (int i = 0; i < clientIDs.size(); i++){
-        if (clientIDs[i] != clientID)
-            server.wsSend(clientIDs[i], os.str());
-    }
+    //vector<int> clientIDs = server.getClientIDs();
+    //for (int i = 0; i < clientIDs.size(); i++){
+    //    if (clientIDs[i] != clientID)
+    //        server.wsSend(clientIDs[i], os.str());
+    //}
+
+	startGame();
+	gameStarted = false;
 }
 
 /* called when a client sends a message to the server */
@@ -75,6 +78,10 @@ void messageHandler(int clientID, string message){
 	else if (message.compare("down") == 0)
 	{
 		paddle->dir = paddle->MOVING_DOWN;
+	}
+	else if (message.substr(0, 5).compare("Name:") == 0)
+	{
+		PlayerManager::id = message.substr(5);
 	}
 }
 
