@@ -1,3 +1,4 @@
+#include "Entity.h"
 #include "Ball.h"
 #include "Vector2.h"
 
@@ -7,15 +8,16 @@ namespace
 {
 	const int STARTING_X_POS = 60; 
 	const int STARTING_Y_POS = 250; 
+	const Vector2 STARTING_POSITION(STARTING_X_POS, STARTING_X_POS);
 
 	const int PADDLE_WIDTH = 20; 
 	const int PADDLE_HEIGHT = 50; 
 }
 
-class Paddle
+class Paddle : Entity
 {
 public:
-	Paddle() : x_pos (STARTING_X_POS), y_pos(STARTING_Y_POS), width (PADDLE_WIDTH), height(PADDLE_HEIGHT) {};
+	Paddle() : Entity(STARTING_POSITION, PADDLE_WIDTH, PADDLE_HEIGHT) {};
 
 	void moveUp(int delta_y = 1);
 
@@ -24,9 +26,5 @@ public:
 	bool isColliding(Ball ball);
 
 private:
-	int y_pos;
-	int x_pos;
 
-	int width;
-	int height;
 };
