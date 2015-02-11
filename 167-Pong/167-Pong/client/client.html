@@ -35,6 +35,12 @@ var stepsize;
 var player1Position;
 var player1;
 
+var ballVelocity;
+var ballX;
+var ballY;
+var ballOffsetX;
+var ballOffsetY;
+
 
 // Image
 
@@ -43,6 +49,7 @@ var borderTop;
 var borderRight; 
 var borderLeft; 
 var borderBottom; 
+var ball;
 
 
 function initialize() { // Drawing the start button
@@ -55,8 +62,6 @@ function initialize() { // Drawing the start button
 	stepsize = 30; // change as necessary.
 	player1Position = cHeight/2;// always starts at the center.
 	var tempString = "Space jam."; // set this temporarily
-
-	player1 = document.getElementById("paddle1");
 // Offsets here.
 
 	paddleOffset = 100;
@@ -74,11 +79,20 @@ function initialize() { // Drawing the start button
  	var player2 = document.getElementById("paddle2");
 	ctx.drawImage(player2, cWidth-100,(cHeight/2) - paddleOffset, 30, 100);
 
-board = document.getElementById("bg");
+ board = document.getElementById("bg");
  borderTop = document.getElementById("top-Border");
  borderRight = document.getElementById("right-Border"); 
  borderLeft = document.getElementById("right-Border"); // use the same!
  borderBottom = document.getElementById("bottom-Border");
+
+ player1 = document.getElementById("paddle1");
+ ball = document.getElementById("baller");
+
+ ballVelocity = 10;
+ ballX = cWidth/2;
+ ballY = cHeight/2;
+ ballOffsetX = 10;
+ ballOffsetY = 10;
 	
 drawGameBoard(); 
 }
@@ -104,16 +118,6 @@ function drawPaddle() // the value we get
 	ctx.drawImage(player1, 20, player1Position, 30, 100);
 }
 
-
-var ballVelocity;
-var ballX;
-var ballY;
-
-function drawBall() // draw da ball.
-{
-
-}
-
 function movePaddleUp()
 {
 	console.log("paddle Up command");
@@ -132,13 +136,29 @@ function movePaddleDown()
 		player1Position+=stepsize;
 }
 
+function drawBall() // draw da ball.
+{
+	
+	ctx.drawImage(ball, ballX - ballOffsetX, ballY - ballOffsetY, 120, 80); // 15 by 10 ~ 3 by 2
+}
+
+
+function update()
+{
+	
+
+	ballX += ballVelocity;
+	ballY -= ballVelocity;
+}
 
 $(document).ready(function(){
 	initialize();
 	window.onkeydown = keyPress;
 	//window.onkeyup = release;
+	window.setInterval(update, 16);
 	window.setInterval(drawGameBoard, 16); // draw the board.
 	window.setInterval(drawPaddle, 16);
+	window.setInterval(drawBall, 16);
 });
 
 
@@ -177,7 +197,7 @@ if([32, 37, 38, 39, 40].indexOf(e.keyCode) > -1) {
 	<img id="paddle2" src="images/Paddle2.png" alt="paddle1"
 	width="0" height="0">
 <!-- BALL SPRITE -->
-	<img id="scream" src="img_the_scream.jpg" alt="The Scream"
+	<img id="baller" src="images/Ball.png" alt="ball"
 	width="0" height="0">
 <!-- CANVAS BACKGROUND -->
 	<img id="bg" src="images/background.png" alt="bg"
@@ -198,17 +218,24 @@ if([32, 37, 38, 39, 40].indexOf(e.keyCode) > -1) {
 	<div class="row">
 	  <form class="col s12">
 	    <div class="row">
-	      <div class="input-field col s6">
+	      <div class="input-field col s4">
 	        <i class="mdi-action-account-circle prefix"></i>
 	        <input id='ip' name='ip' id="icon_prefix" type="text" class="validate">
 	        <label for="icon_prefix">Server IP:</label>
 	      </div>
 
-	      <div class="input-field col s6">
+	      <div class="input-field col s4">
 	        <i class="mdi-communication-phone prefix"></i>
 	        <input id='port' name='port' id="icon_telephone" type="text" class="validate">
 	        <label for="icon_telephone">Server Port:</label>
 	      </div>
+
+		<div class="col s4">
+	       <a onClick="connect()" class="waves-effect waves-light btn"><i class="mdi-file-cloud left"></i>Connect</a>
+
+
+	      </div>
+	     
 	    </div>
 	  </form>
 	</div>
@@ -216,7 +243,7 @@ if([32, 37, 38, 39, 40].indexOf(e.keyCode) > -1) {
 
 <!-- Hit the button to "begin" -->
 <div class="container valign-wrapper"> <!-- Valign wrapper auto-centers -->
- <button class="btn red waves-effect waves-light" onclick="initialize()" type="submit" name="action">LET US PLAY PONG! <i class="mdi-content-send right"></i> 
+ <button class="btn red waves-effect waves-light" onclick="" type="submit" name="action">LET US PLAY PONG! <i class="mdi-content-send right"></i> 
   </button> 
 </div>
 
@@ -249,6 +276,7 @@ if([32, 37, 38, 39, 40].indexOf(e.keyCode) > -1) {
 	<script>
 		var Server;
 
+
 		function log( text ) {
 			$log = $('#log');
 			//Add text to log
@@ -261,8 +289,8 @@ if([32, 37, 38, 39, 40].indexOf(e.keyCode) > -1) {
 			Server.send( 'message', text );
 		}
 
-        function connect(){
-            log('Connecting...');
+       	 function connect(){
+            console.log("Connecting...");
 			Server = new FancyWebSocket('ws://' + document.getElementById('ip').value + ':' + document.getElementById('port').value);
 
 			$('#message').keypress(function(e) {
