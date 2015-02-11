@@ -15,7 +15,6 @@
 	<script src="https://code.jquery.com/jquery-2.1.1.min.js"></script>
 
  	<script> // Drawing script! 
-
 	 	// SET canvas properties here.
 
 		var cWidth; // Width of the canvas.
@@ -152,11 +151,11 @@
 		initialize();
 		window.onkeydown = keyPress;
 		//window.onkeyup = release;
-		window.setInterval(update, 16);
-		window.setInterval(drawGameBoard, 16); // draw the board.
-		window.setInterval(drawPaddle, 16);
-		window.setInterval(drawBall, 16);
-		window.setInterval(refreshStats, 16); // refreshes stats.
+		window.setInterval(update, 33);
+		window.setInterval(drawGameBoard, 33); // draw the board.
+		window.setInterval(drawPaddle, 33);
+		window.setInterval(drawBall, 33);
+		window.setInterval(refreshStats, 33); // refreshes stats.
 	});
 
 	function keyPress(e)
@@ -349,7 +348,8 @@
 
 			//Let the user know we're connected
 			Server.bind('open', function() {
-				console.log( "Connected." );
+			    console.log("Connected.");
+			    send("Name:" + document.getElementById('name').val);
 			});
 
 			//OH NOES! Disconnection occurred.
@@ -358,7 +358,8 @@
 			});
 
 			//Log any messages sent from server
-			Server.bind('message', function( payload ) {
+			Server.bind('message', function (payload) {
+			    console.log("Received Message: " + payload);
 			    typeStr = payload.substring(0, 2);
 			    dataStr = payload.substring(2);
 			    if( typeStr === "pp")
@@ -398,7 +399,6 @@
 			});
 
 			Server.connect();
-			send("Name:" + document.getElementById('name').val);
         }
 
 	</script>

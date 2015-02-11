@@ -130,7 +130,7 @@ void sendPlayerInfo()
 /* called once per select() loop */
 void periodicHandler(){
 	PlayerManager::consecutive_hits++;
-    static time_t next = time(NULL) + REFRESH_RATE;
+	static time_t next = time(NULL) + 10;// +REFRESH_RATE;
 	time_t current = time(NULL);
 	if (gameStarted)
 	{
@@ -143,7 +143,7 @@ void periodicHandler(){
 		}
 	}
 
-	next = time(NULL) + REFRESH_RATE;
+	next = time(NULL) + 10;// +REFRESH_RATE;
 }
 
 void startGame()
