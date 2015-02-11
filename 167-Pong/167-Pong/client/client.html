@@ -15,6 +15,12 @@
 	<script src="https://code.jquery.com/jquery-2.1.1.min.js"></script>
 
  	<script> // Drawing script! 
+	 	
+ 		// Temporary server variables:
+ 		var tempIP;
+ 		var tempPort;
+ 		var name;
+
 	 	// SET canvas properties here.
 
 		var cWidth; // Width of the canvas.
@@ -59,6 +65,12 @@
 	function initialize() { 
 
 		connected = false; // you are not connected to server.
+
+		// Debug stuff.
+
+		tempIP = "127.0.0.1";
+ 		tempPort = "8080";
+ 		name = "Nick";
 
  		// SET BACKGROUND canvas dimensions here.
 	 	cWidth = 1200;
@@ -262,20 +274,20 @@
 	    <div class="row">
 	      <div class="input-field col s3">
 	        <i class="mdi-action-account-circle prefix"></i>
-	        <input id='ip' name='ip' id="icon_prefix" type="text" class="validate">
-	        <label for="icon_prefix">Server IP:</label>
+	        <input id='ip' name='ip' id="icon_prefix" type="text" class="validate" value='127.0.0.1'> 
+	        <label for="icon_prefix">Server IP: (127.0.0.1)</label>
 	      </div>
 
 	      <div class="input-field col s3">
 	        <i class="mdi-communication-phone prefix"></i>
-	        <input id='port' name='port' id="icon_telephone" type="text" class="validate">
-	        <label for="icon_telephone">Server Port:</label>
+	        <input id='port' name='port' id="icon_telephone" type="text" class="validate" value="8080">
+	        <label for="icon_telephone">Server Port: (8080)</label>
 	      </div>
 
 	      <div class="input-field col s3">
 	        <i class="mdi-communication-phone prefix"></i>
-	        <input id='name' name='name' id="icon_telephone" type="text" class="validate">
-	        <label for="icon_telephone">User Name: (!)</label>
+	        <input id='name' name='name' id="icon_telephone" type="text" class="validate" value="Nick is Awesome">
+	        <label for="icon_telephone">User Name: (Nick)</label>
 	      </div>
 
 		<div class="col s3">
@@ -389,6 +401,7 @@
 
        	 function connect(){
             console.log("Connecting...to server.");
+          
 			Server = new FancyWebSocket('ws://' + document.getElementById('ip').value + ':' + document.getElementById('port').value);
 
 			//Let the user know we're connected
