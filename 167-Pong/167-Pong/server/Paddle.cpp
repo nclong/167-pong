@@ -1,9 +1,21 @@
 #include "Paddle.h"
 
-void moveUp(int delta_y = 1);
+void Paddle::moveUp()
+{
+	int next_pos = position.y - speed;
 
-int get_y_pos();
-int get_x_pos();
-bool isColliding(Ball ball);
+	if (next_pos >= 0)
+		position.y = next_pos;
+}
+
+void Paddle::moveDown()
+{
+	int next_pos = position.y + speed;
+
+	if(next_pos + height <= SCREEN_HEIGHT)
+		position.y = next_pos;
+
+}
+
 
 

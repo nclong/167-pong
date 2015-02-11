@@ -6,6 +6,7 @@ class Entity
 public:
 	Vector2 position;
 	Entity();
+	Entity(Vector2 pos, int w, int h, std::string name) : position(pos), width(w), height(h), name(name) {};
 	~Entity();
 
 	std::string name;
