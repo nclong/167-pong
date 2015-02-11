@@ -29,7 +29,7 @@
 		}
 
         function connect(){
-            log('Connecting...');
+            console.log('Connecting...');
 			Server = new FancyWebSocket('ws://' + document.getElementById('ip').value + ':' + document.getElementById('port').value);
 
 			$('#message').keypress(function(e) {
