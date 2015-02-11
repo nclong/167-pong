@@ -2,7 +2,6 @@
 <html>
 <head>
 	<meta charset='UTF-8' />
-
 	<meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
   	<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1.0, user-scalable=no"/>
   	<title>Space Pong : By VGDC</title>
@@ -13,184 +12,158 @@
   	<link href="css/client.css" type="text/css" rel="stylesheet"/>
   	<link rel="icon" type="image/png" href="favicon.ico"/> 
   	<!-- REPLACE WITH YOUR OWN-->
+	<script src="https://code.jquery.com/jquery-2.1.1.min.js"></script>
 
-  <script src="https://code.jquery.com/jquery-2.1.1.min.js"></script>
+ 	<script> // Drawing script! 
 
- <script> // Drawing script! 
+	 	// SET canvas properties here.
 
-
- // RequestAnimFrame: a browser API for getting smooth animations
-
-
- // SET canvas properties here.
-var cWidth;
-var cHeight;
-var display; // get a permanent reference to the permanent stuff.
-var ctx; // the permanent display
+		var cWidth; // Width of the canvas.
+		var cHeight; // Height of the canvas.
+		var display; // reference to the canvas.
+		var ctx; // brush.
 
 
-var paddleOffset;
-// game variables
-var stepsize;
-var player1Position;
-var player1;
+		
+		// game variables
 
-var ballVelocity;
-var ballX;
-var ballY;
-var ballOffsetX;
-var ballOffsetY;
+		var stepsize; // The distance the paddle travels.
+		var player1Position; // position of player one paddle.
+		var player1; // reference to player1 sprite.
+		var paddleOffset; // offset for the paddle sprite.
 
-
-// Image
-
-var board; 
-var borderTop; 
-var borderRight; 
-var borderLeft; 
-var borderBottom; 
-var ball;
+		var ballVelocity; // Velocity of the ball
+		var ballX; // Ball location X
+		var ballY; // Ball location Y
+		var ballOffsetX; // Offset for ball sprite X
+		var ballOffsetY; // Offset for ball sprite Y
 
 
-function initialize() { // Drawing the start button
+		// image links
+
+		var board; // Main game board sprite
+		var borderTop;  // border of top sprite
+		var borderRight;  // right border sprite
+		var borderLeft; // left border sprite
+		var borderBottom;  // bottom border sprite
+		var ball; // ball sprite
+
+		// Initialize all variables.
+
+	function initialize() { 
+ 		// SET BACKGROUND canvas dimensions here.
+	 	cWidth = 1200;
+	 	cHeight = 500;
+
+	 	// Bind display to the canvas, and get my brush.
+	 	display = document.getElementById("myCanvas"); // myCanvas 
+	 	ctx = display.getContext("2d"); // 2D, display.
+
+		// Set stepsize here.
+		stepsize = 30; // change as necessary.
+		player1Position = cHeight/2;// always starts at the center.
+
+		// Get my sprites.
+ 		board = document.getElementById("bg");
+ 		borderTop = document.getElementById("top-Border");
+ 		borderRight = document.getElementById("right-Border"); 
+ 		borderLeft = document.getElementById("right-Border"); // use the same!
+ 		borderBottom = document.getElementById("bottom-Border");
+ 		player1 = document.getElementById("paddle1");
+ 		ball = document.getElementById("baller");
+
+ 		// Set my sprite offsets here.
+		paddleOffset = 100;
+		ballOffsetX = 10;
+ 		ballOffsetY = 10;
+
+ 		// Specify ball starting position and velocity
+ 		ballVelocity = 10;
+ 		ballX = cWidth/2;
+ 		ballY = cHeight/2;
 	
- // SET BACKGROUND canvas properties here.
-	 cWidth = 1200;
-	 cHeight = 500;
-
-// Set stepsize here.
-	stepsize = 30; // change as necessary.
-	player1Position = cHeight/2;// always starts at the center.
-	var tempString = "Space jam."; // set this temporarily
-// Offsets here.
-
-	paddleOffset = 100;
-
-	display = document.getElementById("myCanvas"); // get a reference
- 	ctx = display.getContext("2d");
- 	
-
-	ctx.font = "30px Arial";
-	ctx.fillText(tempString,cWidth/2 - (tempString.length*9),cHeight/2);
-
-// Draw the...  paddle
-// Draw paddle2
- // var player2 = "images/paddle_blue.png";
- 	var player2 = document.getElementById("paddle2");
-	ctx.drawImage(player2, cWidth-100,(cHeight/2) - paddleOffset, 30, 100);
-
- board = document.getElementById("bg");
- borderTop = document.getElementById("top-Border");
- borderRight = document.getElementById("right-Border"); 
- borderLeft = document.getElementById("right-Border"); // use the same!
- borderBottom = document.getElementById("bottom-Border");
-
- player1 = document.getElementById("paddle1");
- ball = document.getElementById("baller");
-
- ballVelocity = 10;
- ballX = cWidth/2;
- ballY = cHeight/2;
- ballOffsetX = 10;
- ballOffsetY = 10;
-	
-drawGameBoard(); 
+		// Draw the game board.
+		drawGameBoard(); 
 }
 // 	
 
 
-function drawGameBoard() // draws all the static elements.
-{
-
-ctx.drawImage(board, 0, 0, 1200, 500); // 0,0 width = 1200, height is 500 
-ctx.drawImage(borderRight, 1180, 0, 20, 500);
-ctx.drawImage(borderLeft, 0, 0, 20, 500);
-ctx.drawImage(borderTop, 0, 0, 1200, 20); 
-ctx.drawImage(borderBottom, 0, 480, 1200, 20);
-
-// drawPaddle(); // draw the paddle.
-
-}
-
-function drawPaddle() // the value we get 
-{
-	 //mtx.clearRect(0, 0, cWidth, cHeight);
-	ctx.drawImage(player1, 20, player1Position, 30, 100);
-}
-
-function movePaddleUp()
-{
-	console.log("paddle Up command");
-	 
-	if(player1Position-stepsize > 0)
+	function drawGameBoard() // draws all the static elements.
 	{
-		console.log("move up");
-		player1Position-=stepsize;
+		ctx.drawImage(board, 0, 0, 1200, 500); 
+		ctx.drawImage(borderRight, 1180, 0, 20, 500);
+		ctx.drawImage(borderLeft, 0, 0, 20, 500);
+		ctx.drawImage(borderTop, 0, 0, 1200, 20); 
+		ctx.drawImage(borderBottom, 0, 480, 1200, 20);
 	}
 
-}
+	function drawPaddle() // the value we get 
+	{
+		 //mtx.clearRect(0, 0, cWidth, cHeight);
+		ctx.drawImage(player1, 20, player1Position, 30, 100);
+	}
 
-function movePaddleDown()
-{
-	if(player1Position+stepsize+100 < cHeight) // 500
-		player1Position+=stepsize;
-}
+	function movePaddleUp()
+	{
+		console.log("Paddle Up");
+		 
+		if(player1Position-stepsize > 0)
+		{
+			player1Position-=stepsize;
+		}
+	}
 
-function drawBall() // draw da ball.
-{
-	
-	ctx.drawImage(ball, ballX - ballOffsetX, ballY - ballOffsetY, 120, 80); // 15 by 10 ~ 3 by 2
-}
+	function movePaddleDown()
+	{
+		console.log("Paddle Down");
 
+		if(player1Position+stepsize+100 < cHeight) // 500
+			player1Position+=stepsize;
+	}
 
-function update()
-{
-	
+	function drawBall() // draw da ball.
+	{
+		
+		ctx.drawImage(ball, ballX-ballOffsetX, ballY-ballOffsetY, 120, 80);
+	}
 
-	ballX += ballVelocity;
-	ballY -= ballVelocity;
-}
+	function update()
+	{
+		ballX += ballVelocity;
+		ballY -= ballVelocity;
+	}
 
-$(document).ready(function(){
-	initialize();
-	window.onkeydown = keyPress;
-	//window.onkeyup = release;
-	window.setInterval(update, 16);
-	window.setInterval(drawGameBoard, 16); // draw the board.
-	window.setInterval(drawPaddle, 16);
-	window.setInterval(drawBall, 16);
-});
+	$(document).ready(function(){
+		initialize();
+		window.onkeydown = keyPress;
+		//window.onkeyup = release;
+		window.setInterval(update, 16);
+		window.setInterval(drawGameBoard, 16); // draw the board.
+		window.setInterval(drawPaddle, 16);
+		window.setInterval(drawBall, 16);
+	});
 
+	function keyPress(e)
+	{
+		console.log("Keypressed");
+	if([32, 37, 38, 39, 40].indexOf(e.keyCode) > -1) {
+	        e.preventDefault();
+	    }
 
-
-function keyPress(e)
-{
-
-if([32, 37, 38, 39, 40].indexOf(e.keyCode) > -1) {
-        e.preventDefault();
-    }
-
-	if(e.keyCode == 38) {
-        //alert('Up was pressed');
-        movePaddleUp();
-       
-    }
-    else if(e.keyCode == 40) {
-        //alert('Down was pressed');
-        movePaddleDown();
-        
-    }
-}
-
-
-
+		if(e.keyCode == 38) {
+	        movePaddleUp();
+	       
+	    }
+	    else if(e.keyCode == 40) {
+	        movePaddleDown();
+	    }
+	}
 </script>
 </head>
 
 <body class="grey lighten-3">
 
 <!-- PUT THE CLIENT SIDE ASSETS HERE -->
-<!-- THEY DO NOT DISPLAY -->
 <!-- PADDLE SPRITE -->
 	<img id="paddle1" src="images/Paddle.png" alt="paddle1"
 	width="0" height="0">
@@ -235,7 +208,7 @@ if([32, 37, 38, 39, 40].indexOf(e.keyCode) > -1) {
 
 
 	      </div>
-	     
+	     	
 	    </div>
 	  </form>
 	</div>
@@ -248,8 +221,8 @@ if([32, 37, 38, 39, 40].indexOf(e.keyCode) > -1) {
 </div>
 
 <div class="container valign-wrapper">
-			<canvas id="myCanvas"  width="1200" height="500" style="border:4px solid #000000;">
-			</canvas>
+	<canvas id="myCanvas"  width="1200" height="500" style="border:4px solid #000000;">
+	</canvas>
 </div>
 
 
@@ -275,7 +248,6 @@ if([32, 37, 38, 39, 40].indexOf(e.keyCode) > -1) {
 	<script src="fancywebsocket.js"></script> <!-- NEED THIS -->
 	<script>
 		var Server;
-
 
 		function log( text ) {
 			$log = $('#log');
