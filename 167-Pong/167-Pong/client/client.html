@@ -9,66 +9,159 @@
   	<!-- MATERIALIZE CSS  -->
   	<link href="css/materialize.css" type="text/css" rel="stylesheet" media="screen,projection"/>
   	<link href="css/style.css" type="text/css" rel="stylesheet" media="screen,projection"/>
+  	<!-- my own css page -->
+  	<link href="css/client.css" type="text/css" rel="stylesheet"/>
   	<link rel="icon" type="image/png" href="favicon.ico"/> 
   	<!-- REPLACE WITH YOUR OWN-->
 
+  <script src="https://code.jquery.com/jquery-2.1.1.min.js"></script>
+
  <script> // Drawing script! 
 
+
+ // RequestAnimFrame: a browser API for getting smooth animations
+
+
  // SET canvas properties here.
-	var cWidth = 1200;
-	var cHeight = 500;
+var cWidth;
+var cHeight;
+var display; // get a permanent reference to the permanent stuff.
+var ctx; // the permanent display
+
+
+var paddleOffset;
+// game variables
+var stepsize;
+var player1Position;
+var player1;
+
+
+// Image
+
+var board; 
+var borderTop; 
+var borderRight; 
+var borderLeft; 
+var borderBottom; 
+
+
+function initialize() { // Drawing the start button
+	
+ // SET BACKGROUND canvas properties here.
+	 cWidth = 1200;
+	 cHeight = 500;
 
 // Set stepsize here.
-	var stepsize = 10; // change as necessary.
+	stepsize = 30; // change as necessary.
+	player1Position = cHeight/2;// always starts at the center.
+	var tempString = "Space jam."; // set this temporarily
 
-	var player1Location = cHeight/2; // always starts at the center.
+	player1 = document.getElementById("paddle1");
+// Offsets here.
 
-// When we change the location, we edit this.
-// var player2Location
+	paddleOffset = 100;
 
-var tempString = "SLKDFJLKSDJFSLKDFJSLKJDLFSKDJFLKSDFJSLK"; // set this temporarily
-function myCanvasInit() { // initialize stuff.
-	
-var display = document.getElementById("myCanvas"); // get a permanent reference
-var ctx = display.getContext("2d");
- //var player1 = "images/paddle_blue.png";
- //var player2 = "images/paddle_blue.png";
- //player1 = {sprite:"images/paddle_blue.png",x:0,y:0};
- // player2 = {sprite:"images/paddle_blue.png",x:0,y:0}; // even though we don't have one, ew.
- window.alert("testing");
-}
-}
-function printStart() { // Drawing the start button
-	var display = document.getElementById("myCanvas"); // get a permanent reference
- var ctx = display.getContext("2d");
-ctx.font = "30px Arial";
-ctx.fillText(tempString,cWidth/2 - (tempString.length*9),cHeight/2);
+	display = document.getElementById("myCanvas"); // get a reference
+ 	ctx = display.getContext("2d");
+ 	
+
+	ctx.font = "30px Arial";
+	ctx.fillText(tempString,cWidth/2 - (tempString.length*9),cHeight/2);
 
 // Draw the...  paddle
-drawPaddle();
 // Draw paddle2
  // var player2 = "images/paddle_blue.png";
-ctx.drawImage(player2,cWidth-30,(cHeight/2) - paddleOffset);
+ 	var player2 = document.getElementById("paddle2");
+	ctx.drawImage(player2, cWidth-100,(cHeight/2) - paddleOffset, 30, 100);
 
+board = document.getElementById("bg");
+ borderTop = document.getElementById("top-Border");
+ borderRight = document.getElementById("right-Border"); 
+ borderLeft = document.getElementById("right-Border"); // use the same!
+ borderBottom = document.getElementById("bottom-Border");
+	
+drawGameBoard(); 
 }
 // 	
+
+
+function drawGameBoard() // draws all the static elements.
+{
+
+ctx.drawImage(board, 0, 0, 1200, 500); // 0,0 width = 1200, height is 500 
+ctx.drawImage(borderRight, 1180, 0, 20, 500);
+ctx.drawImage(borderLeft, 0, 0, 20, 500);
+ctx.drawImage(borderTop, 0, 0, 1200, 20); 
+ctx.drawImage(borderBottom, 0, 480, 1200, 20);
+
+// drawPaddle(); // draw the paddle.
+
+}
+
 function drawPaddle() // the value we get 
 {
-// Draw paddle1
-// var player1 = "images/paddle_blue.png";
-var paddleOffset = 30; // the image is not centered, use offset to compensate.
-ctx.drawImage(player1,10,player1Location - paddleOffset);
+	 //mtx.clearRect(0, 0, cWidth, cHeight);
+	ctx.drawImage(player1, 20, player1Position, 30, 100);
+}
+
+
+var ballVelocity;
+var ballX;
+var ballY;
+
+function drawBall() // draw da ball.
+{
+
 }
 
 function movePaddleUp()
 {
-	player1Location -= stepsize;
+	console.log("paddle Up command");
+	 
+	if(player1Position-stepsize > 0)
+	{
+		console.log("move up");
+		player1Position-=stepsize;
+	}
+
 }
 
 function movePaddleDown()
 {
-	player1Location += stepsize;
+	if(player1Position+stepsize+100 < cHeight) // 500
+		player1Position+=stepsize;
 }
+
+
+$(document).ready(function(){
+	initialize();
+	window.onkeydown = keyPress;
+	//window.onkeyup = release;
+	window.setInterval(drawGameBoard, 16); // draw the board.
+	window.setInterval(drawPaddle, 16);
+});
+
+
+
+function keyPress(e)
+{
+
+if([32, 37, 38, 39, 40].indexOf(e.keyCode) > -1) {
+        e.preventDefault();
+    }
+
+	if(e.keyCode == 38) {
+        //alert('Up was pressed');
+        movePaddleUp();
+       
+    }
+    else if(e.keyCode == 40) {
+        //alert('Down was pressed');
+        movePaddleDown();
+        
+    }
+}
+
 
 
 </script>
@@ -79,15 +172,21 @@ function movePaddleDown()
 <!-- PUT THE CLIENT SIDE ASSETS HERE -->
 <!-- THEY DO NOT DISPLAY -->
 <!-- PADDLE SPRITE -->
-	<img id="paddle1" src="images/paddle_blue.png" alt="paddle1"
+	<img id="paddle1" src="images/Paddle.png" alt="paddle1"
 	width="0" height="0">
-	<img id="paddle2" src="images/paddle_blue.png" alt="paddle1"
+	<img id="paddle2" src="images/Paddle2.png" alt="paddle1"
 	width="0" height="0">
 <!-- BALL SPRITE -->
 	<img id="scream" src="img_the_scream.jpg" alt="The Scream"
 	width="0" height="0">
 <!-- CANVAS BACKGROUND -->
-	<img id="scream" src="img_the_scream.jpg" alt="The Scream"
+	<img id="bg" src="images/background.png" alt="bg"
+	width="0" height="0">
+	<img id="bottom-Border" src="images/Bottom.png" alt="bg"
+	width="0" height="0">
+	<img id="top-Border" src="images/Top.png" alt="bg"
+	width="0" height="0">
+	<img id="right-Border" src="images/Right.png" alt="bg"
 	width="0" height="0">
 
 
@@ -117,16 +216,15 @@ function movePaddleDown()
 
 <!-- Hit the button to "begin" -->
 <div class="container valign-wrapper"> <!-- Valign wrapper auto-centers -->
- <button class="btn red waves-effect waves-light" onclick="printStart()" type="submit" name="action">LET US PLAY PONG! <i class="mdi-content-send right"></i> 
+ <button class="btn red waves-effect waves-light" onclick="initialize()" type="submit" name="action">LET US PLAY PONG! <i class="mdi-content-send right"></i> 
   </button> 
 </div>
 
 <div class="container valign-wrapper">
-<canvas id="myCanvas"  width="1200" height="500"
-style="border:4px solid #000000;">
-Your browser does not support the HTML5 canvas tag.
-</canvas>
+			<canvas id="myCanvas"  width="1200" height="500" style="border:4px solid #000000;">
+			</canvas>
 </div>
+
 
 
 <!-- Footer -->
@@ -144,7 +242,6 @@ Your browser does not support the HTML5 canvas tag.
   </footer>
 
   <!--OTHER Scripts-->
-  <script src="https://code.jquery.com/jquery-2.1.1.min.js"></script>
   <script src="js/materialize.js"></script>
   <script src="js/init.js"></script>
 
