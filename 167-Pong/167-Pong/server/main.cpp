@@ -7,25 +7,35 @@
 #include "websocket.h"
 #include "Entity.h"
 #include "EntityManager.h"
+#include "Paddle.h"
 #include "Ball.h"
 #include "Wall.h"
 #include "Constants.h"
+#include "PlayerManager.h"
 
 using namespace std;
 
 webSocket server;
+bool gameStarted;
+Ball ball;
+Paddle paddle1;
+Wall topWall;
+Wall bottomWall;
+Wall rightWall;
+
 
 /* called when a client connects */
 void openHandler(int clientID){
-    ostringstream os;
-    os << "Stranger " << clientID << " has joined.";
+    //ostringstream os;
+    //os << "Stranger " << clientID << " has joined.";
 
-    vector<int> clientIDs = server.getClientIDs();
-    for (int i = 0; i < clientIDs.size(); i++){
-        if (clientIDs[i] != clientID)
-            server.wsSend(clientIDs[i], os.str());
-    }
-    server.wsSend(clientID, "Welcome!");
+    //vector<int> clientIDs = server.getClientIDs();
+    //for (int i = 0; i < clientIDs.size(); i++){
+    //    if (clientIDs[i] != clientID)
+    //        server.wsSend(clientIDs[i], os.str());
+    //}
+    //server.wsSend(clientID, "Welcome!");
+	startGame();
 }
 
 /* called when a client disconnects */
@@ -50,59 +60,110 @@ void messageHandler(int clientID, string message){
     //    if (clientIDs[i] != clientID)
     //        server.wsSend(clientIDs[i], os.str());
 
+	Paddle* paddle;
+	for (int i = 0; i < EntityManager::AllEntities.size; ++i)
+	{
+		if (EntityManager::AllEntities[i].name.compare("Paddle1") == 0)
+		{
+			paddle = (Paddle*)&(EntityManager::AllEntities[i]);
+		}
+	}
 	if (message.compare("up") == 0 )
 	{
-		//Set Paddle Velocity to up
+		paddle->dir = paddle->MOVING_UP;
     }
 	else if (message.compare("down") == 0)
 	{
-		//Set Paddle Velocity to down
+		paddle->dir = paddle->MOVING_DOWN;
 	}
 }
 
 void sendPlayerInfo()
 {
 	vector<int> clientIDs = server.getClientIDs();
-	std::string paddleString;
+	std::string paddleString = "pp";
+	std::string ballPosString = "bp";
+	std::string ballVelString = "bv";
+	std::string consecScoreString = "cs" + to_string(PlayerManager::consecutive_hits);
+	std::string totalScoreString = "ts" + to_string(PlayerManager::score);
+	std::string totalOppString = "to" + to_string(PlayerManager::score + PlayerManager::failures);
 	//SEND PADDLE POS
+	for (int i = 0; EntityManager::AllEntities.size; ++i)
+	{
+		Entity* current = &EntityManager::AllEntities[i];
+		if (EntityManager::AllEntities[i].name.compare("Paddle1") == 0)
+		{
+			paddleString += to_string(current->position.y);
+		}
+
+		if (EntityManager::AllEntities[i].name.compare("Ball") == 0)
+		{
+			Ball* ball = (Ball*)current;
+			ballPosString += to_string(current->position.x) + "," + to_string(current->position.y);
+			ballVelString += to_string(ball->velocity.x) + "," + to_string(ball->velocity.y);
+		}
+	}
+
 	for (int i = 0; clientIDs.size(); ++i)
 	{
-		server.wsSend(clientIDs[i], )
+		server.wsSend(clientIDs[i], paddleString);
+		server.wsSend(clientIDs[i], ballPosString);
+		server.wsSend(clientIDs[i], ballVelString);
+		server.wsSend(clientIDs[i], consecScoreString);
+		server.wsSend(clientIDs[i], totalScoreString);
+		server.wsSend(clientIDs[i], totalOppString);
 	}
-	//SEND BALL POS
-	//SEND BALL VEL
-	//SEND CONSECUTIVE SCORE
-	//SEND TOTAL SCORE
-	//SEND TOTAL OPPORTUNITY SCORE
-	return;
 }
 
 /* called once per select() loop */
 void periodicHandler(){
     static time_t next = time(NULL) + REFRESH_RATE;
-    time_t current = time(NULL);
-    if (current >= next){
-		//ADD ENTITY UPDATES
-		//SEND PADDLE AND BALL POSITIONS
-		//SEND SCORES
-		for (int i = 0; i < EntityManager::AllEntities.size; ++i)
-		{
-			EntityManager::AllEntities[i].Update();
+	time_t current = time(NULL);
+	if (gameStarted)
+	{
+		if (current >= next){
+			for (int i = 0; i < EntityManager::AllEntities.size; ++i)
+			{
+				EntityManager::AllEntities[i].Update();
+			}
+			sendPlayerInfo();
 		}
-		sendPlayerInfo();
+	}
 
-        next = time(NULL) + REFRESH_RATE;
-    }
+	next = time(NULL) + REFRESH_RATE;
 }
 
 void startGame()
 {
 	//Start the gameplay
-	//EntityManager::AddEntity(new Ball(new Vector2(5, 10) "The Ball"));
-
+	ball.SetPos(SCREEN_WIDTH / 2, SCREEN_HEIGHT / 4);
+	ball.startingPos.x = SCREEN_WIDTH / 2;
+	ball.startingPos.y = SCREEN_WIDTH / 4;
+	ball.startingVel.x = -2;
+	ball.startingVel.y = 1;
+	ball.velocity.x = -2;
+	ball.velocity.y = 1;
+	paddle1.SetPos(0, SCREEN_HEIGHT / 2);
+	paddle1.dir = paddle1.NOT_MOVING;
+	topWall.SetPos(PADDLE_WIDTH, 0);
+	topWall.SetHeight(HORIZ_WALL_WIDTH);
+	topWall.SetWidth(HORIZ_WALL_HEIGHT);
+	bottomWall.SetPos(PADDLE_WIDTH, SCREEN_HEIGHT - HORIZ_WALL_HEIGHT);
+	bottomWall.SetHeight(HORIZ_WALL_HEIGHT);
+	bottomWall.SetWidth(HORIZ_WALL_WIDTH);
+	rightWall.SetPos(SCREEN_WIDTH - VERT_WALL_WIDTH, 0);
+	rightWall.SetHeight(VERT_WALL_HEIGHT);
+	rightWall.SetWidth(VERT_WALL_WIDTH);
+	EntityManager::AddEntity(ball);
+	EntityManager::AddEntity(paddle1);
+	EntityManager::AddEntity(topWall);
+	EntityManager::AddEntity(bottomWall);
+	EntityManager::AddEntity(rightWall);
+	gameStarted = true;
 }
 
 int main(int argc, char *argv[]){
+	gameStarted = false;
     int port;
 
     cout << "Please set server port: ";
@@ -112,7 +173,7 @@ int main(int argc, char *argv[]){
     server.setOpenHandler(openHandler);
     server.setCloseHandler(closeHandler);
     server.setMessageHandler(messageHandler);
-    //server.setPeriodicHandler(periodicHandler);
+    server.setPeriodicHandler(periodicHandler);
 
     /* start the chatroom server, listen to ip '127.0.0.1' and port '8000' */
     server.startServer(port);

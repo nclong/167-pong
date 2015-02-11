@@ -638,8 +638,13 @@ void webSocket::wsAddClient(int socket, in_addr ip){
     if (socket > fdmax)
         fdmax = socket;
 
-    int clientID = wsGetNextClientID();
+	int clientID = wsGetNextClientID();
     wsClient *newClient = new wsClient(socket, ip);
+	if (clientID >= 1)
+	{
+		wsSend(clientID, "Game Denied: Player already active.");
+		return;
+	}
     if (clientID >= wsClients.size()){
         wsClients.push_back(newClient);
     }

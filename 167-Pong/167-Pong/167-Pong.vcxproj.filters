@@ -30,9 +30,6 @@
     <ClCompile Include="server\websocket.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="Paddle.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="server\Ball.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
@@ -45,7 +42,13 @@
     <ClCompile Include="server\EntityManager.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="Wall.cpp">
+    <ClCompile Include="server\PlayerManager.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="server\Paddle.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="server\Wall.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
@@ -57,9 +60,6 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="server\websocket.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="Paddle.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="server\Ball.h">
@@ -74,10 +74,16 @@
     <ClInclude Include="server\Vector2.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="Wall.h">
+    <ClInclude Include="server\Constants.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="server\Constants.h">
+    <ClInclude Include="server\PlayerManager.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="server\Paddle.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="server\Wall.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

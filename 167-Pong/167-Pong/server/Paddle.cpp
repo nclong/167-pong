@@ -4,7 +4,9 @@ void Paddle::moveUp()
 {
 	int next_pos = position.y - speed;
 
-	if (next_pos >= 0)
+	if (next_pos < 0)
+		position.y = 0;
+	else
 		position.y = next_pos;
 }
 
@@ -12,9 +14,47 @@ void Paddle::moveDown()
 {
 	int next_pos = position.y + speed;
 
-	if(next_pos + height <= SCREEN_HEIGHT)
+	if (next_pos + height > SCREEN_HEIGHT)
+		position.y = SCREEN_HEIGHT - height;
+	else
 		position.y = next_pos;
+}
 
+void Paddle::Update()
+{
+	if (dir == MOVING_UP)
+	{
+		moveUp();
+	}
+	else if (dir == MOVING_DOWN)
+	{
+		moveDown();
+	}
+}
+
+Vector2 Paddle::GetPos()
+{
+	return position;
+}
+void Paddle::SetPos(int x, int y)
+{
+	position.x = x; position.y = y;
+}
+int Paddle::GetWidth()
+{
+	return width;
+}
+int Paddle::GetHeight()
+{
+	return height;
+}
+void Paddle::SetWidth(int w)
+{
+	width = w;
+}
+void Paddle::SetHeight(int h)
+{
+	height = h;
 }
 
 

@@ -3,16 +3,19 @@
 class PlayerManager
 {
 public:
-	PlayerManager(std::string player_id, bool player_flag) : id(player_id), flag(player_flag), score(0), failures(0), consecutive_hits(0) {};
+	PlayerManager(){};
+	~PlayerManager(){};
 
-	void add_score();
-	void add_failure();
+	static void Init_PlayerManager();
 
-	std::string id;
-	bool flag;
-	int score;
-	int failures;
-	int consecutive_hits;
+	static void add_score();
+	static void add_failure();
+
+	static std::string id;
+	static bool flag;
+	static int score;
+	static int failures;
+	static int consecutive_hits;
 
 };
 

@@ -26,6 +26,15 @@ Ball::Ball(Vector2 initialPosition, std::string startName)
 	name = startName;
 }
 
+Vector2 Ball::GetPos()
+{
+	return position;
+}
+void Ball::SetPos(int x, int y)
+{
+	position.x = x;
+	position.y = y;
+}
 void Ball::Update()
 {
 	position += velocity;
