@@ -207,7 +207,7 @@
 	{
 		console.log("Function: set score.");
 		var scoreSet = document.getElementById("score");
-		score.innerHTML = s;
+		scoreSet.innerHTML = s;
 	}
 
 	function setOpportunity(o)
@@ -396,6 +396,7 @@
 		function disconnect(){
 			 console.log("Disconnecting from server.");
 			 Server.send("close");
+			 connected = false;
 
 			}
 
