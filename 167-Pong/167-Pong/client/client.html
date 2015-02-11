@@ -36,6 +36,12 @@
 		var ballOffsetX; // Offset for ball sprite X
 		var ballOffsetY; // Offset for ball sprite Y
 
+		// game statistics
+
+		var consecHits; // consecutive hits
+		var score; // the score of the players
+		var opportunity; // opportunities 
+
 
 		// image links
 
@@ -60,6 +66,12 @@
 		// Set stepsize here.
 		stepsize = 30; // change as necessary.
 		player1Position = cHeight/2;// always starts at the center.
+
+		// initialize stats variables
+
+		consecHits = 0; // consecutive hits
+		score = 0; // the score of the players
+		opportunity = 9000; // opportunities 
 
 		// Get my sprites.
  		board = document.getElementById("bg");
@@ -121,7 +133,6 @@
 
 	function drawBall() // draw da ball.
 	{
-		
 		ctx.drawImage(ball, ballX-ballOffsetX, ballY-ballOffsetY, 120, 80);
 	}
 
@@ -139,6 +150,7 @@
 		window.setInterval(drawGameBoard, 16); // draw the board.
 		window.setInterval(drawPaddle, 16);
 		window.setInterval(drawBall, 16);
+		window.setInterval(refreshStats, 16); // refreshes stats.
 	});
 
 	function keyPress(e)
@@ -179,7 +191,16 @@
 	function incrementOpportunity()
 	{
 		var opp = document.getElementById("opp");
-		opp.innerHTML++;
+		opp.innerHTML++; 
+		// doesn't actually increment the stats, just for fun
+	}
+
+	function refreshStats() // refreshes stats board.
+	{
+		setConsecutiveHits(consecHits)
+		setScore(score);
+		setOpportunity(opportunity);
+		
 	}
 
 </script>
@@ -254,11 +275,11 @@
 
 <div id="game" class="row">
 	<div class="col s4">
-	<a>Consecutive Hits<span id="hit" class="badge">1</span></a></div>
+	<a>Consecutive Hits<span id="hit" class="badge"></span></a></div>
 	<div class="col s4">
-	<a>Score<span id="score" class="badge">1</span></a></div>
+	<a>Score<span id="score" class="badge"></span></a></div>
 	<div class="col s4">
-	<a>Opportunities<span id="opp" class="new badge">9000</span></a></div>
+	<a>Opportunities<span id="opp" class="new badge"></span></a></div>
 </div>
 </div>
 
