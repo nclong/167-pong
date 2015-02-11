@@ -24,6 +24,8 @@
 
 		// game variables
 
+		var connected;
+
 		var stepsize; // The distance the paddle travels.
 		var player1Position; // position of player one paddle.
 		var player1; // reference to player1 sprite.
@@ -55,6 +57,9 @@
 		// Initialize all variables.
 
 	function initialize() { 
+
+		connected = false; // you are not connected to server.
+
  		// SET BACKGROUND canvas dimensions here.
 	 	cWidth = 1200;
 	 	cHeight = 500;
@@ -95,6 +100,9 @@
 	
 		// Draw the game board.
 		drawGameBoard(); 
+
+		// Update the initial connection status.
+		//connectionToggle();
 }
 // 	
 
@@ -156,6 +164,7 @@
 		window.setInterval(drawPaddle, 33);
 		window.setInterval(drawBall, 33);
 		window.setInterval(refreshStats, 33); // refreshes stats.
+		// window.setInterval(connectionToggle, 3000); // updates every 3 s.
 	});
 
 	function keyPress(e)
@@ -177,27 +186,37 @@
 
 	function setConsecutiveHits(i)
 	{
-		var consecHits = document.getElementById("hit");
-		consecHits.innerHTML = i; 
+		console.log("Function: set consecutive hits.");
+		var consecHitsSet = document.getElementById("hit");
+		consecHitsSet.innerHTML = i; 
 	}
 
 	function setScore(s)
 	{
-		var score = document.getElementById("score");
+		console.log("Function: set score.");
+		var scoreSet = document.getElementById("score");
 		score.innerHTML = s;
 	}
 
 	function setOpportunity(o)
 	{
-		var opp = document.getElementById("opp");
+		console.log("Function: set opportunity.");
+		var oppSet = document.getElementById("opp");
 		opp.innerHTML = o;
+	}
+
+	function incrementScore()
+	{
+		console.log("Function: increment score.");
+		var oppSet = document.getElementById("opp");
+		oppSet.innerHTML = score; 
 	}
 
 	function incrementOpportunity()
 	{
-		var opp = document.getElementById("opp");
-		opp.innerHTML++; 
-		// doesn't actually increment the stats, just for fun
+		console.log("Function: increment opportunity.");
+		var oppSet = document.getElementById("opp");
+		oppSet.innerHTML++; 
 	}
 
 	function refreshStats() // refreshes stats board.
@@ -260,7 +279,7 @@
 	      </div>
 
 		<div class="col s3">
-	       <a onClick="connect()" class="waves-effect waves-light btn"><i class="mdi-file-cloud left"></i>Connect</a>
+	       <a id="toggleConnection" onClick="connectionToggle()" class="waves-effect waves-light btn"><i class="mdi-file-cloud left"></i>Connect</a>
 
 
 	      </div>
@@ -340,16 +359,46 @@
 
 		function send( text ) {
 			Server.send( 'message', text );
+			console.log("Message sent:" + text);
 		}
 
+		function connectionToggle() {
+			if (connected) // if we are connectd
+			{
+				console.log("Currently connected - changing to d/c.")
+				var c = document.getElementById("toggleConnect");
+				disconnect(); // run disconnect.
+				c.innerHTML = "Connect."
+			}
+			else if (!connected) // if not connected.
+			{
+				console.log("Currently not connected - changing to connect.")
+				var c = document.getElementById("toggleConnection");
+				connect(); // run connect.
+				c.innerHTML = "Connecting..."
+
+			}
+
+		}
+
+		function disconnect(){
+			 console.log("Disconnecting from server.");
+			 Server.send("close");
+
+			}
+
        	 function connect(){
-            console.log("Connecting...");
+            console.log("Connecting...to server.");
 			Server = new FancyWebSocket('ws://' + document.getElementById('ip').value + ':' + document.getElementById('port').value);
 
 			//Let the user know we're connected
 			Server.bind('open', function() {
-			    console.log("Connected.");
+			    console.log("Connected to server.");
 			    send("Name:" + document.getElementById('name').val);
+			    connected = true; // set this to true.
+			    var c = document.getElementById("toggleConnection");
+			    c.innerHTML = "Connected! (Press to D/C)"
+
 			});
 
 			//OH NOES! Disconnection occurred.
@@ -365,11 +414,13 @@
 			    if( typeStr === "pp")
 			    {
                     // Set paddle position.
+                    console.log("Message: Paddle Position Update");
                     player1Position = dataStr;
 			    }
 			    else if( typeStr === "bp" )
 			    {	
 			    	// Set the ball position.
+			    	console.log("Message: Ball Position Update");
 			        var xStr = dataStr(0, dataStr.indexOf(","));
 			        var yStr = dataStr(dataStr.indexOf(",")+1);
 			        ballX = xStr;
@@ -378,6 +429,7 @@
 			    else if( typeStr === "bv" )
 			    {
 			    	// Set the ball velocity.
+			    	console.log("Message: Ball Velocity Update");
 			        var xStr = dataStr(0, dataStr.indexOf(","));
 			        var yStr = dataStr(dataStr.indexOf(",")+1);
 			        ballVelocityX = xStr;
