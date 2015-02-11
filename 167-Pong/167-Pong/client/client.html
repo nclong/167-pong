@@ -12,15 +12,141 @@
   	<link rel="icon" type="image/png" href="favicon.ico"/> 
   	<!-- REPLACE WITH YOUR OWN-->
 
+ <script> // Drawing script! 
 
-  	<script> // Drawing script! 
-function myCanvas() { // Draw stuff.
-    var c = document.getElementById("myCanvas");
-    var ctx = c.getContext("2d");
-    var img = document.getElementById("pongTemp");
-    ctx.drawImage(img,10,10);
+ // SET canvas properties here.
+	var cWidth = 1200;
+	var cHeight = 500;
+
+// Set stepsize here.
+	var stepsize = 10; // change as necessary.
+
+	var player1Location = cHeight/2; // always starts at the center.
+
+// When we change the location, we edit this.
+// var player2Location
+
+var tempString = "SLKDFJLKSDJFSLKDFJSLKJDLFSKDJFLKSDFJSLK"; // set this temporarily
+function myCanvasInit() { // initialize stuff.
+	
+var display = document.getElementById("myCanvas"); // get a permanent reference
+var ctx = display.getContext("2d");
+ //var player1 = "images/paddle_blue.png";
+ //var player2 = "images/paddle_blue.png";
+ //player1 = {sprite:"images/paddle_blue.png",x:0,y:0};
+ // player2 = {sprite:"images/paddle_blue.png",x:0,y:0}; // even though we don't have one, ew.
+ window.alert("testing");
 }
+}
+function printStart() { // Drawing the start button
+	var display = document.getElementById("myCanvas"); // get a permanent reference
+ var ctx = display.getContext("2d");
+ctx.font = "30px Arial";
+ctx.fillText(tempString,cWidth/2 - (tempString.length*9),cHeight/2);
+
+// Draw the...  paddle
+drawPaddle();
+// Draw paddle2
+ // var player2 = "images/paddle_blue.png";
+ctx.drawImage(player2,cWidth-30,(cHeight/2) - paddleOffset);
+
+}
+// 	
+function drawPaddle() // the value we get 
+{
+// Draw paddle1
+// var player1 = "images/paddle_blue.png";
+var paddleOffset = 30; // the image is not centered, use offset to compensate.
+ctx.drawImage(player1,10,player1Location - paddleOffset);
+}
+
+function movePaddleUp()
+{
+	player1Location -= stepsize;
+}
+
+function movePaddleDown()
+{
+	player1Location += stepsize;
+}
+
+
 </script>
+</head>
+
+<body class="grey lighten-3">
+
+<!-- PUT THE CLIENT SIDE ASSETS HERE -->
+<!-- THEY DO NOT DISPLAY -->
+<!-- PADDLE SPRITE -->
+	<img id="paddle1" src="images/paddle_blue.png" alt="paddle1"
+	width="0" height="0">
+	<img id="paddle2" src="images/paddle_blue.png" alt="paddle1"
+	width="0" height="0">
+<!-- BALL SPRITE -->
+	<img id="scream" src="img_the_scream.jpg" alt="The Scream"
+	width="0" height="0">
+<!-- CANVAS BACKGROUND -->
+	<img id="scream" src="img_the_scream.jpg" alt="The Scream"
+	width="0" height="0">
+
+
+
+<h1 class="center"> Space Pong </h1> <!-- Header -->
+
+<!-- Input client IP and other things here -->
+<div class="container valign-wrapper">
+	<div class="row">
+	  <form class="col s12">
+	    <div class="row">
+	      <div class="input-field col s6">
+	        <i class="mdi-action-account-circle prefix"></i>
+	        <input id='ip' name='ip' id="icon_prefix" type="text" class="validate">
+	        <label for="icon_prefix">Server IP:</label>
+	      </div>
+
+	      <div class="input-field col s6">
+	        <i class="mdi-communication-phone prefix"></i>
+	        <input id='port' name='port' id="icon_telephone" type="text" class="validate">
+	        <label for="icon_telephone">Server Port:</label>
+	      </div>
+	    </div>
+	  </form>
+	</div>
+</div>
+
+<!-- Hit the button to "begin" -->
+<div class="container valign-wrapper"> <!-- Valign wrapper auto-centers -->
+ <button class="btn red waves-effect waves-light" onclick="printStart()" type="submit" name="action">LET US PLAY PONG! <i class="mdi-content-send right"></i> 
+  </button> 
+</div>
+
+<div class="container valign-wrapper">
+<canvas id="myCanvas"  width="1200" height="500"
+style="border:4px solid #000000;">
+Your browser does not support the HTML5 canvas tag.
+</canvas>
+</div>
+
+
+<!-- Footer -->
+  <footer class="grey darken-4">
+    <div class="container">
+      <div class="row"> 
+      <p class="flow-text white-text">Made with love from VGDC</p>
+      </div>
+    </div>
+    <div class="footer-copyright">
+      <div class="container">
+      This site was made with <a class="orange-text lighten-3" href="http://materializecss.com">Materialize.</a> Please check out their work!
+      </div>
+    </div>
+  </footer>
+
+  <!--OTHER Scripts-->
+  <script src="https://code.jquery.com/jquery-2.1.1.min.js"></script>
+  <script src="js/materialize.js"></script>
+  <script src="js/init.js"></script>
 
 	<script src="fancywebsocket.js"></script> <!-- NEED THIS -->
 	<script>
@@ -72,67 +198,6 @@ function myCanvas() { // Draw stuff.
         }
 
 	</script>
-</head>
-
-<body>
-
-
-<h1 class="center"> Space Pong </h1> <!-- Header -->
-
-<!-- Input client IP and other things here -->
-<div class="container valign-wrapper">
-	<div class="row">
-	  <form class="col s12">
-	    <div class="row">
-	      <div class="input-field col s6">
-	        <i class="mdi-action-account-circle prefix"></i>
-	        <input id='ip' name='ip' id="icon_prefix" type="text" class="validate">
-	        <label for="icon_prefix">Server IP:</label>
-	      </div>
-
-	      <div class="input-field col s6">
-	        <i class="mdi-communication-phone prefix"></i>
-	        <input id='port' name='port' id="icon_telephone" type="text" class="validate">
-	        <label for="icon_telephone">Server Port:</label>
-	      </div>
-	    </div>
-	  </form>
-	</div>
-</div>
-
-<!-- Hit the button to "begin" -->
-<div class="container valign-wrapper"> <!-- Valign wrapper auto-centers -->
- <button class="btn red waves-effect waves-light" onclick="myCanvas()" type="submit" name="action">LET US PLAY PONG! <i class="mdi-content-send right"></i> 
-  </button> 
-</div>
-
-<div class="container valign-wrapper">
-<canvas id="myCanvas"  width="1200" height="400"
-style="border:4px solid #000000;">
-Your browser does not support the HTML5 canvas tag.
-</canvas>
-</div>
-
-
-<!-- Footer -->
-  <footer class="grey darken-4">
-    <div class="container">
-      <div class="row"> 
-      <p class="flow-text white-text">Made with love from VGDC</p>
-      </div>
-    </div>
-    <div class="footer-copyright">
-      <div class="container">
-      This site was made with <a class="orange-text lighten-3" href="http://materializecss.com">Materialize.</a> Please check out their work!
-      </div>
-    </div>
-  </footer>
-
-  <!--OTHER Scripts-->
-  <script src="https://code.jquery.com/jquery-2.1.1.min.js"></script>
-  <script src="js/materialize.js"></script>
-  <script src="js/init.js"></script>
-
      
 
 
