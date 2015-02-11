@@ -5,7 +5,9 @@ class Ball : Entity
 {
 	public:
 		Ball();
+		Ball(std::string startName);
 		Ball(Vector2 initialPosition);
+		Ball(Vector2 initialPosition, std::string startName);
 		~Ball();
 		Vector2 velocity;
 		int Speed();

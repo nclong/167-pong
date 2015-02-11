@@ -1,5 +1,6 @@
 #pragma once
 #include "Vector2.h"
+#include <string>
 class Entity
 {
 public:
@@ -7,6 +8,7 @@ public:
 	Entity();
 	~Entity();
 
+	std::string name;
 	int height;
 	int width;
 	int Top();
