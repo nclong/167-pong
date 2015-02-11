@@ -5,6 +5,11 @@
 #include <sstream>
 #include <time.h>
 #include "websocket.h"
+#include "Entity.h"
+#include "EntityManager.h"
+#include "Ball.h"
+#include "Wall.h"
+#include "Constants.h"
 
 using namespace std;
 
@@ -37,32 +42,64 @@ void closeHandler(int clientID){
 
 /* called when a client sends a message to the server */
 void messageHandler(int clientID, string message){
-    ostringstream os;
-    os << "Testing the Message Handler";
+    //ostringstream os;
+    //os << "Testing the Message Handler";
 
-    vector<int> clientIDs = server.getClientIDs();
-    for (int i = 0; i < clientIDs.size(); i++){
-        if (clientIDs[i] != clientID)
-            server.wsSend(clientIDs[i], os.str());
+    //vector<int> clientIDs = server.getClientIDs();
+    //for (int i = 0; i < clientIDs.size(); i++){
+    //    if (clientIDs[i] != clientID)
+    //        server.wsSend(clientIDs[i], os.str());
+
+	if (message.compare("up") == 0 )
+	{
+		//Set Paddle Velocity to up
     }
+	else if (message.compare("down") == 0)
+	{
+		//Set Paddle Velocity to down
+	}
+}
+
+void sendPlayerInfo()
+{
+	vector<int> clientIDs = server.getClientIDs();
+	std::string paddleString;
+	//SEND PADDLE POS
+	for (int i = 0; clientIDs.size(); ++i)
+	{
+		server.wsSend(clientIDs[i], )
+	}
+	//SEND BALL POS
+	//SEND BALL VEL
+	//SEND CONSECUTIVE SCORE
+	//SEND TOTAL SCORE
+	//SEND TOTAL OPPORTUNITY SCORE
+	return;
 }
 
 /* called once per select() loop */
 void periodicHandler(){
-    static time_t next = time(NULL) + 10;
+    static time_t next = time(NULL) + REFRESH_RATE;
     time_t current = time(NULL);
     if (current >= next){
-        ostringstream os;
-        string timestring = ctime(&current);
-        timestring = timestring.substr(0, timestring.size() - 1);
-        os << timestring;
+		//ADD ENTITY UPDATES
+		//SEND PADDLE AND BALL POSITIONS
+		//SEND SCORES
+		for (int i = 0; i < EntityManager::AllEntities.size; ++i)
+		{
+			EntityManager::AllEntities[i].Update();
+		}
+		sendPlayerInfo();
 
-        vector<int> clientIDs = server.getClientIDs();
-        for (int i = 0; i < clientIDs.size(); i++)
-            server.wsSend(clientIDs[i], os.str());
-
-        next = time(NULL) + 10;
+        next = time(NULL) + REFRESH_RATE;
     }
+}
+
+void startGame()
+{
+	//Start the gameplay
+	//EntityManager::AddEntity(new Ball(new Vector2(5, 10) "The Ball"));
+
 }
 
 int main(int argc, char *argv[]){

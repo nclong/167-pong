@@ -77,5 +77,16 @@
     <ClInclude Include="Wall.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="server\Constants.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="client\fancywebsocket.js">
+      <Filter>Client</Filter>
+    </None>
+    <None Include="client\chatroom_client.html">
+      <Filter>Client</Filter>
+    </None>
   </ItemGroup>
 </Project>

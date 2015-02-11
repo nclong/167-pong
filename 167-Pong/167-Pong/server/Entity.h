@@ -16,7 +16,5 @@ public:
 	int Left();
 	int Right();
 	void Update();
-
-
 };
 
