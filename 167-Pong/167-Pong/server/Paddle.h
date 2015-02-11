@@ -17,7 +17,7 @@ namespace
 class Paddle : Entity
 {
 public:
-	Paddle() : Entity(STARTING_POSITION, PADDLE_WIDTH, PADDLE_HEIGHT) {};
+	Paddle() : Entity(STARTING_POSITION, PADDLE_WIDTH, PADDLE_HEIGHT, "Paddle") {};
 
 	void moveUp(int delta_y = 1);
 
