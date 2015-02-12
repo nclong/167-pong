@@ -5,6 +5,7 @@
 #include <string>
 #include <sstream>
 #include <time.h>
+#include <chrono>
 #include "websocket.h"
 #include "Entity.h"
 #include "EntityManager.h"
@@ -13,6 +14,8 @@
 #include "Wall.h"
 #include "Constants.h"
 #include "PlayerManager.h"
+#include "PongTime.h"
+#include "LatencyManager.h"
 
 using namespace std;
 
@@ -23,6 +26,15 @@ Paddle paddle1;
 Wall topWall;
 Wall bottomWall;
 Wall rightWall;
+PongTime PacketSentFromServer;
+PongTime PacketReceivedAtClient;
+PongTime PacketSentFromClient;
+PongTime PacketReceivedAtServer;
+
+float latencyRatio;
+
+bool packetSent = false;
+bool packetReceived = false;
 
 void startGame();
 /* called when a client connects */
@@ -54,6 +66,11 @@ void closeHandler(int clientID){
 	gameStarted = false;
 }
 
+void updateLatencyInfo()
+{
+	static bool cycleComplete = true;
+}
+
 /* called when a client sends a message to the server */
 void messageHandler(int clientID, string message){
     //ostringstream os;
@@ -67,32 +84,104 @@ void messageHandler(int clientID, string message){
 
 	if (message.compare("up") == 0 )
 	{
+		latencyRatio = LatencyManager::AverageClientToServerLatency / (float)REFRESH_RATE;
+		if (paddle1.dir == paddle1.MOVING_DOWN)
+		{
+			paddle1.position.y -= (int)((float)PADDLE_SPEED * latencyRatio);
+		}
 		paddle1.dir = paddle1.MOVING_UP;
     }
-	else if (message.compare("down") == 0)
+	if (message.compare("down") == 0)
 	{
+		latencyRatio = LatencyManager::AverageClientToServerLatency / (float)REFRESH_RATE;
+		if (paddle1.dir == paddle1.MOVING_UP)
+		{
+			paddle1.position.y += (int)((float)PADDLE_SPEED * latencyRatio);
+		}
 		paddle1.dir = paddle1.MOVING_DOWN;
 	}
-	else if (message.compare("stop") == 0)
+	if (message.compare("stop") == 0)
 	{
+		latencyRatio = LatencyManager::AverageClientToServerLatency / (float)REFRESH_RATE;
+		if (paddle1.dir == paddle1.MOVING_UP)
+		{
+			paddle1.position.y += (int)((float)PADDLE_SPEED * latencyRatio);
+		}
+		else if (paddle1.dir == paddle1.MOVING_DOWN)
+		{
+			paddle1.position.y -= (int)((float)PADDLE_SPEED * latencyRatio);
+		}
 		paddle1.dir = paddle1.NOT_MOVING;
 	}
-	else if (message.substr(0, 5).compare("Name:") == 0)
+	if (message.substr(0, 5).compare("Name:") == 0)
 	{
 		PlayerManager::id = message.substr(5);
 	}
-	else if (message.substr(0, 5).compare("Time:") == 0)
+	if (message.substr(0, 5).compare("Time:") == 0)
 	{
-		//Time Stuff!
+		if (packetSent && !packetReceived)
+		{
+			PacketReceivedAtServer.GetNow();
+			std::string times = message.substr(5);
+			int commaIndex = times.find_first_of(",");
+			std::string clientRecived = times.substr(0, commaIndex);
+			std::string clientSent = times.substr(commaIndex + 1);
+			PacketReceivedAtClient.SetFromString(clientRecived);
+			PacketSentFromClient.SetFromString(clientSent);
+			packetReceived = true;
+		}
+
+
+		if (packetSent && packetReceived)
+		{
+			LatencyManager::AddServerToClientLatency(PacketReceivedAtClient - PacketSentFromServer);
+			LatencyManager::AddClientToServerLatency(PacketReceivedAtServer - PacketSentFromClient);
+
+			cout << endl;
+			cout << "Estimated Server To Client: " << LatencyManager::AverageServerToClientLatency << endl;
+			cout << "Estimated Client To Server: " << LatencyManager::AverageClientToServerLatency << endl;
+			cout << endl;
+			packetSent = false;
+			packetReceived = false;
+		}
 	}
 }
 
 void sendPlayerInfo()
 {
+	latencyRatio = LatencyManager::AverageServerToClientLatency / (float)REFRESH_RATE;
+	Vector2 estimatedPaddlePos;
+	if (paddle1.dir == paddle1.NOT_MOVING)
+	{
+		estimatedPaddlePos = paddle1.position;
+	}
+	else if (paddle1.dir == paddle1.MOVING_UP)
+	{
+		int estY = paddle1.position.y - (int)((float)PADDLE_SPEED * latencyRatio );
+		if (estY < 0)
+		{
+			estY = 0;
+		}
+		estimatedPaddlePos.x = paddle1.position.x;
+		estimatedPaddlePos.y = estY;
+	}
+	else
+	{
+		int estY = paddle1.position.y + (int)((float)PADDLE_SPEED * latencyRatio);
+		if (estY + paddle1.height > SCREEN_HEIGHT)
+		{
+			estY = SCREEN_HEIGHT - paddle1.height;
+		}
+		estimatedPaddlePos.x = paddle1.position.x;
+		estimatedPaddlePos.y = estY;
+	}
+	Vector2 estimatedBallPos;
+	estimatedBallPos.x = ball.position.x + (int)((float)(ball.velocity.x) * latencyRatio);
+	estimatedBallPos.y = ball.position.y + (int)((float)(ball.velocity.y) * latencyRatio);
 	vector<int> clientIDs = server.getClientIDs();
-	std::string paddleString = "pp" + to_string(paddle1.position.y);
-	std::string ballPosString = "bp" + to_string(ball.position.x) + "," + to_string(ball.position.y);
-	std::string ballVelString = "bv" + to_string(ball.velocity.x) + "," + to_string(ball.velocity.y);
+	std::string paddleString = "pp" + to_string(estimatedPaddlePos.y);
+	std::string ballPosString = "bp" + to_string(estimatedBallPos.x) + "," + to_string(estimatedBallPos.y);
+	std::string ballVelString = "bv" + to_string(estimatedBallPos.x) + "," + to_string(estimatedBallPos.y);
 	std::string consecScoreString = "cs" + to_string(PlayerManager::consecutive_hits);
 	std::string totalScoreString = "ts" + to_string(PlayerManager::score);
 	std::string totalOppString = "to" + to_string(PlayerManager::score + PlayerManager::failures);
@@ -109,6 +198,19 @@ void sendPlayerInfo()
 	}
 }
 
+void sendLatencyTest()
+{
+	PacketSentFromServer.GetNow();
+	std::string timeStamp = "ti";
+	timeStamp += PacketSentFromServer.ToString();
+	vector<int> clientIDs = server.getClientIDs();
+	for (int i = 0; i < clientIDs.size(); ++i)
+	{
+		server.wsSend(clientIDs[i], timeStamp);
+	}
+	packetSent = true;
+}
+
 /* called once per select() loop */
 void periodicHandler(){
 	static clock_t baseClock = clock();
@@ -116,7 +218,12 @@ void periodicHandler(){
 	if (gameStarted)
 	{
 		if (((int)t - (int)baseClock) % REFRESH_RATE == 0 ){
-			//Send time to client
+			if ( !packetSent && !packetReceived)
+			{
+				sendLatencyTest();
+
+			}
+			
 			paddle1.Update();
 			ball.Update();
 			sendPlayerInfo();

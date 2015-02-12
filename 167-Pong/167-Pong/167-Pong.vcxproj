@@ -11,28 +11,30 @@
     </ProjectConfiguration>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="LatencyManager.cpp" />
     <ClCompile Include="server\Ball.cpp" />
     <ClCompile Include="server\base64.cpp" />
     <ClCompile Include="server\Entity.cpp" />
     <ClCompile Include="server\EntityManager.cpp" />
+    <ClCompile Include="server\LatencyManager.cpp" />
     <ClCompile Include="server\main.cpp" />
     <ClCompile Include="server\Paddle.cpp" />
     <ClCompile Include="server\PlayerManager.cpp" />
+    <ClCompile Include="server\PongTime.cpp" />
     <ClCompile Include="server\sha1.cpp" />
     <ClCompile Include="server\Vector2.cpp" />
     <ClCompile Include="server\Wall.cpp" />
     <ClCompile Include="server\websocket.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="LatencyManager.h" />
     <ClInclude Include="server\Ball.h" />
     <ClInclude Include="server\base64.h" />
     <ClInclude Include="server\Constants.h" />
     <ClInclude Include="server\Entity.h" />
     <ClInclude Include="server\EntityManager.h" />
+    <ClInclude Include="server\LatencyManager.h" />
     <ClInclude Include="server\Paddle.h" />
     <ClInclude Include="server\PlayerManager.h" />
+    <ClInclude Include="server\PongTime.h" />
     <ClInclude Include="server\sha1.h" />
     <ClInclude Include="server\Vector2.h" />
     <ClInclude Include="server\Wall.h" />

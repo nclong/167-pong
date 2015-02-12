@@ -14,8 +14,13 @@
   	<!-- REPLACE WITH YOUR OWN-->
 	<script src="https://code.jquery.com/jquery-2.1.1.min.js"></script>
 
- 	<script> // Drawing script! 
-	 	
+ 	<script>        // Drawing script!
+
+        //Strings
+        var PacketSentFromServer;
+        var PacketReceivedAtClient;
+        var PacketSentFromClient;
+        var PacketReceivedAtServer;
  		// Temporary server variables:
  		var tempIP;
  		var tempPort;
@@ -67,14 +72,20 @@
 		var borderBottom;  // bottom border sprite
 		var ball; // ball sprite
 
-		// Initialize all variables.
+        // Initialize all variables.
+
+		function toLatencyTime( t )
+		{
+		    return t.getHours().toString() + ":" + t.getMinutes().toString()
+            + ":" + t.getSeconds().toString() + ":" + t.getMilliseconds().toString();
+		}
 
 	function initialize() { 
 
 		connected = false; // you are not connected to server.
 
 		d = new Date();
-		time = d.toLocaleTimeString(); // do conversion, need to keep doing it.
+		time = toLatencyTime(d); // do conversion, need to keep doing it.
 		// Debug stuff.
 		console.log(time.toString());
 
@@ -297,7 +308,7 @@
 	function incrementMyTimer() 
 	{
     d = new Date();
-	time = d.toLocaleTimeString(); // update this.
+	time = toLatencyTime(d); // update this.
    
 	}
 
@@ -428,7 +439,10 @@
 
 	<script src="fancywebsocket.js"></script> <!-- NEED THIS -->
 	<script>
-		var Server;
+        var Server;
+        var latencyStartClock = Date.now();
+        var messageReceivedClock = Date.now();
+        var messageSentClock = Date.now();
 
 		function log( text ) {
 			$log = $('#log');
@@ -533,7 +547,13 @@
 
 			    else if (typeStr === "ti") // time
 			    {
-
+			        PacketReceivedAtClient = toLatencyTime(new Date());
+			        PacketSentFromServer = dataStr;
+			        var toSend = "Time:";
+			        toSend += PacketReceivedAtClient;
+			        toSend += ",";
+			        toSend += PackSentFromClient = toLatencyTime(new Date());
+			        send(toSend);
 			    }
 
 			});

@@ -51,7 +51,10 @@
     <ClCompile Include="server\Wall.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="LatencyManager.cpp">
+    <ClCompile Include="server\PongTime.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="server\LatencyManager.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
@@ -89,7 +92,10 @@
     <ClInclude Include="server\Wall.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="LatencyManager.h">
+    <ClInclude Include="server\PongTime.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="server\LatencyManager.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
