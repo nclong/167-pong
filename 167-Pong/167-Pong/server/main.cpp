@@ -135,10 +135,14 @@ void messageHandler(int clientID, string message){
 
 		if (packetSent && packetReceived)
 		{
+			LatencyManager::CurrentServerToClientLatency = PacketReceivedAtClient - PacketSentFromServer;
+			LatencyManager::CurrentClientToServerLatency = PacketReceivedAtServer - PacketSentFromClient;
 			LatencyManager::AddServerToClientLatency(PacketReceivedAtClient - PacketSentFromServer);
 			LatencyManager::AddClientToServerLatency(PacketReceivedAtServer - PacketSentFromClient);
 
 			cout << endl;
+			cout << "Current Server To Client: " << LatencyManager::CurrentServerToClientLatency << endl;
+			cout << "Current Client To Server: " << LatencyManager::CurrentClientToServerLatency << endl;
 			cout << "Estimated Server To Client: " << LatencyManager::AverageServerToClientLatency << endl;
 			cout << "Estimated Client To Server: " << LatencyManager::AverageClientToServerLatency << endl;
 			cout << endl;
