@@ -21,10 +21,15 @@
         var PacketReceivedAtClient;
         var PacketSentFromClient;
         var PacketReceivedAtServer;
+
  		// Temporary server variables:
  		var tempIP;
  		var tempPort;
  		var name;
+
+ 		// Buffer.
+
+ 		var packetBuffer; // this will store our packets until we process them.
 
  		var d; // date item
  		var timer; // time item
@@ -211,13 +216,13 @@
 	}
 
 	$(document).ready(function(){
-		initialize();
-		window.onkeydown = keyPress;
-		window.onkeyup = release;
-		window.setInterval(update, 33);
+		initialize(); // run once.
+		window.onkeydown = keyPress; // keyPress passed to the onKeyDown
+		window.onkeyup = release; 
+		window.setInterval(update, 33); // run update loop
 		window.setInterval(drawGameBoard, 33); // draw the board.
-		window.setInterval(drawPaddle, 33);
-		window.setInterval(drawBall, 33);
+		window.setInterval(drawPaddle, 33);  // draw paddle
+		window.setInterval(drawBall, 33); // draw ball
 		window.setInterval(refreshStats, 33); // refreshes stats.
 		// window.setInterval(connectionToggle, 3000); // updates every 3 s.
 	});
