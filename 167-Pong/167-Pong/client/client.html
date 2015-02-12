@@ -21,6 +21,9 @@
  		var tempPort;
  		var name;
 
+ 		var d; // date item
+ 		var timer; // time item
+
 	 	// SET canvas properties here.
 
 		var cWidth; // Width of the canvas.
@@ -70,7 +73,10 @@
 
 		connected = false; // you are not connected to server.
 
+		d = new Date();
+		time = d.toLocaleTimeString(); // do conversion, need to keep doing it.
 		// Debug stuff.
+		console.log(time.toString());
 
 		tempIP = "127.0.0.1";
  		tempPort = "8080";
@@ -109,8 +115,8 @@
  		ballOffsetY = 10;
 
  		// Specify ball starting position and velocity
- 		ballVelocityX = 10;
- 		ballVelocityY = 10;
+ 		ballVelocityX = 1;
+ 		ballVelocityY = 11;
  		ballX = cWidth/2;
  		ballY = cHeight/2;
 
@@ -139,7 +145,6 @@
 
 	function drawPaddle() // the value we get 
 	{
-		 //mtx.clearRect(0, 0, cWidth, cHeight);
 		ctx.drawImage(player1, 20, player1Position, 30, 100);
 	}
 
@@ -189,6 +194,7 @@
 		ballX += ballVelocityX;
 		ballY -= ballVelocityY;
 		paddleMoveUpDown();
+		incrementMyTimer(); // increment timer;
 	}
 
 	$(document).ready(function(){
@@ -259,11 +265,17 @@
 		opp.innerHTML = o;
 	}
 
+	function setTimeCurrent(t)
+	{
+		var timeSet = document.getElementById("timed");
+		timeSet.innerHTML = t.toString();
+	}
+
 	function incrementScore()
 	{
 		//console.log("Function: increment score.");
-		var oppSet = document.getElementById("opp");
-		oppSet.innerHTML = score; 
+		var oppSet = document.getElementById("score");
+		oppSet.innerHTML++; 
 	}
 
 	function incrementOpportunity()
@@ -278,7 +290,20 @@
 		setConsecutiveHits(consecHits)
 		setScore(score);
 		setOpportunity(opportunity);
+		setTimeCurrent(time);
 		
+	}
+
+	function incrementMyTimer() 
+	{
+    d = new Date();
+	time = d.toLocaleTimeString(); // update this.
+   
+	}
+
+	function getCurrentTime() // 
+	{
+		return time;
 	}
 
 </script>
@@ -328,8 +353,8 @@
 
 	      <div class="input-field col s3">
 	        <i class="mdi-communication-phone prefix"></i>
-	        <input id='name' name='name' id="icon_telephone" type="text" class="validate" value="Nick is Awesome">
-	        <label for="icon_telephone">User Name: (Nick)</label>
+	        <input id='name' name='name' id="icon_telephone" type="text" class="validate" value="Connor is Awesome">
+	        <label for="icon_telephone">User Name: (Connor)</label>
 	      </div>
 
 		<div class="col s3">
@@ -352,12 +377,14 @@
 <div class="container grey lighten-2">
 
 <div id="game" class="row">
-	<div class="col s4">
+	<div class="col s3">
 	<a>Consecutive Hits<span id="hit" class="badge"></span></a></div>
-	<div class="col s4">
+	<div class="col s3">
 	<a>Score<span id="score" class="badge"></span></a></div>
-	<div class="col s4">
+	<div class="col s3">
 	<a>Opportunities<span id="opp" class="new badge"></span></a></div>
+	<div class="col s3">
+	<a>Current Time:<span id="timed" class="badge"></span></a></div>
 </div>
 </div>
 
@@ -502,6 +529,11 @@
 			    else if (typeStr === "to")
 			    {
 			        opportunity = dataStr;
+			    }
+
+			    else if (typeStr === "ti") // time
+			    {
+
 			    }
 
 			});
