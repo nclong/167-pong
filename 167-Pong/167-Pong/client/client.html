@@ -126,8 +126,8 @@
  		ballOffsetY = 10;
 
  		// Specify ball starting position and velocity
- 		ballVelocityX = 1;
- 		ballVelocityY = 11;
+ 		ballVelocityX = 0; // should be stationary until we move.
+ 		ballVelocityY = 0; // should be stationary until we move.
  		ballX = cWidth/2;
  		ballY = cHeight/2;
 
@@ -195,15 +195,15 @@
 		}	
 	}	
 
-	function drawBall() // draw da ball.
+	function drawBall() // draw da ball. edit values here.
 	{
 		ctx.drawImage(ball, ballX-ballOffsetX, ballY-ballOffsetY, 120, 80);
 	}
 
 	function update()
 	{
-		ballX += ballVelocityX;
-		ballY -= ballVelocityY;
+		ballX += ballVelocityX; // adds velocity per update loop
+		ballY += ballVelocityY;  // adds velocty per update loop
 		paddleMoveUpDown();
 		incrementMyTimer(); // increment timer;
 	}
