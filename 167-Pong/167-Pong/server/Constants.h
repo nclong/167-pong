@@ -1,6 +1,7 @@
 #pragma once
 
 const int REFRESH_RATE = 33;
+const int LATENCY_POLL_RATE = 500;
 const int X_ORIGIN = 0;
 const int Y_ORIGIN = 0;
 const int SCREEN_WIDTH = 1200;

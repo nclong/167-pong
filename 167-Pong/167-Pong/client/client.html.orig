@@ -14,21 +14,7 @@
   	<!-- REPLACE WITH YOUR OWN-->
 	<script src="https://code.jquery.com/jquery-2.1.1.min.js"></script>
 
- 	<script>        // Drawing script!
-
-        //Strings
-        var PacketSentFromServer;
-        var PacketReceivedAtClient;
-        var PacketSentFromClient;
-        var PacketReceivedAtServer;
- 		// Temporary server variables:
- 		var tempIP;
- 		var tempPort;
- 		var name;
-
- 		var d; // date item
- 		var timer; // time item
-
+ 	<script> // Drawing script! 
 	 	// SET canvas properties here.
 
 		var cWidth; // Width of the canvas.
@@ -44,10 +30,6 @@
 		var player1Position; // position of player one paddle.
 		var player1; // reference to player1 sprite.
 		var paddleOffset; // offset for the paddle sprite.
-
-		var paddleMoving; // paddle moving
-		var paddleDirection; // paddle direction.  0 = up 1 = down.
-		var keyDown; // paddle needs to know this
 
 		var ballVelocityX; // Velocity of the ball
 		var ballVelocityY; // Velocity of the ball
@@ -72,26 +54,11 @@
 		var borderBottom;  // bottom border sprite
 		var ball; // ball sprite
 
-        // Initialize all variables.
-
-		function toLatencyTime( t )
-		{
-		    return t.getHours().toString() + ":" + t.getMinutes().toString()
-            + ":" + t.getSeconds().toString() + ":" + t.getMilliseconds().toString();
-		}
+		// Initialize all variables.
 
 	function initialize() { 
 
 		connected = false; // you are not connected to server.
-
-		d = new Date();
-		time = toLatencyTime(d); // do conversion, need to keep doing it.
-		// Debug stuff.
-		console.log(time.toString());
-
-		tempIP = "127.0.0.1";
- 		tempPort = "8080";
- 		name = "Nick";
 
  		// SET BACKGROUND canvas dimensions here.
 	 	cWidth = 1200;
@@ -102,7 +69,7 @@
 	 	ctx = display.getContext("2d"); // 2D, display.
 
 		// Set stepsize here.
-		stepsize = 10; // change as necessary.
+		stepsize = 30; // change as necessary.
 		player1Position = cHeight/2;// always starts at the center.
 
 		// initialize stats variables
@@ -126,16 +93,11 @@
  		ballOffsetY = 10;
 
  		// Specify ball starting position and velocity
- 		ballVelocityX = 0; // should be stationary until we move.
- 		ballVelocityY = 0; // should be stationary until we move.
+ 		ballVelocityX = 10;
+ 		ballVelocityY = 10;
  		ballX = cWidth/2;
  		ballY = cHeight/2;
-
- 		// Paddle stuff.
- 		paddleMoving = false; // set to false while not moving.
-		paddleDirection = 0; // initially 0, but paddle moving is not true.
-		keyDown = false;
-
+	
 		// Draw the game board.
 		drawGameBoard(); 
 
@@ -156,64 +118,47 @@
 
 	function drawPaddle() // the value we get 
 	{
+		 //mtx.clearRect(0, 0, cWidth, cHeight);
 		ctx.drawImage(player1, 20, player1Position, 30, 100);
 	}
 
-	function movePaddle(i) // takes in an integer. 0 for up, 1 for down.
+	function movePaddleUp()
 	{
-			if (i == 0)
-			{
-				console.log("Paddle moving up");
-				paddleDirection = 0; // set Paddle direction to up.
-				send("up"); // send up message to server
-				
-			}
-
-			else if (i == 1)
-			{
-				console.log("Paddle moving down");
-				paddleDirection = 1; // set Padle direction do down.
-				send("down"); // send down message to server
-
-			}
+		console.log("Paddle Up");
+		 
+		if(player1Position-stepsize > 0)
+		{
+			player1Position-=stepsize;
+			send("up");
+		}
 	}
 
-	function paddleMoveUpDown()
+	function movePaddleDown()
 	{
-		if(paddleMoving) // while this is true.
-		{
-			if(player1Position-stepsize > 0 
-				&& paddleDirection == 0)
-			{
-				player1Position-=stepsize;
-			}
-			else if(player1Position+stepsize+100 < cHeight 
-				&& paddleDirection == 1) 
-			{
-				player1Position+=stepsize;
-			}
-		}	
-	}	
+		console.log("Paddle Down");
 
-	function drawBall() // draw da ball. edit values here.
+		if(player1Position+stepsize+100 < cHeight) // 500
+		{
+			player1Position+=stepsize;
+			send("down");
+		}
+	}
+
+	function drawBall() // draw da ball.
 	{
-	    ctx.drawImage(ball, ballX - ballOffsetX, ballY - ballOffsetY, 90, 90);
-	    console.log("BallX: " + ballX);
-	    console.log("BallY: " + ballY);
+		ctx.drawImage(ball, ballX-ballOffsetX, ballY-ballOffsetY, 120, 80);
 	}
 
 	function update()
 	{
-		ballX += ballVelocityX; // adds velocity per update loop
-		ballY += ballVelocityY;  // adds velocty per update loop
-		paddleMoveUpDown();
-		incrementMyTimer(); // increment timer;
+		ballX += ballVelocityX;
+		ballY -= ballVelocityY;
 	}
 
 	$(document).ready(function(){
 		initialize();
 		window.onkeydown = keyPress;
-		window.onkeyup = release;
+		//window.onkeyup = release;
 		window.setInterval(update, 33);
 		window.setInterval(drawGameBoard, 33); // draw the board.
 		window.setInterval(drawPaddle, 33);
@@ -230,70 +175,46 @@
 	    }
 
 		if(e.keyCode == 38) {
-	        //movePaddleUp();
-	        if (!keyDown)
-	        {
-	        	paddleMoving = true;
-	        	movePaddle(0); // 0 is up.
-	        	keyDown = true;
-	    	}      
+	        movePaddleUp();
+	       
 	    }
 	    else if(e.keyCode == 40) {
-	        //movePaddleDown();
-	        if (!keyDown)
-	        {
-	        	paddleMoving = true;
-	        	movePaddle(1); // 1 is down.
-	        	keyDown = true;
-	   		}
+	        movePaddleDown();
 	    }
 	}
 
-	function release(e) // on key release.
-	{
-		paddleMoving = false; 
-		keyDown = false;
-		console.log("key release dskjfsldkjfsl");
-		send("stop"); // send stop message to server
-	}
 
 	function setConsecutiveHits(i)
 	{
-		//console.log("Function: set consecutive hits.");
+		console.log("Function: set consecutive hits.");
 		var consecHitsSet = document.getElementById("hit");
 		consecHitsSet.innerHTML = i; 
 	}
 
 	function setScore(s)
 	{
-		//console.log("Function: set score.");
+		console.log("Function: set score.");
 		var scoreSet = document.getElementById("score");
-		scoreSet.innerHTML = s;
+		score.innerHTML = s;
 	}
 
 	function setOpportunity(o)
 	{
-		//console.log("Function: set opportunity.");
+		console.log("Function: set opportunity.");
 		var oppSet = document.getElementById("opp");
 		opp.innerHTML = o;
 	}
 
-	function setTimeCurrent(t)
-	{
-		var timeSet = document.getElementById("timed");
-		timeSet.innerHTML = t.toString();
-	}
-
 	function incrementScore()
 	{
-		//console.log("Function: increment score.");
-		var oppSet = document.getElementById("score");
-		oppSet.innerHTML++; 
+		console.log("Function: increment score.");
+		var oppSet = document.getElementById("opp");
+		oppSet.innerHTML = score; 
 	}
 
 	function incrementOpportunity()
 	{
-		//console.log("Function: increment opportunity.");
+		console.log("Function: increment opportunity.");
 		var oppSet = document.getElementById("opp");
 		oppSet.innerHTML++; 
 	}
@@ -303,20 +224,7 @@
 		setConsecutiveHits(consecHits)
 		setScore(score);
 		setOpportunity(opportunity);
-		setTimeCurrent(time);
 		
-	}
-
-	function incrementMyTimer() 
-	{
-    d = new Date();
-	time = toLatencyTime(d); // update this.
-   
-	}
-
-	function getCurrentTime() // 
-	{
-		return time;
 	}
 
 </script>
@@ -354,20 +262,20 @@
 	    <div class="row">
 	      <div class="input-field col s3">
 	        <i class="mdi-action-account-circle prefix"></i>
-	        <input id='ip' name='ip' id="icon_prefix" type="text" class="validate" value='127.0.0.1'> 
-	        <label for="icon_prefix">Server IP: (127.0.0.1)</label>
+	        <input id='ip' name='ip' id="icon_prefix" type="text" class="validate">
+	        <label for="icon_prefix">Server IP:</label>
 	      </div>
 
 	      <div class="input-field col s3">
 	        <i class="mdi-communication-phone prefix"></i>
-	        <input id='port' name='port' id="icon_telephone" type="text" class="validate" value="8080">
-	        <label for="icon_telephone">Server Port: (8080)</label>
+	        <input id='port' name='port' id="icon_telephone" type="text" class="validate">
+	        <label for="icon_telephone">Server Port:</label>
 	      </div>
 
 	      <div class="input-field col s3">
 	        <i class="mdi-communication-phone prefix"></i>
-	        <input id='name' name='name' id="icon_telephone" type="text" class="validate" value="Connor is Awesome">
-	        <label for="icon_telephone">User Name: (Connor)</label>
+	        <input id='name' name='name' id="icon_telephone" type="text" class="validate">
+	        <label for="icon_telephone">User Name: (!)</label>
 	      </div>
 
 		<div class="col s3">
@@ -390,14 +298,12 @@
 <div class="container grey lighten-2">
 
 <div id="game" class="row">
-	<div class="col s3">
+	<div class="col s4">
 	<a>Consecutive Hits<span id="hit" class="badge"></span></a></div>
-	<div class="col s3">
+	<div class="col s4">
 	<a>Score<span id="score" class="badge"></span></a></div>
-	<div class="col s3">
+	<div class="col s4">
 	<a>Opportunities<span id="opp" class="new badge"></span></a></div>
-	<div class="col s3">
-	<a>Current Time:<span id="timed" class="badge"></span></a></div>
 </div>
 </div>
 
@@ -441,10 +347,7 @@
 
 	<script src="fancywebsocket.js"></script> <!-- NEED THIS -->
 	<script>
-        var Server;
-        var latencyStartClock = Date.now();
-        var messageReceivedClock = Date.now();
-        var messageSentClock = Date.now();
+		var Server;
 
 		function log( text ) {
 			$log = $('#log');
@@ -481,13 +384,11 @@
 		function disconnect(){
 			 console.log("Disconnecting from server.");
 			 Server.send("close");
-			 connected = false;
-			 Server.disconnect();
+
 			}
 
        	 function connect(){
             console.log("Connecting...to server.");
-          
 			Server = new FancyWebSocket('ws://' + document.getElementById('ip').value + ':' + document.getElementById('port').value);
 
 			//Let the user know we're connected
@@ -513,24 +414,34 @@
 			    if( typeStr === "pp")
 			    {
                     // Set paddle position.
-                    //console.log("Message: Paddle Position Update");
+                    console.log("Message: Paddle Position Update");
                     player1Position = dataStr;
 			    }
 			    else if( typeStr === "bp" )
 			    {	
 			    	// Set the ball position.
-			    	//console.log("Message: Ball Position Update");
+<<<<<<< HEAD
 			        var xStr = dataStr.substring(0, dataStr.indexOf(","));
 			        var yStr = dataStr.substring(dataStr.indexOf(",")+1);
+=======
+			    	console.log("Message: Ball Position Update");
+			        var xStr = dataStr(0, dataStr.indexOf(","));
+			        var yStr = dataStr(dataStr.indexOf(",")+1);
+>>>>>>> 18c338c6b76f572fb7211b787ed40e38cb3346e3
 			        ballX = xStr;
                     ballY = yStr;
 			    }
 			    else if( typeStr === "bv" )
 			    {
 			    	// Set the ball velocity.
-			    	//console.log("Message: Ball Velocity Update");
+<<<<<<< HEAD
 			        var xStr = dataStr.substring(0, dataStr.indexOf(","));
 			        var yStr = dataStr.substring(dataStr.indexOf(",")+1);
+=======
+			    	console.log("Message: Ball Velocity Update");
+			        var xStr = dataStr(0, dataStr.indexOf(","));
+			        var yStr = dataStr(dataStr.indexOf(",")+1);
+>>>>>>> 18c338c6b76f572fb7211b787ed40e38cb3346e3
 			        ballVelocityX = xStr;
                     ballVelocityY = yStr;
 			    }
@@ -545,17 +456,6 @@
 			    else if (typeStr === "to")
 			    {
 			        opportunity = dataStr;
-			    }
-
-			    else if (typeStr === "ti") // time
-			    {
-			        PacketReceivedAtClient = toLatencyTime(new Date());
-			        PacketSentFromServer = dataStr;
-			        var toSend = "Time:";
-			        toSend += PacketReceivedAtClient;
-			        toSend += ",";
-			        toSend += PackSentFromClient = toLatencyTime(new Date());
-			        send(toSend);
 			    }
 
 			});

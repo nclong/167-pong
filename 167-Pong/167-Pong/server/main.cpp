@@ -119,6 +119,7 @@ void messageHandler(int clientID, string message){
 	}
 	if (message.substr(0, 5).compare("Time:") == 0)
 	{
+		packetSent = true;
 		if (packetSent && !packetReceived)
 		{
 			PacketReceivedAtServer.GetNow();
@@ -181,7 +182,7 @@ void sendPlayerInfo()
 	vector<int> clientIDs = server.getClientIDs();
 	std::string paddleString = "pp" + to_string(estimatedPaddlePos.y);
 	std::string ballPosString = "bp" + to_string(estimatedBallPos.x) + "," + to_string(estimatedBallPos.y);
-	std::string ballVelString = "bv" + to_string(estimatedBallPos.x) + "," + to_string(estimatedBallPos.y);
+	std::string ballVelString = "bv" + to_string(ball.velocity.x) + "," + to_string(ball.velocity.y);
 	std::string consecScoreString = "cs" + to_string(PlayerManager::consecutive_hits);
 	std::string totalScoreString = "ts" + to_string(PlayerManager::score);
 	std::string totalOppString = "to" + to_string(PlayerManager::score + PlayerManager::failures);
@@ -208,7 +209,7 @@ void sendLatencyTest()
 	{
 		server.wsSend(clientIDs[i], timeStamp);
 	}
-	packetSent = true;
+	//packetSent = true;
 }
 
 /* called once per select() loop */
@@ -217,16 +218,19 @@ void periodicHandler(){
 	clock_t t = clock();
 	if (gameStarted)
 	{
-		if (((int)t - (int)baseClock) % REFRESH_RATE == 0 ){
-			if ( !packetSent && !packetReceived)
+		if (((int)t - (int)baseClock) % REFRESH_RATE == 0){
+			paddle1.Update();
+			ball.Update();
+			
+		}
+
+		if (((int)t - (int)baseClock) % LATENCY_POLL_RATE == 0){
+			if (!packetSent && !packetReceived)
 			{
+				sendPlayerInfo();
 				sendLatencyTest();
 
 			}
-			
-			paddle1.Update();
-			ball.Update();
-			sendPlayerInfo();
 		}
 	}
 }
