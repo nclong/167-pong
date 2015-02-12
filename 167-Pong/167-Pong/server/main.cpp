@@ -16,6 +16,7 @@
 #include "PlayerManager.h"
 #include "PongTime.h"
 #include "LatencyManager.h"
+#include "PacketBuffer.h"
 
 using namespace std;
 
@@ -119,37 +120,39 @@ void messageHandler(int clientID, string message){
 	}
 	if (message.substr(0, 5).compare("Time:") == 0)
 	{
-		packetSent = true;
-		if (packetSent && !packetReceived)
-		{
-			PacketReceivedAtServer.GetNow();
-			std::string times = message.substr(5);
-			int commaIndex = times.find_first_of(",");
-			std::string clientRecived = times.substr(0, commaIndex);
-			std::string clientSent = times.substr(commaIndex + 1);
-			PacketReceivedAtClient.SetFromString(clientRecived);
-			PacketSentFromClient.SetFromString(clientSent);
-			packetReceived = true;
-		}
+		char packetIdChar = message.at(5);
+		int packetId = packetIdChar - '0';
+		PacketReceivedAtServer.GetNow();
+		std::string times = message.substr(6);
+		int commaIndex = times.find_first_of(",");
+		std::string clientRecived = times.substr(0, commaIndex);
+		std::string clientSent = times.substr(commaIndex + 1);
+		PacketReceivedAtClient.SetFromString(clientRecived);
+		PacketSentFromClient.SetFromString(clientSent);
 
+		PacketBuffer::EnqueueById(PacketReceivedAtClient, 1, packetId);
+		PacketBuffer::EnqueueById(PacketSentFromClient, 2, packetId);
+		PacketBuffer::EnqueueById(PacketReceivedAtServer, 3, packetId);
 
-		if (packetSent && packetReceived)
-		{
-			LatencyManager::CurrentServerToClientLatency = PacketReceivedAtClient - PacketSentFromServer;
-			LatencyManager::CurrentClientToServerLatency = PacketReceivedAtServer - PacketSentFromClient;
-			LatencyManager::AddServerToClientLatency(PacketReceivedAtClient - PacketSentFromServer);
-			LatencyManager::AddClientToServerLatency(PacketReceivedAtServer - PacketSentFromClient);
-
-			cout << endl;
-			cout << "Current Server To Client: " << LatencyManager::CurrentServerToClientLatency << endl;
-			cout << "Current Client To Server: " << LatencyManager::CurrentClientToServerLatency << endl;
-			cout << "Estimated Server To Client: " << LatencyManager::AverageServerToClientLatency << endl;
-			cout << "Estimated Client To Server: " << LatencyManager::AverageClientToServerLatency << endl;
-			cout << endl;
-			packetSent = false;
-			packetReceived = false;
-		}
 	}
+
+
+		//if (packetSent && packetReceived)
+		//{
+		//	LatencyManager::CurrentServerToClientLatency = PacketReceivedAtClient - PacketSentFromServer;
+		//	LatencyManager::CurrentClientToServerLatency = PacketReceivedAtServer - PacketSentFromClient;
+		//	LatencyManager::AddServerToClientLatency(PacketReceivedAtClient - PacketSentFromServer);
+		//	LatencyManager::AddClientToServerLatency(PacketReceivedAtServer - PacketSentFromClient);
+
+		//	cout << endl;
+		//	cout << "Current Server To Client: " << LatencyManager::CurrentServerToClientLatency << endl;
+		//	cout << "Current Client To Server: " << LatencyManager::CurrentClientToServerLatency << endl;
+		//	cout << "Estimated Server To Client: " << LatencyManager::AverageServerToClientLatency << endl;
+		//	cout << "Estimated Client To Server: " << LatencyManager::AverageClientToServerLatency << endl;
+		//	cout << endl;
+		//	packetSent = false;
+		//	packetReceived = false;
+		//}
 }
 
 void sendPlayerInfo()
@@ -184,8 +187,10 @@ void sendPlayerInfo()
 	estimatedBallPos.x = ball.position.x + (int)((float)(ball.velocity.x) * latencyRatio);
 	estimatedBallPos.y = ball.position.y + (int)((float)(ball.velocity.y) * latencyRatio);
 	vector<int> clientIDs = server.getClientIDs();
-	std::string paddleString = "pp" + to_string(estimatedPaddlePos.y);
-	std::string ballPosString = "bp" + to_string(estimatedBallPos.x) + "," + to_string(estimatedBallPos.y);
+	std::string paddleString = "pp" + to_string(paddle1.position.x);
+	//std::string paddleString = "pp" + to_string(estimatedPaddlePos.y);
+	//std::string ballPosString = "bp" + to_string(estimatedBallPos.x) + "," + to_string(estimatedBallPos.y);
+	std::string ballPosString = "bp" + to_string(ball.position.x) + "," + to_string(ball.position.y);
 	std::string ballVelString = "bv" + to_string(ball.velocity.x) + "," + to_string(ball.velocity.y);
 	std::string consecScoreString = "cs" + to_string(PlayerManager::consecutive_hits);
 	std::string totalScoreString = "ts" + to_string(PlayerManager::score);
@@ -207,6 +212,8 @@ void sendLatencyTest()
 {
 	PacketSentFromServer.GetNow();
 	std::string timeStamp = "ti";
+	int packetId = PacketBuffer::GetNewPacketId();
+	//if (!PacketBuffer::hasId(packetId) && )
 	timeStamp += PacketSentFromServer.ToString();
 	vector<int> clientIDs = server.getClientIDs();
 	for (int i = 0; i < clientIDs.size(); ++i)
@@ -224,31 +231,32 @@ void periodicHandler(){
 	{
 		if (((int)t - (int)baseClock) % REFRESH_RATE == 0){
 			paddle1.Update();
-			ball.Update();
+			ball.BallUpdate(paddle1, topWall, bottomWall, rightWall);
+			sendPlayerInfo();
 			
 		}
 
-		if (((int)t - (int)baseClock) % LATENCY_POLL_RATE == 0){
-			if (!packetSent && !packetReceived)
-			{
-				sendPlayerInfo();
-				sendLatencyTest();
+		//if (((int)t - (int)baseClock) % LATENCY_POLL_RATE == 0){
+		//	if (!packetSent && !packetReceived)
+		//	{
+		//		sendPlayerInfo();
+		//		sendLatencyTest();
 
-			}
-		}
+		//	}
+		//}
 	}
 }
 
 void startGame()
 {
 	//Start the gameplay
-	ball.SetPos(SCREEN_WIDTH / 2, SCREEN_HEIGHT / 4);
+	ball.SetPos(SCREEN_WIDTH / 2, SCREEN_HEIGHT / 3);
 	ball.startingPos.x = SCREEN_WIDTH / 2;
-	ball.startingPos.y = SCREEN_WIDTH / 4;
-	ball.startingVel.x = -2;
-	ball.startingVel.y = 1;
-	ball.velocity.x = -2;
-	ball.velocity.y = 1;
+	ball.startingPos.y = SCREEN_WIDTH / 3;
+	ball.startingVel.x = -5;
+	ball.startingVel.y = 2;
+	ball.velocity.x = -5;
+	ball.velocity.y = 2;
 	ball.name = "Ball";
 	paddle1.SetPos(0, SCREEN_HEIGHT / 2);
 	paddle1.dir = paddle1.NOT_MOVING;

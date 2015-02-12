@@ -2,6 +2,8 @@
 #include "Vector2.h"
 #include "Entity.h"
 #include "PlayerManager.h"
+#include "Paddle.h"
+#include "Wall.h"
 
 class Ball : public Entity
 {
@@ -21,7 +23,7 @@ public:
 	Vector2 startingPos;
 	Vector2 startingVel;
 	int Speed();
-	void Update();
+	void BallUpdate(Paddle paddle, Wall t, Wall b, Wall r);
 
 private:
 	int speed;

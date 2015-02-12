@@ -1,5 +1,5 @@
+#pragma once
 #include "Entity.h"
-#include "Ball.h"
 #include "Vector2.h"
 #include "Constants.h"
 

@@ -36,48 +36,77 @@ void Ball::SetPos(int x, int y)
 	position.x = x;
 	position.y = y;
 }
-void Ball::Update()
+void Ball::BallUpdate(Paddle paddle, Wall t, Wall b, Wall r)
 {
+
 	position += velocity;
-	for (int i = 0; i < EntityManager::AllEntities.size(); ++i)
+	//for (int i = 0; i < EntityManager::AllEntities.size(); ++i)
+	//{
+	//	Entity* currentEnt = &EntityManager::AllEntities[i];
+	//	if (currentEnt->name.compare(name) != 0)
+	//	{
+	//		//Collision Detection Goes here
+	//		//top Collision
+	//		//Reverse y, increase speed
+	//		if (Top() < currentEnt->Bottom() && (Left() < currentEnt->Right() || Right() > currentEnt->Left()))
+	//		{
+	//			//Top Collision
+	//			position.y += currentEnt->Bottom() - Top();
+	//			velocity.y *= -1;
+	//			addScore(currentEnt);
+	//		}
+	//		else if (Bottom() > currentEnt->Top() && (Left() < currentEnt->Right() || Right() > currentEnt->Left()))
+	//		{
+	//			//Bottom Collision
+	//			position.y -= Bottom() - currentEnt->Top();
+	//			velocity.y *= -1;
+	//			addScore(currentEnt);
+	//		}
+	//		else if (Left() < currentEnt->Right() && (Top() < currentEnt->Bottom() || Bottom() > currentEnt->Top()))
+	//		{
+	//			//Left Collision
+	//			position.x += currentEnt->Right() - Left();
+	//			velocity.x *= -1;
+	//			addScore(currentEnt);
+	//		}
+	//		else if (Right() < currentEnt->Left() && (Top() < currentEnt->Bottom() || Bottom() > currentEnt->Top()))
+	//		{
+	//			//Right Collision
+	//			position.x -= Right() - currentEnt->Left();
+	//			velocity.x *= -1;
+	//			addScore(currentEnt);
+	//		}
+	//	}
+	//}
+
+	if (Left() < paddle.Right() && ((position.y > paddle.Top() && position.y < paddle.Bottom()) || Bottom() > paddle.Top() && Bottom() < paddle.Bottom()))
 	{
-		Entity* currentEnt = &EntityManager::AllEntities[i];
-		if (currentEnt->name.compare(name) != 0)
-		{
-			//Collision Detection Goes here
-			//top Collision
-			//Reverse y, increase speed
-			if (Top() < currentEnt->Bottom() && (Left() < currentEnt->Right() || Right() > currentEnt->Left()))
-			{
-				//Top Collision
-				position.y += currentEnt->Bottom() - Top();
-				velocity.y *= -1;
-				addScore(currentEnt);
-			}
-			else if (Bottom() > currentEnt->Top() && (Left() < currentEnt->Right() || Right() > currentEnt->Left()))
-			{
-				//Bottom Collision
-				position.y -= Bottom() - currentEnt->Top();
-				velocity.y *= -1;
-				addScore(currentEnt);
-			}
-			else if (Left() < currentEnt->Right() && (Top() < currentEnt->Bottom() || Bottom() > currentEnt->Top()))
-			{
-				//Left Collision
-				position.x += currentEnt->Right() - Left();
-				velocity.x *= -1;
-				addScore(currentEnt);
-			}
-			else if (Right() < currentEnt->Left() && (Top() < currentEnt->Bottom() || Bottom() > currentEnt->Top()))
-			{
-				//Right Collision
-				position.x -= Right() - currentEnt->Left();
-				velocity.x *= -1;
-				addScore(currentEnt);
-			}
-		}
+		position.x = paddle.Right();
+		velocity.x *= -2;
+		PlayerManager::consecutive_hits++;
+		PlayerManager::score++;
 	}
-	
+
+	if (Top() < t.Bottom())
+	{
+		position.y = t.Bottom();
+		velocity.y *= -2;
+	}
+
+	if (Right() > r.Left())
+	{
+		position.x = r.Left() - width;
+		velocity.x *= -2;
+	}
+
+	if (Bottom() > b.Top())
+	{
+		//Bottom Wall Collion
+		position.y = b.Top() - height;
+		velocity.y *= -2;
+	}
+
+
 	if (position.x < 0)
 	{
 		position = startingPos;
@@ -85,15 +114,8 @@ void Ball::Update()
 		PlayerManager::consecutive_hits = 0;
 		PlayerManager::failures++;
 	}
-
-	
 }
 
 void Ball::addScore(Entity* collider)
 {
-	if (collider->name.compare("Paddle1") == 0)
-	{
-		PlayerManager::score++;
-		PlayerManager::consecutive_hits++;
-	}
 }

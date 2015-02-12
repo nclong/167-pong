@@ -17,6 +17,7 @@
     <ClCompile Include="server\EntityManager.cpp" />
     <ClCompile Include="server\LatencyManager.cpp" />
     <ClCompile Include="server\main.cpp" />
+    <ClCompile Include="server\PacketBuffer.cpp" />
     <ClCompile Include="server\Paddle.cpp" />
     <ClCompile Include="server\PlayerManager.cpp" />
     <ClCompile Include="server\PongTime.cpp" />
@@ -32,6 +33,7 @@
     <ClInclude Include="server\Entity.h" />
     <ClInclude Include="server\EntityManager.h" />
     <ClInclude Include="server\LatencyManager.h" />
+    <ClInclude Include="server\PacketBuffer.h" />
     <ClInclude Include="server\Paddle.h" />
     <ClInclude Include="server\PlayerManager.h" />
     <ClInclude Include="server\PongTime.h" />

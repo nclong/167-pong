@@ -549,6 +549,8 @@
 
 			    else if (typeStr === "ti") // time
 			    {
+			        var packetNum = dataStr[0];
+			        dataStr = dataStr.substring(1);
 			        PacketReceivedAtClient = toLatencyTime(new Date());
 			        PacketSentFromServer = dataStr;
 			        var toSend = "Time:";

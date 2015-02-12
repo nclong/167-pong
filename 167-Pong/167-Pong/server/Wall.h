@@ -1,6 +1,5 @@
 #pragma once
 #include "Entity.h"
-#include "Ball.h"
 #include "Vector2.h"
 
 class Wall : public Entity
