@@ -81,6 +81,10 @@ void messageHandler(int clientID, string message){
 	{
 		PlayerManager::id = message.substr(5);
 	}
+	else if (message.substr(0, 5).compare("Time:") == 0)
+	{
+		//Time Stuff!
+	}
 }
 
 void sendPlayerInfo()
@@ -112,10 +116,10 @@ void periodicHandler(){
 	if (gameStarted)
 	{
 		if (((int)t - (int)baseClock) % REFRESH_RATE == 0 ){
+			//Send time to client
 			paddle1.Update();
 			ball.Update();
 			sendPlayerInfo();
-
 		}
 	}
 }
