@@ -514,7 +514,7 @@
 			    {
                     // Set paddle position.
                     //console.log("Message: Paddle Position Update");
-                    player1Position = dataStr;
+                    player1Position = parseInt(dataStr);
 			    }
 			    else if( typeStr === "bp" )
 			    {	
@@ -522,8 +522,8 @@
 			    	//console.log("Message: Ball Position Update");
 			        var xStr = dataStr.substring(0, dataStr.indexOf(","));
 			        var yStr = dataStr.substring(dataStr.indexOf(",")+1);
-			        ballX = xStr;
-                    ballY = yStr;
+			        ballX = parseInt(xStr);
+                    ballY = parseInt(yStr);
 			    }
 			    else if( typeStr === "bv" )
 			    {
@@ -531,8 +531,8 @@
 			    	//console.log("Message: Ball Velocity Update");
 			        var xStr = dataStr.substring(0, dataStr.indexOf(","));
 			        var yStr = dataStr.substring(dataStr.indexOf(",")+1);
-			        ballVelocityX = xStr;
-                    ballVelocityY = yStr;
+			        ballVelocityX = parseInt(xStr);
+                    ballVelocityY = parseInt(yStr);
 			    }
 			    else if (typeStr === "cs")
 			    {
