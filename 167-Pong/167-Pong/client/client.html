@@ -22,6 +22,22 @@
         var PacketSentFromClient;
         var PacketReceivedAtServer;
 
+        var paddlePosReceived = false;
+        var ballPosReceived = false;
+        var ballVelReceived = false;
+        var consecHitsReceived = false;
+        var scoreReceived = false;
+        var opportunitiesReceived = false;
+
+        var serverPaddlePos;
+        var serverBallPosX;
+        var serverBallPosY;
+        var serverBallVelX;
+        var serverBallVelY;
+        var serverConsecHits;
+        var serverScore;
+        var serverOpportunities;
+
  		// Temporary server variables:
  		var tempIP;
  		var tempPort;
@@ -203,15 +219,40 @@
 	function drawBall() // draw da ball. edit values here.
 	{
 	    ctx.drawImage(ball, ballX - ballOffsetX, ballY - ballOffsetY, 90, 90);
-	    console.log("BallX: " + ballX);
-	    console.log("BallY: " + ballY);
+	    //console.log("BallX: " + ballX);
+	    //console.log("BallY: " + ballY);
 	}
 
 	function update()
 	{
-		ballX += ballVelocityX; // adds velocity per update loop
-		ballY += ballVelocityY;  // adds velocty per update loop
-		paddleMoveUpDown();
+
+	    if(paddlePosReceived
+	    && ballPosReceived 
+	    && ballVelReceived 
+	    && consecHitsReceived 
+	    && scoreReceived 
+	    && opportunitiesReceived )
+	    {
+	        player1Position = serverPaddlePos;
+	        ballX = serverBallPosX;
+	        ballY = serverBallPosY;
+	        consecHits = serverConsecHits;
+	        score = serverScore;
+	        opportunity = serverOpportunities;
+	        //Set stuff from server
+	        paddlePosReceived = false;
+	        ballPosReceived = false;
+	        ballVelReceived = false;
+	        consecHitsReceived = false;
+	        scoreReceived = false;
+	        opportunitiesReceived = false;
+	    }
+        else
+        {
+		    ballX += ballVelocityX; // adds velocity per update loop
+		    ballY += ballVelocityY;  // adds velocty per update loop
+		    paddleMoveUpDown();
+        }
 		incrementMyTimer(); // increment timer;
 	}
 
@@ -519,7 +560,8 @@
 			    {
                     // Set paddle position.
                     //console.log("Message: Paddle Position Update");
-                    player1Position = parseInt(dataStr);
+			        serverPaddlePos = parseInt(dataStr);
+			        paddlePosReceived = true;
 			    }
 			    else if( typeStr === "bp" )
 			    {	
@@ -527,8 +569,9 @@
 			    	//console.log("Message: Ball Position Update");
 			        var xStr = dataStr.substring(0, dataStr.indexOf(","));
 			        var yStr = dataStr.substring(dataStr.indexOf(",")+1);
-			        ballX = parseInt(xStr);
-                    ballY = parseInt(yStr);
+			        serverBallPosX = parseInt(xStr);
+			        serverBallPosY = parseInt(yStr);
+			        ballPosReceived = true;
 			    }
 			    else if( typeStr === "bv" )
 			    {
@@ -536,20 +579,24 @@
 			    	//console.log("Message: Ball Velocity Update");
 			        var xStr = dataStr.substring(0, dataStr.indexOf(","));
 			        var yStr = dataStr.substring(dataStr.indexOf(",")+1);
-			        ballVelocityX = parseInt(xStr);
-                    ballVelocityY = parseInt(yStr);
+			        serverBallVelX = parseInt(xStr);
+			        serverBallVelY = parseInt(yStr);
+			        ballVelReceived = true;
 			    }
 			    else if (typeStr === "cs")
 			    {
-			        consecHits = dataStr;
+			        serverConsecHits = dataStr;
+			        consecHitsReceived = true;
 			    }
 			    else if (typeStr === "ts")
 			    {
-			        score = dataStr;
+			        serverScore = dataStr;
+			        scoreReceived = true;
 			    }
 			    else if (typeStr === "to")
 			    {
-			        opportunity = dataStr;
+			        serverOpportunities = dataStr;
+			        opportunitiesReceived = true;
 			    }
 
 			    else if (typeStr === "ti") // time

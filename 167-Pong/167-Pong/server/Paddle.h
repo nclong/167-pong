@@ -2,6 +2,7 @@
 #include "Entity.h"
 #include "Vector2.h"
 #include "Constants.h"
+#include <iostream>
 
 //Screen Size : 1200 x 500
 
@@ -32,7 +33,7 @@ public:
 	int GetHeight();
 	void SetWidth(int w);
 	void SetHeight(int h);
-	enum MovementDirection
+	static enum MovementDirection
 	{
 		MOVING_UP,
 		MOVING_DOWN,

@@ -24,22 +24,24 @@ void Paddle::Update()
 {
 	if (dir == MOVING_UP)
 	{
-		moveUp();
+		position.y -= PADDLE_SPEED;
 	}
 	else if (dir == MOVING_DOWN)
 	{
-		moveDown();
+		position.y += PADDLE_SPEED;
 	}
 
-	if (position.y < 0)
+	if (position.y < HORIZ_WALL_HEIGHT)
 	{
-		position.y = 0;
+		position.y = HORIZ_WALL_HEIGHT;
 	}
 
-	if (position.y + PADDLE_HEIGHT > SCREEN_HEIGHT)
+	if (position.y + PADDLE_HEIGHT > SCREEN_HEIGHT - HORIZ_WALL_HEIGHT)
 	{
-		position.y = SCREEN_HEIGHT - PADDLE_HEIGHT;
+		position.y = SCREEN_HEIGHT - HORIZ_WALL_HEIGHT - PADDLE_HEIGHT;
 	}
+
+	std::cout << "Paddle Direction: " << dir << "  |  Pos: " << position.y << std::endl;
 }
 
 Vector2 Paddle::GetPos()

@@ -37,6 +37,8 @@ float latencyRatio;
 bool packetSent = false;
 bool packetReceived = false;
 
+Paddle::MovementDirection clientPaddleDirection;
+
 void startGame();
 /* called when a client connects */
 void openHandler(int clientID){
@@ -85,34 +87,38 @@ void messageHandler(int clientID, string message){
 
 	if (message.compare("up") == 0 )
 	{
-		latencyRatio = LatencyManager::AverageClientToServerLatency / (float)REFRESH_RATE;
-		if (paddle1.dir == paddle1.MOVING_DOWN)
-		{
-			paddle1.position.y -= (int)((float)PADDLE_SPEED * latencyRatio);
-		}
-		paddle1.dir = paddle1.MOVING_UP;
+		//latencyRatio = LatencyManager::AverageClientToServerLatency / (float)REFRESH_RATE;
+		//if (paddle1.dir == paddle1.MOVING_DOWN)
+		//{
+		//	paddle1.position.y -= (int)((float)PADDLE_SPEED * latencyRatio);
+		//}
+		clientPaddleDirection = Paddle::MOVING_UP;
+		packetReceived = true;
+
     }
 	if (message.compare("down") == 0)
 	{
-		latencyRatio = LatencyManager::AverageClientToServerLatency / (float)REFRESH_RATE;
-		if (paddle1.dir == paddle1.MOVING_UP)
-		{
-			paddle1.position.y += (int)((float)PADDLE_SPEED * latencyRatio);
-		}
-		paddle1.dir = paddle1.MOVING_DOWN;
+		//latencyRatio = LatencyManager::AverageClientToServerLatency / (float)REFRESH_RATE;
+		//if (paddle1.dir == paddle1.MOVING_UP)
+		//{
+		//	paddle1.position.y += (int)((float)PADDLE_SPEED * latencyRatio);
+		//}
+		clientPaddleDirection = Paddle::MOVING_DOWN;
+		packetReceived = true;
 	}
 	if (message.compare("stop") == 0)
 	{
 		latencyRatio = LatencyManager::AverageClientToServerLatency / (float)REFRESH_RATE;
-		if (paddle1.dir == paddle1.MOVING_UP)
-		{
-			paddle1.position.y += (int)((float)PADDLE_SPEED * latencyRatio);
-		}
-		else if (paddle1.dir == paddle1.MOVING_DOWN)
-		{
-			paddle1.position.y -= (int)((float)PADDLE_SPEED * latencyRatio);
-		}
-		paddle1.dir = paddle1.NOT_MOVING;
+		//if (paddle1.dir == paddle1.MOVING_UP)
+		//{
+		//	paddle1.position.y += (int)((float)PADDLE_SPEED * latencyRatio);
+		//}
+		//else if (paddle1.dir == paddle1.MOVING_DOWN)
+		//{
+		//	paddle1.position.y -= (int)((float)PADDLE_SPEED * latencyRatio);
+		//}
+		clientPaddleDirection = Paddle::NOT_MOVING;
+		packetReceived = true;
 	}
 	if (message.substr(0, 5).compare("Name:") == 0)
 	{
@@ -187,7 +193,7 @@ void sendPlayerInfo()
 	estimatedBallPos.x = ball.position.x + (int)((float)(ball.velocity.x) * latencyRatio);
 	estimatedBallPos.y = ball.position.y + (int)((float)(ball.velocity.y) * latencyRatio);
 	vector<int> clientIDs = server.getClientIDs();
-	std::string paddleString = "pp" + to_string(paddle1.position.x);
+	std::string paddleString = "pp" + to_string(paddle1.position.y);
 	//std::string paddleString = "pp" + to_string(estimatedPaddlePos.y);
 	//std::string ballPosString = "bp" + to_string(estimatedBallPos.x) + "," + to_string(estimatedBallPos.y);
 	std::string ballPosString = "bp" + to_string(ball.position.x) + "," + to_string(ball.position.y);
@@ -195,6 +201,7 @@ void sendPlayerInfo()
 	std::string consecScoreString = "cs" + to_string(PlayerManager::consecutive_hits);
 	std::string totalScoreString = "ts" + to_string(PlayerManager::score);
 	std::string totalOppString = "to" + to_string(PlayerManager::score + PlayerManager::failures);
+	packetSent = true;
 	//SEND PADDLE POS
 
 	for (int i = 0; i < clientIDs.size(); ++i)
@@ -225,16 +232,17 @@ void sendLatencyTest()
 
 /* called once per select() loop */
 void periodicHandler(){
-	static clock_t baseClock = clock();
-	clock_t t = clock();
 	if (gameStarted)
 	{
-		if (((int)t - (int)baseClock) % REFRESH_RATE == 0){
-			paddle1.Update();
-			ball.BallUpdate(paddle1, topWall, bottomWall, rightWall);
-			sendPlayerInfo();
-			
+		if (packetReceived)
+		{
+			paddle1.dir = clientPaddleDirection;
+			packetReceived = false;
 		}
+		paddle1.Update();
+		ball.BallUpdate(paddle1, topWall, bottomWall, rightWall);
+		sendPlayerInfo();
+			
 
 		//if (((int)t - (int)baseClock) % LATENCY_POLL_RATE == 0){
 		//	if (!packetSent && !packetReceived)
@@ -253,21 +261,21 @@ void startGame()
 	ball.SetPos(SCREEN_WIDTH / 2, SCREEN_HEIGHT / 3);
 	ball.startingPos.x = SCREEN_WIDTH / 2;
 	ball.startingPos.y = SCREEN_WIDTH / 3;
-	ball.startingVel.x = -5;
-	ball.startingVel.y = 2;
-	ball.velocity.x = -5;
-	ball.velocity.y = 2;
+	ball.startingVel.x = -7;
+	ball.startingVel.y = 3;
+	ball.velocity.x = -7;
+	ball.velocity.y = 3;
 	ball.name = "Ball";
 	paddle1.SetPos(0, SCREEN_HEIGHT / 2);
 	paddle1.dir = paddle1.NOT_MOVING;
 	paddle1.SetHeight(PADDLE_HEIGHT);
 	paddle1.SetWidth(PADDLE_WIDTH);
 	paddle1.name = "Paddle1";
-	topWall.SetPos(PADDLE_WIDTH, 0);
+	topWall.SetPos(0, 0);
 	topWall.SetHeight(HORIZ_WALL_WIDTH);
 	topWall.SetWidth(HORIZ_WALL_HEIGHT);
 	topWall.name = "TopWall";
-	bottomWall.SetPos(PADDLE_WIDTH, SCREEN_HEIGHT - HORIZ_WALL_HEIGHT);
+	bottomWall.SetPos(0, SCREEN_HEIGHT - HORIZ_WALL_HEIGHT);
 	bottomWall.SetHeight(HORIZ_WALL_HEIGHT);
 	bottomWall.SetWidth(HORIZ_WALL_WIDTH);
 	bottomWall.name = "BottomWall";
@@ -282,7 +290,7 @@ void startGame()
 	EntityManager::AddEntity((Entity*)&rightWall);
 	PlayerManager::consecutive_hits = 0;
 	PlayerManager::failures = 0;
-	PlayerManager::score;
+	PlayerManager::score = 0;
 	gameStarted = true;
 }
 

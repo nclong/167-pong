@@ -78,11 +78,12 @@ void Ball::BallUpdate(Paddle paddle, Wall t, Wall b, Wall r)
 	//		}
 	//	}
 	//}
+	int randFactor = rand() & 2 + 1;
 
 	if (Left() < paddle.Right() && ((position.y > paddle.Top() && position.y < paddle.Bottom()) || Bottom() > paddle.Top() && Bottom() < paddle.Bottom()))
 	{
 		position.x = paddle.Right();
-		velocity.x *= -2;
+		velocity.x *= randFactor * -1;
 		PlayerManager::consecutive_hits++;
 		PlayerManager::score++;
 	}
@@ -90,27 +91,28 @@ void Ball::BallUpdate(Paddle paddle, Wall t, Wall b, Wall r)
 	if (Top() < t.Bottom())
 	{
 		position.y = t.Bottom();
-		velocity.y *= -2;
+		velocity.y *= randFactor * -1;
 	}
 
 	if (Right() > r.Left())
 	{
 		position.x = r.Left() - width;
-		velocity.x *= -2;
+		velocity.x *= randFactor * -1;
 	}
 
 	if (Bottom() > b.Top())
 	{
 		//Bottom Wall Collion
 		position.y = b.Top() - height;
-		velocity.y *= -2;
+		velocity.y *= randFactor * -1;
 	}
 
 
 	if (position.x < 0)
 	{
 		position = startingPos;
-		velocity = startingVel;
+		velocity.x = rand() % 6 - 3;
+		velocity.y = rand() % 2 + 1;
 		PlayerManager::consecutive_hits = 0;
 		PlayerManager::failures++;
 	}

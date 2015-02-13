@@ -711,7 +711,10 @@ void webSocket::startServer(int port){
 
     struct timeval timeout;
     time_t nextPingTime = time(NULL) + 1;
+	clock_t periodicCallStart = clock();
+	clock_t periodicCallTimer;
     while (FD_ISSET(listenfd, &fds)){
+		periodicCallTimer = clock();
         read_fds = fds;
         timeout.tv_sec = 0;
         timeout.tv_usec = 10000;
@@ -723,8 +726,8 @@ void webSocket::startServer(int port){
                         int newfd = accept(listenfd, (struct sockaddr*)&cli_addr, &addrlen);
                         if (newfd != -1){
                             /* add new client */
-                            wsAddClient(newfd, cli_addr.sin_addr);
-                            printf("New connection from %s on socket %d\n", inet_ntoa(cli_addr.sin_addr), newfd);
+							wsAddClient(newfd, cli_addr.sin_addr);
+							printf("New connection from %s on socket %d\n", inet_ntoa(cli_addr.sin_addr), newfd);
                         }
                     }
                     else {
@@ -749,8 +752,12 @@ void webSocket::startServer(int port){
             nextPingTime = time(NULL) + 1;
         }
 
-        if (callPeriodic != NULL)
-            callPeriodic();
+		if (callPeriodic != NULL &&
+			periodicCallTimer - periodicCallStart >= REFRESH_RATE )
+		{
+			callPeriodic();
+			periodicCallTimer = periodicCallStart = clock();
+		}
     }
 }
 

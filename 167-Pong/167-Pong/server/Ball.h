@@ -4,6 +4,7 @@
 #include "PlayerManager.h"
 #include "Paddle.h"
 #include "Wall.h"
+#include <random>
 
 class Ball : public Entity
 {
