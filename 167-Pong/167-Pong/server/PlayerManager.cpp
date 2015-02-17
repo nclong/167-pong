@@ -1,20 +1,9 @@
 #include "PlayerManager.h"
 
 
-void PlayerManager::add_score()
+void PlayerManager::add_score(int player)
 {
-	score += 1;
-	consecutive_hits += 1;
+	Players[player].score++;
 }
 
-void PlayerManager::add_failure()
-{
-	failures += 1;
-	consecutive_hits = 0;
-}
-
-std::string PlayerManager::id;
-bool PlayerManager::flag;
-int PlayerManager::score;
-int PlayerManager::failures;
-int PlayerManager::consecutive_hits;
+int PlayerManager::playerCount = 2;

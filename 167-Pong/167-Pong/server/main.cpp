@@ -17,13 +17,15 @@
 #include "PongTime.h"
 #include "LatencyManager.h"
 #include "PacketBuffer.h"
+#include "PacketTypes.h"
 
 using namespace std;
 
 webSocket server;
 bool gameStarted;
 Ball ball;
-Paddle paddle1;
+PlayerInfo player1;
+PlayerInfo player2;
 Wall topWall;
 Wall bottomWall;
 Wall rightWall;
@@ -37,9 +39,46 @@ float latencyRatio;
 bool packetSent = false;
 bool packetReceived = false;
 
+bool player1Connected = false;
+bool player2Connected = false;
+
 Paddle::MovementDirection clientPaddleDirection;
 
 void startGame();
+string FormatPacketString(SendTypes sendType, int clientId, int value1, int value2)
+{
+	string result = "";
+	switch (sendType)
+	{
+		case PaddlePosition:
+			result += "pp";
+			break;
+		case BallPosition:
+			result += "bp";
+			break;
+		case BallVelocity:
+			result += "bv";
+			break;
+		case PlayerScore:
+			result += "ps";
+			break;
+		default:
+			break;
+	}
+
+	result += "[";
+	result += to_string(clientId);
+	result += "]";
+	result += "{";
+	result += to_string(value1);
+	if (sendType == BallPosition || sendType == BallVelocity)
+	{
+		result += ",";
+		result += to_string(value2);
+	}
+	result += "}";
+	return result;
+}
 /* called when a client connects */
 void openHandler(int clientID){
     //ostringstream os;
@@ -51,7 +90,19 @@ void openHandler(int clientID){
     //        server.wsSend(clientIDs[i], os.str());
     //}
     //server.wsSend(clientID, "Welcome!");
-	startGame();
+	if (clientID == 0)
+	{
+		player1Connected = true;
+	}
+	if (clientID == 1)
+	{
+		player2Connected = true;
+	}
+
+	if (player1Connected && player2Connected)
+	{
+		startGame();
+	}
 }
 
 /* called when a client disconnects */
@@ -122,7 +173,7 @@ void messageHandler(int clientID, string message){
 	}
 	if (message.substr(0, 5).compare("Name:") == 0)
 	{
-		PlayerManager::id = message.substr(5);
+		//Set Player Stuff
 	}
 	if (message.substr(0, 5).compare("Time:") == 0)
 	{
@@ -163,55 +214,52 @@ void messageHandler(int clientID, string message){
 
 void sendPlayerInfo()
 {
-	latencyRatio = LatencyManager::AverageServerToClientLatency / (float)REFRESH_RATE;
-	Vector2 estimatedPaddlePos;
-	if (paddle1.dir == paddle1.NOT_MOVING)
-	{
-		estimatedPaddlePos = paddle1.position;
-	}
-	else if (paddle1.dir == paddle1.MOVING_UP)
-	{
-		int estY = paddle1.position.y - (int)((float)PADDLE_SPEED * latencyRatio );
-		if (estY < 0)
-		{
-			estY = 0;
-		}
-		estimatedPaddlePos.x = paddle1.position.x;
-		estimatedPaddlePos.y = estY;
-	}
-	else
-	{
-		int estY = paddle1.position.y + (int)((float)PADDLE_SPEED * latencyRatio);
-		if (estY + paddle1.height > SCREEN_HEIGHT)
-		{
-			estY = SCREEN_HEIGHT - paddle1.height;
-		}
-		estimatedPaddlePos.x = paddle1.position.x;
-		estimatedPaddlePos.y = estY;
-	}
-	Vector2 estimatedBallPos;
-	estimatedBallPos.x = ball.position.x + (int)((float)(ball.velocity.x) * latencyRatio);
-	estimatedBallPos.y = ball.position.y + (int)((float)(ball.velocity.y) * latencyRatio);
-	vector<int> clientIDs = server.getClientIDs();
-	std::string paddleString = "pp" + to_string(paddle1.position.y);
-	//std::string paddleString = "pp" + to_string(estimatedPaddlePos.y);
-	//std::string ballPosString = "bp" + to_string(estimatedBallPos.x) + "," + to_string(estimatedBallPos.y);
-	std::string ballPosString = "bp" + to_string(ball.position.x) + "," + to_string(ball.position.y);
-	std::string ballVelString = "bv" + to_string(ball.velocity.x) + "," + to_string(ball.velocity.y);
-	std::string consecScoreString = "cs" + to_string(PlayerManager::consecutive_hits);
-	std::string totalScoreString = "ts" + to_string(PlayerManager::score);
-	std::string totalOppString = "to" + to_string(PlayerManager::score + PlayerManager::failures);
-	packetSent = true;
-	//SEND PADDLE POS
+	//latencyRatio = LatencyManager::AverageServerToClientLatency / (float)REFRESH_RATE;
+	//Vector2 estimatedPaddlePos;
+	//if (paddle1.dir == paddle1.NOT_MOVING)
+	//{
+	//	estimatedPaddlePos = paddle1.position;
+	//}
+	//else if (paddle1.dir == paddle1.MOVING_UP)
+	//{
+	//	int estY = paddle1.position.y - (int)((float)PADDLE_SPEED * latencyRatio );
+	//	if (estY < 0)
+	//	{
+	//		estY = 0;
+	//	}
+	//	estimatedPaddlePos.x = paddle1.position.x;
+	//	estimatedPaddlePos.y = estY;
+	//}
+	//else
+	//{
+	//	int estY = paddle1.position.y + (int)((float)PADDLE_SPEED * latencyRatio);
+	//	if (estY + paddle1.height > SCREEN_HEIGHT)
+	//	{
+	//		estY = SCREEN_HEIGHT - paddle1.height;
+	//	}
+	//	estimatedPaddlePos.x = paddle1.position.x;
+	//	estimatedPaddlePos.y = estY;
+	//}
+	//Vector2 estimatedBallPos;
+	//estimatedBallPos.x = ball.position.x + (int)((float)(ball.velocity.x) * latencyRatio);
+	//estimatedBallPos.y = ball.position.y + (int)((float)(ball.velocity.y) * latencyRatio);
+	
+	string Player1Paddle = FormatPacketString(PaddlePosition, 0, PlayerManager::Players[0].paddle.position.y, 0);
+	string Player2Paddle = FormatPacketString(PaddlePosition, 1, PlayerManager::Players[1].paddle.position.y, 0);
+	string ballPos = FormatPacketString(BallPosition, 0, ball.position.x, ball.position.y);
+	string ballVel = FormatPacketString(BallVelocity, 0, ball.velocity.x, ball.velocity.y);
+	string Player1Score = FormatPacketString(PlayerScore, 0, PlayerManager::Players[0].score, 0);
+	string Player2Score = FormatPacketString(PlayerScore, 0, PlayerManager::Players[1].score, 0);
 
+	vector<int> clientIDs = server.getClientIDs();
 	for (int i = 0; i < clientIDs.size(); ++i)
 	{
-		server.wsSend(clientIDs[i], paddleString);
-		server.wsSend(clientIDs[i], ballPosString);
-		server.wsSend(clientIDs[i], ballVelString);
-		server.wsSend(clientIDs[i], consecScoreString);
-		server.wsSend(clientIDs[i], totalScoreString);
-		server.wsSend(clientIDs[i], totalOppString);
+		server.wsSend(i, Player1Paddle);
+		server.wsSend(i, Player2Paddle);
+		server.wsSend(i, ballPos);
+		server.wsSend(i, ballVel);
+		server.wsSend(i, Player1Score);
+		server.wsSend(i, Player2Score);
 	}
 }
 
@@ -288,9 +336,6 @@ void startGame()
 	EntityManager::AddEntity((Entity*)&topWall);
 	EntityManager::AddEntity((Entity*)&bottomWall);
 	EntityManager::AddEntity((Entity*)&rightWall);
-	PlayerManager::consecutive_hits = 0;
-	PlayerManager::failures = 0;
-	PlayerManager::score = 0;
 	gameStarted = true;
 }
 

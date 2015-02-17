@@ -19,6 +19,7 @@
     <ClCompile Include="server\main.cpp" />
     <ClCompile Include="server\PacketBuffer.cpp" />
     <ClCompile Include="server\Paddle.cpp" />
+    <ClCompile Include="server\PlayerInfo.cpp" />
     <ClCompile Include="server\PlayerManager.cpp" />
     <ClCompile Include="server\PongTime.cpp" />
     <ClCompile Include="server\sha1.cpp" />
@@ -34,7 +35,9 @@
     <ClInclude Include="server\EntityManager.h" />
     <ClInclude Include="server\LatencyManager.h" />
     <ClInclude Include="server\PacketBuffer.h" />
+    <ClInclude Include="server\PacketTypes.h" />
     <ClInclude Include="server\Paddle.h" />
+    <ClInclude Include="server\PlayerInfo.h" />
     <ClInclude Include="server\PlayerManager.h" />
     <ClInclude Include="server\PongTime.h" />
     <ClInclude Include="server\sha1.h" />

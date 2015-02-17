@@ -15,6 +15,9 @@
 #pragma comment(lib, "iphlpapi.lib")
 #define MALLOC(x) HeapAlloc(GetProcessHeap(), 0, (x))
 #define FREE(x) HeapFree(GetProcessHeap(), 0, (x))
+#define SHUT_RD SD_RECEIVE
+#define SHUT_WR SD_SEND
+#define SHUT_RDWR SD_BOTH
 #endif
 
 #include <stdio.h>
@@ -727,6 +730,12 @@ void webSocket::startServer(int port){
                         if (newfd != -1){
                             /* add new client */
 							wsAddClient(newfd, cli_addr.sin_addr);
+							if (wsClients.size() >= 2)
+							{
+								printf("Connection Refused from %s. Already two players in game.", inet_ntoa(cli_addr.sin_addr));
+								wsSendClientClose(wsClients.size() - 1, WS_STATUS_PROTOCOL_ERROR);
+								wsRemoveClient(wsClients.size() - 1);
+							}
 							printf("New connection from %s on socket %d\n", inet_ntoa(cli_addr.sin_addr), newfd);
                         }
                     }

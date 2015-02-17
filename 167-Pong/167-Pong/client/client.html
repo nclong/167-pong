@@ -22,12 +22,12 @@
         var PacketSentFromClient;
         var PacketReceivedAtServer;
 
-        var paddlePosReceived = false;
+        var paddle1PosReceived = false;
+        var paddle2PosReceived = false;
         var ballPosReceived = false;
         var ballVelReceived = false;
-        var consecHitsReceived = false;
-        var scoreReceived = false;
-        var opportunitiesReceived = false;
+        var score1Received = false;
+        var score2Received = false;
 
         var serverPaddlePos;
         var serverBallPosX;
@@ -37,6 +37,9 @@
         var serverConsecHits;
         var serverScore;
         var serverOpportunities;
+
+        var thisClientID;
+        var otherClientID;
 
  		// Temporary server variables:
  		var tempIP;
@@ -100,7 +103,11 @@
 		    return t.getHours().toString() + ":" + t.getMinutes().toString()
             + ":" + t.getSeconds().toString() + ":" + t.getMilliseconds().toString();
 		}
-
+		function FormatPacketString(startString)
+		{
+		    startString += "[" + thisClientID.toString() + "]";
+		    return startString;
+		}
 	function initialize() { 
 
 		connected = false; // you are not connected to server.
@@ -226,12 +233,12 @@
 	function update()
 	{
 
-	    if(paddlePosReceived
+	    if (paddle2PosReceived
+        && paddle2PosReceived
 	    && ballPosReceived 
 	    && ballVelReceived 
-	    && consecHitsReceived 
-	    && scoreReceived 
-	    && opportunitiesReceived )
+	    && score1Received 
+	    && score2Received)
 	    {
 	        player1Position = serverPaddlePos;
 	        ballX = serverBallPosX;
@@ -555,11 +562,18 @@
 			Server.bind('message', function (payload) {
 			    console.log("Received Message: " + payload);
 			    typeStr = payload.substring(0, 2);
-			    dataStr = payload.substring(2);
+			    var leftBracketIndex = payload.indexOf("[");
+			    var rightBracketIndex = payload.indexOf("]");
+			    var leftBraceIndex = payload.indexOf("{");
+			    var rightBraceIndex = payload.indexOf("}");
+			    var packetClient = parseInt(payload.substring(leftBracketIndex + 1, rightBracketIndex - leftBracketIndex - 1));
+			    dataStr = payload.substring(leftBraceIndex + 1, rightBraceIndex - leftBraceIndex - 1);
 			    if( typeStr === "pp")
 			    {
                     // Set paddle position.
-                    //console.log("Message: Paddle Position Update");
+			        //console.log("Message: Paddle Position Update");
+                    
+                    //Need to determine which paddle moves where
 			        serverPaddlePos = parseInt(dataStr);
 			        paddlePosReceived = true;
 			    }
@@ -583,33 +597,9 @@
 			        serverBallVelY = parseInt(yStr);
 			        ballVelReceived = true;
 			    }
-			    else if (typeStr === "cs")
+			    else if( typeStr === "ps" )
 			    {
-			        serverConsecHits = dataStr;
-			        consecHitsReceived = true;
-			    }
-			    else if (typeStr === "ts")
-			    {
-			        serverScore = dataStr;
-			        scoreReceived = true;
-			    }
-			    else if (typeStr === "to")
-			    {
-			        serverOpportunities = dataStr;
-			        opportunitiesReceived = true;
-			    }
-
-			    else if (typeStr === "ti") // time
-			    {
-			        var packetNum = dataStr[0];
-			        dataStr = dataStr.substring(1);
-			        PacketReceivedAtClient = toLatencyTime(new Date());
-			        PacketSentFromServer = dataStr;
-			        var toSend = "Time:";
-			        toSend += PacketReceivedAtClient;
-			        toSend += ",";
-			        toSend += PackSentFromClient = toLatencyTime(new Date());
-			        send(toSend);
+                    //Need to update the appropriate player score
 			    }
 
 			});

@@ -1,5 +1,6 @@
 #pragma once
 #include<string>
+#include"PlayerInfo.h"
 class PlayerManager
 {
 public:
@@ -7,15 +8,11 @@ public:
 	~PlayerManager(){};
 
 	static void Init_PlayerManager();
+	static PlayerInfo Players[2];
+	static void add_score(int player);
 
-	static void add_score();
-	static void add_failure();
-
-	static std::string id;
-	static bool flag;
-	static int score;
-	static int failures;
-	static int consecutive_hits;
+private:
+	static int playerCount;
 
 };
 
