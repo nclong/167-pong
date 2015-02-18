@@ -127,11 +127,8 @@
 
 		connected = false; // you are not connected to server
 
-		myName = "defaultGuy"; // set temp names.
-        theirName = "itHurtsWhenIP"; // set temp names.
-
-        setPlayer1Name(myName);
-        setPlayer2Name(theirName);
+       // setPlayer1Name("itHurtsWhenIP");
+       // setPlayer2Name("itHurtsWhenIP");
 
         player1Score = 0; // init
 		player2Score = 0; // init
@@ -765,13 +762,13 @@
 			    {
 			        if( packetClient === 0)
 			        {
-			            player1Score = dataStr;
+			            player1Score = parseInt(dataStr);
 			            score1Received = true;
-			            setYourScore
+			            
 			        }
 			        else if ( packetClient === 1)
 			        {
-			            player2Score = dataStr;
+			            player2Score = parseInt(dataStr);
 			            score2Received = true;
 			        }
 			    }
