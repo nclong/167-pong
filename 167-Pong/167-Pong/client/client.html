@@ -291,7 +291,7 @@
 	function update()
 	{
 
-	    if (paddle2PosReceived
+	    if (paddle1PosReceived
         && paddle2PosReceived
 	    && ballPosReceived 
 	    && ballVelReceived 
@@ -682,7 +682,15 @@
                     
                     //Need to determine which paddle moves where
 			        serverPaddlePos = parseInt(dataStr);
-			        paddlePosReceived = true;
+			        if (packetClient === 0) // if this is player 1
+			        {
+			            serverPaddle1Pos = serverPaddlePos;
+			            paddle1PosReceived = true;
+			        }
+			        else {
+			            serverPaddle2Pos = serverPaddlePos;
+			            paddle2PosReceived = true;
+			        }
 			    }
 			    else if( typeStr === "bp" )
 			    {	
