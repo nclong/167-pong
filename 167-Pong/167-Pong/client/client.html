@@ -246,7 +246,7 @@
 		}
 
 	}
-	function paddleUpdate()
+	function paddleUpdate() // displayed
 	{
 	    if( paddle1MovingUp )
 	    {
@@ -307,6 +307,8 @@
 	        player2Score = serverPlayer2Score;
 	        //Set stuff from server
 	        paddlePosReceived = false;
+			paddle1PosReceived = false;
+			paddle2PosReceived = false;
 	        ballPosReceived = false;
 	        ballVelReceived = false;
 	        score1Received = false;
@@ -686,10 +688,12 @@
 			        {
 			            serverPaddle1Pos = serverPaddlePos;
 			            paddle1PosReceived = true;
+			            console.log("My Paddle position recieved.")
 			        }
 			        else {
 			            serverPaddle2Pos = serverPaddlePos;
 			            paddle2PosReceived = true;
+			            console.log("Opponent Paddle position recieved.")
 			        }
 			    }
 			    else if( typeStr === "bp" )
