@@ -130,6 +130,8 @@
        // setPlayer1Name("itHurtsWhenIP");
        // setPlayer2Name("itHurtsWhenIP");
 
+       	myName = "";
+
         player1Score = 0; // init
 		player2Score = 0; // init
 
@@ -473,13 +475,13 @@
 
 	function setPlayer1Name(n) // should be run only once.
 		{
-			// takes in a string.
-			document.getElementById("p1Name").innerHTML = n;
+			var temp = document.getElementById("p1Name");
+			temp.innerHTML = n.toString();
 		}
 	function setPlayer2Name(n) // should be run only once.
 		{
-			// takes in a string.
-			document.getElementById("p2Name").innerHTML = n;
+			var temp = document.getElementById("p2Name");
+			temp.innerHTML = n.toString();
 		}
 
 
@@ -652,9 +654,9 @@
        	 function connect(){
             console.log("Connecting...to server.");
 
-            // myName = document.getElementById("myNameIs").innerHTML;
-            setPlayer1Name("connecting...");
-            setPlayer2Name("connecting...");
+            myName = document.getElementById("myNameIs").innerHTML;
+            setPlayer1Name("connecting..."); // change
+            setPlayer2Name("connecting..."); // change
 
             // save my name.
           
@@ -730,12 +732,12 @@
 			        {
 			            serverPaddle1Pos = serverPaddlePos;
 			            paddle1PosReceived = true;
-			            console.log("My Paddle position recieved.")
+			            //console.log("My Paddle position recieved.")
 			        }
 			        else {
 			            serverPaddle2Pos = serverPaddlePos;
 			            paddle2PosReceived = true;
-			            console.log("Opponent Paddle position recieved.")
+			            //console.log("Opponent Paddle position recieved.")
 			        }
 			    }
 			    else if( typeStr === "bp" )
@@ -762,13 +764,13 @@
 			    {
 			        if( packetClient === 0)
 			        {
-			            player1Score = parseInt(dataStr);
+			            serverPlayer1Score = parseInt(dataStr);
 			            score1Received = true;
 			            
 			        }
 			        else if ( packetClient === 1)
 			        {
-			            player2Score = parseInt(dataStr);
+			            serverPlayer2Score = parseInt(dataStr);
 			            score2Received = true;
 			        }
 			    }
