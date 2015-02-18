@@ -12,5 +12,7 @@ public:
 	int clientId;
 	Paddle paddle;
 	Paddle::MovementDirection movementDirection;
+	Paddle::MovementDirection clientMovementDirection;
+	bool packetReceived = false;
 };
 

@@ -7,3 +7,5 @@ void PlayerManager::add_score(int player)
 }
 
 int PlayerManager::playerCount = 2;
+
+PlayerInfo PlayerManager::Players[2];

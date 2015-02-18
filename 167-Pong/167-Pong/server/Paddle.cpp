@@ -31,9 +31,9 @@ void Paddle::Update()
 		position.y += PADDLE_SPEED;
 	}
 
-	if (position.y < HORIZ_WALL_HEIGHT)
+	if (position.y < 0)
 	{
-		position.y = HORIZ_WALL_HEIGHT;
+		position.y = 0;
 	}
 
 	if (position.y + PADDLE_HEIGHT > SCREEN_HEIGHT - HORIZ_WALL_HEIGHT)

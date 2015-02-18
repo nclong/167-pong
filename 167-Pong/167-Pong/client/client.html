@@ -15,7 +15,11 @@
 	<script src="https://code.jquery.com/jquery-2.1.1.min.js"></script>
 
  	<script>        // Drawing script!
-
+        //HERE ARE SOME THINGS TO DO
+        //IMPLIMENT THE SECOND PADDLE
+        //DISPLAY BOTH USER NAMES
+        //DISPLAY BOTH SCORES
+        //GAME SHOULD NOT START readyToPlay === true
         //Strings
         var PacketSentFromServer;
         var PacketReceivedAtClient;
@@ -29,17 +33,29 @@
         var score1Received = false;
         var score2Received = false;
 
-        var serverPaddlePos;
+        var readyToStart = false;
+
+        var serverPaddle1Pos;
+        var serverPaddle2Pos;
         var serverBallPosX;
         var serverBallPosY;
         var serverBallVelX;
         var serverBallVelY;
-        var serverConsecHits;
-        var serverScore;
-        var serverOpportunities;
+        var serverPlayer1Score;
+        var serverPlayer2Score;
+
+        var paddle1MovingUp = false;
+        var paddle1MovingDown = false;
+        var paddle1Stopped = true;
+
+        var paddle2MovingUp = false;
+        var paddle2MovingDown = false;
+        var paddle2Stopped = true;
 
         var thisClientID;
         var otherClientID;
+
+        var clientIDReceived = false;
 
  		// Temporary server variables:
  		var tempIP;
@@ -66,7 +82,9 @@
 
 		var stepsize; // The distance the paddle travels.
 		var player1Position; // position of player one paddle.
+		var player2Position;
 		var player1; // reference to player1 sprite.
+		var player2;
 		var paddleOffset; // offset for the paddle sprite.
 
 		var paddleMoving; // paddle moving
@@ -82,9 +100,8 @@
 
 		// game statistics
 
-		var consecHits; // consecutive hits
-		var score; // the score of the players
-		var opportunity; // opportunities 
+		var player1Score;
+		var player2Score;
 
 
 		// image links
@@ -96,26 +113,20 @@
 		var borderBottom;  // bottom border sprite
 		var ball; // ball sprite
 
-        // Initialize all variables.
+    // Initialize all variables.
 
-		function toLatencyTime( t )
-		{
-		    return t.getHours().toString() + ":" + t.getMinutes().toString()
-            + ":" + t.getSeconds().toString() + ":" + t.getMilliseconds().toString();
-		}
-		function FormatPacketString(startString)
-		{
-		    startString += "[" + thisClientID.toString() + "]";
-		    return startString;
-		}
+	function FormatPacketString(startString)
+	{
+		startString += "[" + thisClientID.toString() + "]";
+		return startString;
+	}
 	function initialize() { 
 
 		connected = false; // you are not connected to server.
 
 		d = new Date();
-		time = toLatencyTime(d); // do conversion, need to keep doing it.
 		// Debug stuff.
-		console.log(time.toString());
+		//console.log(time.toString());
 
 		tempIP = "127.0.0.1";
  		tempPort = "8080";
@@ -142,10 +153,11 @@
 		// Get my sprites.
  		board = document.getElementById("bg");
  		borderTop = document.getElementById("top-Border");
- 		borderRight = document.getElementById("right-Border"); 
+ 		//borderRight = document.getElementById("right-Border"); 
  		borderLeft = document.getElementById("right-Border"); // use the same!
  		borderBottom = document.getElementById("bottom-Border");
  		player1 = document.getElementById("paddle1");
+ 		player2 = document.getElementById("paddle2"); //Needs to be made
  		ball = document.getElementById("baller");
 
  		// Set my sprite offsets here.
@@ -176,35 +188,97 @@
 	function drawGameBoard() // draws all the static elements.
 	{
 		ctx.drawImage(board, 0, 0, 1200, 500); 
-		ctx.drawImage(borderRight, 1180, 0, 20, 500);
 		ctx.drawImage(borderLeft, 0, 0, 20, 500);
 		ctx.drawImage(borderTop, 0, 0, 1200, 20); 
 		ctx.drawImage(borderBottom, 0, 480, 1200, 20);
 	}
 
-	function drawPaddle() // the value we get 
+	function drawPaddle1() // the value we get 
 	{
 		ctx.drawImage(player1, 20, player1Position, 30, 100);
 	}
 
+	function drawPaddle2()
+	{
+	    ctx.drawImage(player2, 50, player2Position, 30, 100);
+	}
+
 	function movePaddle(i) // takes in an integer. 0 for up, 1 for down.
 	{
-			if (i == 0)
-			{
-				console.log("Paddle moving up");
-				paddleDirection = 0; // set Paddle direction to up.
-				send("up"); // send up message to server
-				
-			}
+	    if (thisClientID == 0) {
+	        if (i == 0) {
+	            console.log("Paddle moving up");
+	            paddle1MovingUp = true;
+	            paddle1MovingDown = false;
+	            paddle1Stopped = false;
+	            send(FormatPacketString("up")); // send up message to server
 
-			else if (i == 1)
-			{
-				console.log("Paddle moving down");
-				paddleDirection = 1; // set Padle direction do down.
-				send("down"); // send down message to server
+	        }
 
-			}
+	        else if (i == 1) {
+	            console.log("Paddle moving down");
+	            paddle1MovingUp = false;
+	            paddle1MovingDown = true;
+	            paddle1Stopped = false;
+	            send(FormatPacketString("down")); // send down message to server
+
+	        }
+		}
+	    else {
+	        if (i == 0) {
+	            console.log("Paddle moving up");
+	            paddle2MovingUp = true;
+	            paddle2MovingDown = false;
+	            paddle2Stopped = false;
+	            send(FormatPacketString("up")); // send up message to server
+
+	        }
+
+	        else if (i == 1) {
+	            console.log("Paddle moving down");
+	            paddle2MovingUp = false;
+	            paddle2MovingDown = true;
+	            paddle2Stopped = false;
+	            send(FormatPacketString("down")); // send down message to server
+
+	        }
+		}
+
 	}
+	function paddleUpdate()
+	{
+	    if( paddle1MovingUp )
+	    {
+	        if(player1Position-stepsize > 0)
+	        {
+	            player1Position-=stepsize;
+	        }
+	    }
+
+	    if( paddle1MovingDown )
+	    {
+	        if(player1Position+stepsize+100 < cHeight ) 
+	        {
+	            player1Position+=stepsize;
+	        }
+	    }
+
+	    if( paddle2MovingUp )
+	    {
+	        if(player2Position-stepsize > 0)
+	        {
+	            player2Position-=stepsize;
+	        }
+	    }
+
+	    if( paddle2MovingDown )
+	    {
+	        if(player2Position+stepsize+100 < cHeight ) 
+	        {
+	            player2Position+=stepsize;
+	        }
+	    }
+	} 
 
 	function paddleMoveUpDown()
 	{
@@ -238,28 +312,28 @@
 	    && ballPosReceived 
 	    && ballVelReceived 
 	    && score1Received 
-	    && score2Received)
+	    && score2Received
+        && readyToStart)
 	    {
-	        player1Position = serverPaddlePos;
+	        player1Position = serverPaddle1Pos;
+	        player2Position = serverPaddle2Pos;
 	        ballX = serverBallPosX;
 	        ballY = serverBallPosY;
-	        consecHits = serverConsecHits;
-	        score = serverScore;
-	        opportunity = serverOpportunities;
+	        player1Score = serverPlayer1Score;
+	        player2Score = serverPlayer2Score;
 	        //Set stuff from server
 	        paddlePosReceived = false;
 	        ballPosReceived = false;
 	        ballVelReceived = false;
-	        consecHitsReceived = false;
-	        scoreReceived = false;
-	        opportunitiesReceived = false;
+	        score1Received = false;
+	        score2Received = false;
 	    }
-        else
-        {
-		    ballX += ballVelocityX; // adds velocity per update loop
-		    ballY += ballVelocityY;  // adds velocty per update loop
-		    paddleMoveUpDown();
-        }
+	    else
+	    {
+	        ballX += ballVelocityX; // adds velocity per update loop
+	        ballY += ballVelocityY;  // adds velocty per update loop
+	        paddleUpdate();
+	    }
 		incrementMyTimer(); // increment timer;
 	}
 
@@ -269,7 +343,8 @@
 		window.onkeyup = release; 
 		window.setInterval(update, 33); // run update loop
 		window.setInterval(drawGameBoard, 33); // draw the board.
-		window.setInterval(drawPaddle, 33);  // draw paddle
+		window.setInterval(drawPaddle1, 33);  // draw paddle
+		window.setInterval(drawPaddle2, 33);
 		window.setInterval(drawBall, 33); // draw ball
 		window.setInterval(refreshStats, 33); // refreshes stats.
 		// window.setInterval(connectionToggle, 3000); // updates every 3 s.
@@ -306,8 +381,18 @@
 	{
 		paddleMoving = false; 
 		keyDown = false;
-		console.log("key release dskjfsldkjfsl");
-		send("stop"); // send stop message to server
+		if (thisClientID == 0)
+		{
+		    cvingUp = false;
+		    paddle1MovingDown = false;
+		    paddle1Stopped = true;
+		}
+		else {
+		    paddle2MovingUp = false;
+		    paddle2MovingDown = false;
+		    paddle2Stopped = true;
+		}
+		send(FormatPacketString("stop")); // send stop message to server
 	}
 
 	function setConsecutiveHits(i)
@@ -356,14 +441,12 @@
 		setConsecutiveHits(consecHits)
 		setScore(score);
 		setOpportunity(opportunity);
-		setTimeCurrent(time);
 		
 	}
 
 	function incrementMyTimer() 
 	{
     d = new Date();
-	time = toLatencyTime(d); // update this.
    
 	}
 
@@ -546,7 +629,9 @@
 			//Let the user know we're connected
 			Server.bind('open', function() {
 			    console.log("Connected to server.");
-			    send("Name:" + document.getElementById('name').val);
+			    var nameString = FormatPacketString("Name");
+			    nameString += "[" + thisClientID.toString() + "]" + "{" + document.getElementById('name').value + "}";
+			    send(nameString);
 			    connected = true; // set this to true.
 			    var c = document.getElementById("toggleConnection");
 			    c.innerHTML = "Connected! (Press to D/C)"
@@ -568,7 +653,26 @@
 			    var rightBraceIndex = payload.indexOf("}");
 			    var packetClient = parseInt(payload.substring(leftBracketIndex + 1, rightBracketIndex - leftBracketIndex - 1));
 			    dataStr = payload.substring(leftBraceIndex + 1, rightBraceIndex - leftBraceIndex - 1);
-			    if( typeStr === "pp")
+			    if (typeStr === "rd")
+			    {
+			        readyToStart = true;
+			    }
+
+			    if (typeStr === "ci")
+			    {
+			        if( packetClient === 0)
+			        {
+			            thisClientID = 0;
+			            otherClientID = 1;
+			        }
+			        else
+			        {
+			            thisClientID = 1;
+			            otherClientID = 0;
+			        }
+			    }
+
+			    if (typeStr === "pp")
 			    {
                     // Set paddle position.
 			        //console.log("Message: Paddle Position Update");

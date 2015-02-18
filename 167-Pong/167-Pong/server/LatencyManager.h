@@ -1,3 +1,4 @@
+//Bad class
 #pragma once
 class LatencyManager
 {

@@ -731,12 +731,13 @@ void webSocket::startServer(int port){
                             /* add new client */
 							wsAddClient(newfd, cli_addr.sin_addr);
 							if (wsClients.size() >= 2)
-							{
-								printf("Connection Refused from %s. Already two players in game.", inet_ntoa(cli_addr.sin_addr));
-								wsSendClientClose(wsClients.size() - 1, WS_STATUS_PROTOCOL_ERROR);
-								wsRemoveClient(wsClients.size() - 1);
-							}
+							//{
+							//	printf("Connection Refused from %s. Already two players in game.", inet_ntoa(cli_addr.sin_addr));
+							//	wsSendClientClose(wsClients.size() - 1, WS_STATUS_PROTOCOL_ERROR);
+							//	wsRemoveClient(wsClients.size() - 1);
+							//}
 							printf("New connection from %s on socket %d\n", inet_ntoa(cli_addr.sin_addr), newfd);
+
                         }
                     }
                     else {
@@ -765,6 +766,7 @@ void webSocket::startServer(int port){
 			periodicCallTimer - periodicCallStart >= REFRESH_RATE )
 		{
 			callPeriodic();
+			//Start Both timers over
 			periodicCallTimer = periodicCallStart = clock();
 		}
     }
