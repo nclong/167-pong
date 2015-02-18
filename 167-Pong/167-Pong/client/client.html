@@ -658,6 +658,7 @@
 			    if (typeStr === "rd")
 			    {
 			        readyToStart = true;
+                    send("ready["+thisClientID.toString()+"]")
 			    }
 
 			    if (typeStr === "ci") // client ID

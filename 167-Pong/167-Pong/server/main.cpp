@@ -158,11 +158,6 @@ void messageHandler(int clientID, string message){
 		{
 			player2Ready = true;
 		}
-
-		if (player1Ready && player2Ready)
-		{
-			startGame();
-		}
 	}
 
 	if (typeString.compare("up") == 0 )
@@ -262,6 +257,11 @@ void sendPlayerInfo()
 
 /* called once per select() loop */
 void periodicHandler(){
+	if (player1Ready && player2Ready)
+	{
+		startGame();
+	}
+
 	if (gameStarted)
 	{
 		for (int i = 0; i < PlayerManager::playerCount; ++i)
