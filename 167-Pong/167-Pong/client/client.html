@@ -652,8 +652,9 @@
 			    var rightBracketIndex = payload.indexOf("]");
 			    var leftBraceIndex = payload.indexOf("{");
 			    var rightBraceIndex = payload.indexOf("}");
-			    var packetClient = parseInt(payload.substring(leftBracketIndex + 1, rightBracketIndex - leftBracketIndex - 1));
-			    dataStr = payload.substring(leftBraceIndex + 1, rightBraceIndex - leftBraceIndex - 1);
+			    var packetClient = 
+			    parseInt(payload.substring(leftBracketIndex + 1, rightBracketIndex));
+			    dataStr = payload.substring(leftBraceIndex + 1, rightBraceIndex);
 			    if (typeStr === "rd")
 			    {
 			        readyToStart = true;
