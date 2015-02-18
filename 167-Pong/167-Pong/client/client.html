@@ -52,8 +52,8 @@
         var paddle2MovingDown = false;
         var paddle2Stopped = true;
 
-        var thisClientID;
-        var otherClientID;
+        var thisClientID = 0;
+        var otherClientID = 1;
 
         var clientIDReceived = false;
 
@@ -187,20 +187,22 @@
 
 
 	function drawGameBoard() // draws all the static elements.
-	{
-		ctx.drawImage(board, 0, 0, 1200, 500); 
-		ctx.drawImage(borderLeft, 0, 0, 20, 500);
-		ctx.drawImage(borderTop, 0, 0, 1200, 20); 
-		ctx.drawImage(borderBottom, 0, 480, 1200, 20);
-	}
+		{
+			ctx.drawImage(board, 0, 0, 1200, 500); 
+			ctx.drawImage(borderLeft, 0, 0, 20, 500);
+			ctx.drawImage(borderTop, 0, 0, 1200, 20); 
+			ctx.drawImage(borderBottom, 0, 480, 1200, 20);
+		}
 
 	function drawPaddle1() // the value we get 
 	{
+		console.log("Paddle 1 drawn");
 		ctx.drawImage(player1, 20, player1Position, 30, 100);
 	}
 
 	function drawPaddle2()
 	{
+		console.log("Paddle 2 drawn");
 	    ctx.drawImage(player2, cWidth-30, player2Position, 30, 100);
 	}
 
@@ -306,7 +308,6 @@
 	        player1Score = serverPlayer1Score;
 	        player2Score = serverPlayer2Score;
 	        //Set stuff from server
-	        paddlePosReceived = false;
 			paddle1PosReceived = false;
 			paddle2PosReceived = false;
 	        ballPosReceived = false;
@@ -320,7 +321,7 @@
 	        ballY += ballVelocityY;  // adds velocty per update loop
 	        paddleUpdate();
 	    }
-		incrementMyTimer(); // increment timer;
+		// incrementMyTimer(); // increment timer;
 	}
 
 	$(document).ready(function(){
@@ -344,7 +345,6 @@
 	    }
 
 		if(e.keyCode == 38) {
-	        //movePaddleUp();
 	        if (!keyDown)
 	        {
 	        	paddleMoving = true;
@@ -353,7 +353,6 @@
 	    	}      
 	    }
 	    else if(e.keyCode == 40) {
-	        //movePaddleDown();
 	        if (!keyDown)
 	        {
 	        	paddleMoving = true;
@@ -367,13 +366,13 @@
 	{
 		paddleMoving = false; 
 		keyDown = false;
-		if (thisClientID == 0)
+		if (thisClientID === 0)
 		{
 		    paddle1MovingUp = false;
 		    paddle1MovingDown = false;
 		    paddle1Stopped = true;
 		}
-		else {
+		else if (thisClientID === 1){
 		    paddle2MovingUp = false;
 		    paddle2MovingDown = false;
 		    paddle2Stopped = true;
@@ -654,8 +653,7 @@
 			    var rightBracketIndex = payload.indexOf("]");
 			    var leftBraceIndex = payload.indexOf("{");
 			    var rightBraceIndex = payload.indexOf("}");
-			    var packetClient = 
-			    parseInt(payload.substring(leftBracketIndex + 1, rightBracketIndex));
+			    var packetClient = parseInt(payload.substring(leftBracketIndex + 1, rightBracketIndex));
 			    dataStr = payload.substring(leftBraceIndex + 1, rightBraceIndex);
 			    if (typeStr === "rd")
 			    {
@@ -670,7 +668,7 @@
 			            thisClientID = 0;
 			            otherClientID = 1;
 			        }
-			        else
+			        else if ( packetClient === 1)
 			        {
 			            thisClientID = 1; // if this is player 2
 			            otherClientID = 0;
