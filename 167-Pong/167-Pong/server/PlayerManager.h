@@ -8,8 +8,7 @@ public:
 	~PlayerManager(){};
 
 	static void Init_PlayerManager();
-	static PlayerInfo Players[2];
-	static void add_score(int player);
+	static PlayerInfo* Players[2];
 	static int playerCount;
 
 };

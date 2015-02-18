@@ -36,21 +36,21 @@ void Ball::SetPos(int x, int y)
 	position.x = x;
 	position.y = y;
 }
-void Ball::BallUpdate(Paddle paddle1, Paddle paddle2, Wall t, Wall b)
+void Ball::BallUpdate(Paddle* paddle1, Paddle* paddle2, Wall t, Wall b)
 {
 
 	position += velocity;
 	int randFactor = rand() % 3 + 1;
 
-	if (Left() < paddle1.Right() && ((position.y > paddle1.Top() && position.y < paddle1.Bottom()) || Bottom() > paddle1.Top() && Bottom() < paddle1.Bottom()))
+	if (Left() < paddle1->Right() && ((position.y > paddle1->Top() && position.y < paddle1->Bottom()) || Bottom() > paddle1->Top() && Bottom() < paddle1->Bottom()))
 	{
-		position.x = paddle1.Right();
+		position.x = paddle1->Right();
 		velocity.x *= randFactor * -1;
 	}
 
-	if (Right() > paddle2.Left() && ((position.y > paddle2.Top() && position.y < paddle2.Bottom()) || Bottom() > paddle2.Top() && Bottom() < paddle2.Bottom()))
+	if (Right() > paddle2->Left() && ((position.y > paddle2->Top() && position.y < paddle2->Bottom()) || Bottom() > paddle2->Top() && Bottom() < paddle2->Bottom()))
 	{
-		position.x = paddle2.Left() - BALL_WIDTH;
+		position.x = paddle2->Left() - BALL_WIDTH;
 		velocity.x *= randFactor * -1;
 	}
 

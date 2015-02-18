@@ -19,7 +19,6 @@
     <ClCompile Include="server\main.cpp" />
     <ClCompile Include="server\PacketBuffer.cpp" />
     <ClCompile Include="server\Paddle.cpp" />
-    <ClCompile Include="server\PlayerInfo.cpp" />
     <ClCompile Include="server\PlayerManager.cpp" />
     <ClCompile Include="server\PongTime.cpp" />
     <ClCompile Include="server\sha1.cpp" />

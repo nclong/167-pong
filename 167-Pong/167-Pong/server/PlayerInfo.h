@@ -1,17 +1,12 @@
 #pragma once
 #include<string>
 #include"Paddle.h"
-class PlayerInfo
+struct PlayerInfo
 {
-public:
-	PlayerInfo();
-	~PlayerInfo();
-
 	int score;
 	std::string userName;
 	int clientId;
-	Paddle paddle;
-	Paddle::MovementDirection movementDirection;
+	Paddle* paddle;
 	Paddle::MovementDirection clientMovementDirection;
 	bool packetReceived = false;
 };

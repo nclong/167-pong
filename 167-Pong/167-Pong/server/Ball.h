@@ -24,7 +24,7 @@ public:
 	Vector2 startingPos;
 	Vector2 startingVel;
 	int Speed();
-	void BallUpdate(Paddle paddle1, Paddle paddle2, Wall t, Wall b);
+	void BallUpdate(Paddle* paddle1, Paddle* paddle2, Wall t, Wall b);
 
 private:
 	int speed;

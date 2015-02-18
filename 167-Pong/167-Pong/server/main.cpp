@@ -23,6 +23,8 @@ using namespace std;
 
 webSocket server;
 Ball ball;
+Paddle paddle1;
+Paddle paddle2;
 PlayerInfo player1;
 PlayerInfo player2;
 Wall topWall;
@@ -162,23 +164,23 @@ void messageHandler(int clientID, string message){
 
 	if (typeString.compare("up") == 0 )
 	{
-		PlayerManager::Players[currentClient].clientMovementDirection = Paddle::MOVING_UP;
-		PlayerManager::Players[currentClient].packetReceived = true;
+		PlayerManager::Players[currentClient]->clientMovementDirection = Paddle::MOVING_UP;
+		PlayerManager::Players[currentClient]->packetReceived = true;
 
     }
 	if (typeString.compare("down") == 0)
 	{
-		PlayerManager::Players[currentClient].clientMovementDirection = Paddle::MOVING_DOWN;
-		PlayerManager::Players[currentClient].packetReceived = true;
+		PlayerManager::Players[currentClient]->clientMovementDirection = Paddle::MOVING_DOWN;
+		PlayerManager::Players[currentClient]->packetReceived = true;
 	}
 	if (typeString.compare("stop") == 0)
 	{
-		PlayerManager::Players[currentClient].clientMovementDirection = Paddle::NOT_MOVING;
-		PlayerManager::Players[currentClient].packetReceived = true;
+		PlayerManager::Players[currentClient]->clientMovementDirection = Paddle::NOT_MOVING;
+		PlayerManager::Players[currentClient]->packetReceived = true;
 	}
 	if (typeString.compare("Name:") == 0)
 	{
-		PlayerManager::Players[currentClient].userName = message.substr(closeBracketIndex + 1);
+		PlayerManager::Players[currentClient]->userName = message.substr(closeBracketIndex + 1);
 	}
 //	if (message.substr(0, 5).compare("Time:") == 0)
 //	{
@@ -221,12 +223,12 @@ void messageHandler(int clientID, string message){
 void sendPlayerInfo()
 {
 
-	string Player1Paddle = FormatPacketString(PaddlePosition, 0, PlayerManager::Players[0].paddle.position.y, 0);
-	string Player2Paddle = FormatPacketString(PaddlePosition, 1, PlayerManager::Players[1].paddle.position.y, 0);
+	string Player1Paddle = FormatPacketString(PaddlePosition, 0, PlayerManager::Players[0]->paddle->position.y, 0);
+	string Player2Paddle = FormatPacketString(PaddlePosition, 1, PlayerManager::Players[1]->paddle->position.y, 0);
 	string ballPos = FormatPacketString(BallPosition, 0, ball.position.x, ball.position.y);
 	string ballVel = FormatPacketString(BallVelocity, 0, ball.velocity.x, ball.velocity.y);
-	string Player1Score = FormatPacketString(PlayerScore, 0, PlayerManager::Players[0].score, 0);
-	string Player2Score = FormatPacketString(PlayerScore, 0, PlayerManager::Players[1].score, 0);
+	string Player1Score = FormatPacketString(PlayerScore, 0, PlayerManager::Players[0]->score, 0);
+	string Player2Score = FormatPacketString(PlayerScore, 0, PlayerManager::Players[1]->score, 0);
 
 	vector<int> clientIDs = server.getClientIDs();
 	for (int i = 0; i < clientIDs.size(); ++i)
@@ -257,7 +259,7 @@ void sendPlayerInfo()
 
 /* called once per select() loop */
 void periodicHandler(){
-	if (player1Ready && player2Ready)
+	if (player1Ready && player2Ready && !gameStarted)
 	{
 		startGame();
 	}
@@ -266,18 +268,18 @@ void periodicHandler(){
 	{
 		for (int i = 0; i < PlayerManager::playerCount; ++i)
 		{
-			if (PlayerManager::Players[i].packetReceived)
+			if (PlayerManager::Players[i]->packetReceived)
 			{
-				PlayerManager::Players[i].paddle.dir = PlayerManager::Players[i].clientMovementDirection;
-				PlayerManager::Players[i].packetReceived = false;
+				PlayerManager::Players[i]->paddle->dir = PlayerManager::Players[i]->clientMovementDirection;
+				PlayerManager::Players[i]->packetReceived = false;
 			}
 		}
 
 		for (int i = 0; i < PlayerManager::playerCount; ++i)
 		{
-			PlayerManager::Players[i].paddle.Update();
+			PlayerManager::Players[i]->paddle->Update();
 		}
-		ball.BallUpdate(PlayerManager::Players[0].paddle, PlayerManager::Players[1].paddle, topWall, bottomWall);
+		ball.BallUpdate(PlayerManager::Players[0]->paddle, PlayerManager::Players[1]->paddle, topWall, bottomWall);
 		sendPlayerInfo();
 	}
 }
@@ -294,17 +296,23 @@ void startGame()
 	ball.velocity.y = 3;
 	ball.name = "Ball";
 
-	PlayerManager::Players[0].paddle.SetPos(0, SCREEN_HEIGHT / 2);
-	PlayerManager::Players[0].paddle.dir = PlayerManager::Players[0].paddle.NOT_MOVING;
-	PlayerManager::Players[0].paddle.SetHeight(PADDLE_HEIGHT);
-	PlayerManager::Players[0].paddle.SetWidth(PADDLE_WIDTH);
-	PlayerManager::Players[0].paddle.name = "Paddle1";
+	player1.paddle = &paddle1;
+	player2.paddle = &paddle2;
+	
+	PlayerManager::Players[0] = &player1;
+	PlayerManager::Players[1] = &player2;
 
-	PlayerManager::Players[1].paddle.SetPos(SCREEN_WIDTH - PADDLE_WIDTH, SCREEN_HEIGHT / 2);
-	PlayerManager::Players[1].paddle.dir = PlayerManager::Players[0].paddle.NOT_MOVING;
-	PlayerManager::Players[1].paddle.SetHeight(PADDLE_HEIGHT);
-	PlayerManager::Players[1].paddle.SetWidth(PADDLE_WIDTH);
-	PlayerManager::Players[1].paddle.name = "Paddle2";
+	PlayerManager::Players[0]->paddle->SetPos(0, SCREEN_HEIGHT / 2);
+	PlayerManager::Players[0]->paddle->dir = Paddle::NOT_MOVING;
+	PlayerManager::Players[0]->paddle->SetHeight(PADDLE_HEIGHT);
+	PlayerManager::Players[0]->paddle->SetWidth(PADDLE_WIDTH);
+	PlayerManager::Players[0]->paddle->name = "Paddle1";
+							 		 
+	PlayerManager::Players[1]->paddle->SetPos(SCREEN_WIDTH - PADDLE_WIDTH, SCREEN_HEIGHT / 2);
+	PlayerManager::Players[1]->paddle->dir = Paddle::NOT_MOVING;
+	PlayerManager::Players[1]->paddle->SetHeight(PADDLE_HEIGHT);
+	PlayerManager::Players[1]->paddle->SetWidth(PADDLE_WIDTH);
+	PlayerManager::Players[1]->paddle->name = "Paddle2";
 	
 	topWall.SetPos(0, 0);
 	topWall.SetHeight(HORIZ_WALL_WIDTH);
