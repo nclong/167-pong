@@ -36,6 +36,7 @@ void Ball::SetPos(int x, int y)
 	position.x = x;
 	position.y = y;
 }
+
 void Ball::BallUpdate(Paddle* paddle1, Paddle* paddle2, Wall t, Wall b)
 {
 
@@ -72,8 +73,12 @@ void Ball::BallUpdate(Paddle* paddle1, Paddle* paddle2, Wall t, Wall b)
 	{
 		//Player 2 Needs to score
 		position = startingPos;
-		velocity.x = rand() % 6 - 3;
+		while (velocity.x == 0)
+		{
+			velocity.x = rand() % 6 - 3;
+		}
 		velocity.y = rand() % 2 + 1;
+		PlayerManager::Players[1]->score++;
 	}
 	
 	if (position.x + BALL_WIDTH > SCREEN_WIDTH)
@@ -81,6 +86,11 @@ void Ball::BallUpdate(Paddle* paddle1, Paddle* paddle2, Wall t, Wall b)
 		//Player 1 Needs to score
 		position = startingPos;
 		velocity.x = rand() % 6 - 3;
-		velocity.y = rand() % 2 + 1;
+		while (velocity.x == 0)
+		{
+			velocity.x = rand() % 6 - 3;
+		}
+		velocity.y = rand() % 3 + 1;
+		PlayerManager::Players[0]->score++;
 	}
 }
