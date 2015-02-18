@@ -26,6 +26,9 @@
         var PacketSentFromClient;
         var PacketReceivedAtServer;
 
+        var myName;
+        var theirName;
+
         var paddle1PosReceived = false;
         var paddle2PosReceived = false;
         var ballPosReceived = false;
@@ -122,7 +125,16 @@
 	}
 	function initialize() { 
 
-		connected = false; // you are not connected to server.
+		connected = false; // you are not connected to server
+
+		myName = "defaultGuy"; // set temp names.
+        theirName = "itHurtsWhenIP"; // set temp names.
+
+        setPlayer1Name(myName);
+        setPlayer2Name(theirName);
+
+        player1Score = 0; // init
+		player2Score = 0; // init
 
 		d = new Date();
 		// Debug stuff.
@@ -395,17 +407,17 @@
 			scoreSet.innerHTML = s;
 		}  // 
 
-	function setYourScore(s) //
+	function setP1Score(s) //
 		{
 			//console.log("Function: set score.");
-			var scoreSet = document.getElementById("score");
+			var scoreSet = document.getElementById("p1Score");
 			scoreSet.innerHTML = s;
 		}  // 
 
-	function setTheirScore(s)
+	function setP2Score(s)
 		{
 			//console.log("Function: set score.");
-			var scoreSet = document.getElementById("score");
+			var scoreSet = document.getElementById("p2Score");
 			scoreSet.innerHTML = s;
 		}  // 
 
@@ -430,8 +442,10 @@
 	function refreshStats() // refreshes stats board (consec Hits, score, opp)
 		{
 			//setConsecutiveHits(consecHits)
-			setScore(score);
+			//setScore(score);
 			//setOpportunity(opportunity);	
+			setP1Score(player1Score);
+			setP2Score(player2Score);
 		}
 	function incrementMyTimer() // makes a new date.
 		{
@@ -460,6 +474,16 @@
 			return time;
 		}
 
+	function setPlayer1Name(n) // should be run only once.
+		{
+			// takes in a string.
+			document.getElementById("p1Name").innerHTML = n;
+		}
+	function setPlayer2Name(n) // should be run only once.
+		{
+			// takes in a string.
+			document.getElementById("p2Name").innerHTML = n;
+		}
 
 
 </script>
@@ -509,7 +533,7 @@
 
 	      <div class="input-field col s3">
 	        <i class="mdi-communication-phone prefix"></i>
-	        <input id='name' name='name' id="icon_telephone" type="text" class="validate" value="Jason & Nick are Awesome">
+	        <input id='name' name='name' id="myNameIs" type="text" class="validate" value="Jason & Nick are Awesome">
 	        <label for="icon_telephone">User Name: (Uther)</label>
 	      </div>
 
@@ -530,14 +554,15 @@
 <div id="game" class="row">
 	
 	<div class="col s6"> <!-- TODO: change the ID of the score -->
-	<a> <i class="mdi-action-account-circle"></i><span id="p1Name"></span>score<span id="score" class="badge"></span></a></div>
+	<a> <i class="mdi-action-account-circle"></i>
+	<span id="p1Name">???</span> score
+	<span id="p1Score" class="badge"></span></a>
+	</div>
 	<div class="col s6">
-	<a><i class="mdi-action-account-circle"></i><span id="p2Name"></span>score<span id="score" class="badge"></span></a></div>
-	<!--<div class="col s3">
-	 <a>Opportunities<span id="opp" class="new badge"></span></a></div><div class="col s3"> 
-	<div class="col s3">
-	<a>Consecutive Hits<span id="hit" class="badge"></span></a></div>
-	<a>Current Time:<span id="timed" class="badge"></span></a></div>-->
+	<a><i class="mdi-action-account-circle"></i>
+	<span id="p2Name">???</span> score
+	<span id="p2Score" class="badge"></span></a>
+	</div>
 </div>
 </div>
 
@@ -629,6 +654,12 @@
 
        	 function connect(){
             console.log("Connecting...to server.");
+
+            myName = document.getElementById("myNameIs").innerHTML;
+            setPlayer1Name("connecting...");
+            setPlayer2Name("connecting...");
+
+            // save my name.
           
 			Server = new FancyWebSocket('ws://' + document.getElementById('ip').value + ':' + document.getElementById('port').value);
 
@@ -659,8 +690,23 @@
 			    if (typeStr === "rd")
 			    {
 			        readyToStart = true;
-                    send("ready["+thisClientID.toString()+"]")
+                    send("ready["+thisClientID.toString()+"]");
+                    send("name["+thisClientID.toString()+"]" + myName);
+                    // sends my name to the server.
 			    }
+
+			    if (typeStr === "na")
+			    {
+                   if( packetClient === 0) // if this is player 1
+			        {
+			           setPlayer1Name(dataStr);
+			        }
+			        else if ( packetClient === 1)
+			        {
+			           setPlayer2Name(dataStr);
+			        }
+			    }
+			    
 
 			    if (typeStr === "ci") // client ID
 			    {
@@ -721,8 +767,9 @@
 			        {
 			            player1Score = dataStr;
 			            score1Received = true;
+			            setYourScore
 			        }
-			        else
+			        else if ( packetClient === 1)
 			        {
 			            player2Score = dataStr;
 			            score2Received = true;
