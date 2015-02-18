@@ -532,7 +532,7 @@
 
 	      <div class="input-field col s3">
 	        <i class="mdi-communication-phone prefix"></i>
-	        <input id='name' name='name' id="myNameIs" type="text" class="validate" value="Jason & Nick are Awesome">
+	        <input name='name' id="myNameIs" type="text" class="validate" value="Jason & Nick are Awesome">
 	        <label for="icon_telephone">User Name: (Uther)</label>
 	      </div>
 
@@ -654,7 +654,9 @@
        	 function connect(){
             console.log("Connecting...to server.");
 
-            myName = document.getElementById("myNameIs").innerHTML;
+            varMyName = document.getElementById("myNameIs");
+            myName = varMyName.value;
+           	console.log("myName" + myName);
             setPlayer1Name("connecting..."); // change
             setPlayer2Name("connecting..."); // change
 
@@ -699,10 +701,12 @@
                    if( packetClient === 0) // if this is player 1
 			        {
 			           setPlayer1Name(dataStr);
+			           console.log("player 1 name set: " + dataStr);
 			        }
 			        else if ( packetClient === 1)
 			        {
 			           setPlayer2Name(dataStr);
+			           console.log("player 2 name set: " + dataStr);
 			        }
 			    }
 			    
