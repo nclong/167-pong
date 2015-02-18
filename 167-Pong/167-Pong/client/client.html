@@ -306,7 +306,8 @@
 	        player1Score = serverPlayer1Score;
 	        player2Score = serverPlayer2Score;
 	        //Set stuff from server
-	        paddlePosReceived = false;
+	        paddle1PosReceived = false;
+	        paddle2PosReceived = false;
 	        ballPosReceived = false;
 	        ballVelReceived = false;
 	        score1Received = false;
@@ -717,10 +718,12 @@
 			        if( packetClient === 0)
 			        {
 			            player1Score = dataStr;
+			            score1Received = true;
 			        }
 			        else
 			        {
 			            player2Score = dataStr;
+			            score2Received = true;
 			        }
 			    }
 
