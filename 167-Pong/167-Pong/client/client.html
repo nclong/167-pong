@@ -718,14 +718,14 @@
 			    }
 			    else if( typeStr === "ps" )
 			    {
-                   /*
-                   if (the string client id is your client ID)
-                   console.log("Updating my score.");
-
-                   else // the client ID is NOT your client ID
-                   console.log("Updating enemy score.");
-					*/
-                    //Need to update the appropriate player score
+			        if( packetClient === 0)
+			        {
+			            player1Score = dataStr;
+			        }
+			        else
+			        {
+			            player2Score = dataStr;
+			        }
 			    }
 
 			});

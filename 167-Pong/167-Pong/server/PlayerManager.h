@@ -10,7 +10,6 @@ public:
 	static void Init_PlayerManager();
 	static PlayerInfo* Players[2];
 	static int playerCount;
-
 };
 
 //id
