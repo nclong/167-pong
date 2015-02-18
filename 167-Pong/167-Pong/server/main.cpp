@@ -30,6 +30,9 @@ PlayerInfo player2;
 Wall topWall;
 Wall bottomWall;
 
+string player1Name;
+string player2Name;
+
 bool packetSent = false;
 
 bool player1Connected = false;
@@ -180,7 +183,13 @@ void messageHandler(int clientID, string message){
 	}
 	if (typeString.compare("name") == 0)
 	{
-		PlayerManager::Players[currentClient]->userName = message.substr(closeBracketIndex + 1);
+		if (currentClient == 0){
+			player1Name = message.substr(closeBracketIndex + 1);
+		}
+		else
+		{
+			player2Name = message.substr(closeBracketIndex + 1);
+		}
 	}
 //	if (message.substr(0, 5).compare("Time:") == 0)
 //	{
@@ -307,12 +316,14 @@ void startGame()
 	PlayerManager::Players[0]->paddle->SetHeight(PADDLE_HEIGHT);
 	PlayerManager::Players[0]->paddle->SetWidth(PADDLE_WIDTH);
 	PlayerManager::Players[0]->paddle->name = "Paddle1";
+	PlayerManager::Players[0]->userName = player1Name;
 							 		 
 	PlayerManager::Players[1]->paddle->SetPos(SCREEN_WIDTH - PADDLE_WIDTH, SCREEN_HEIGHT / 2);
 	PlayerManager::Players[1]->paddle->dir = Paddle::NOT_MOVING;
 	PlayerManager::Players[1]->paddle->SetHeight(PADDLE_HEIGHT);
 	PlayerManager::Players[1]->paddle->SetWidth(PADDLE_WIDTH);
 	PlayerManager::Players[1]->paddle->name = "Paddle2";
+	PlayerManager::Players[1]->userName = player2Name;
 
 	server.wsSend(0, "na[0]{" + PlayerManager::Players[0]->userName + "}");
 	server.wsSend(0, "na[1]{" + PlayerManager::Players[1]->userName + "}");
