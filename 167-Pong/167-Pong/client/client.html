@@ -256,7 +256,7 @@
 	        }
 	    }
 
-	    if( paddle1MovingDown )
+	    else if( paddle1MovingDown )
 	    {
 	        if(player1Position+stepsize+100 < cHeight ) 
 	        {
@@ -264,7 +264,7 @@
 	        }
 	    }
 
-	    if( paddle2MovingUp )
+	    else if( paddle2MovingUp )
 	    {
 	        if(player2Position-stepsize > 0)
 	        {
@@ -272,7 +272,7 @@
 	        }
 	    }
 
-	    if( paddle2MovingDown )
+	    else if( paddle2MovingDown )
 	    {
 	        if(player2Position+stepsize+100 < cHeight ) 
 	        {
@@ -367,7 +367,7 @@
 		keyDown = false;
 		if (thisClientID == 0)
 		{
-		    paddle1MovingUp = false;
+		    cvingUp = false;
 		    paddle1MovingDown = false;
 		    paddle1Stopped = true;
 		}
@@ -680,17 +680,7 @@
 			        //console.log("Message: Paddle Position Update");
                     
                     //Need to determine which paddle moves where
-			        var serverPaddlePos = parseInt(dataStr);
-			        if (packetClient === 0)
-			        {
-			            serverPaddle1Pos = serverPaddlePos;
-			            paddle1PosReceived = true;
-			        }
-			        else
-			        {
-			            serverPaddle2Pos = serverPaddlePos;
-			            paddle2PosReceived;
-			        }
+			        serverPaddlePos = parseInt(dataStr);
 			        paddlePosReceived = true;
 			    }
 			    else if( typeStr === "bp" )
