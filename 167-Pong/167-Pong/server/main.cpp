@@ -228,7 +228,7 @@ void sendPlayerInfo()
 	string ballPos = FormatPacketString(BallPosition, 0, ball.position.x, ball.position.y);
 	string ballVel = FormatPacketString(BallVelocity, 0, ball.velocity.x, ball.velocity.y);
 	string Player1Score = FormatPacketString(PlayerScore, 0, PlayerManager::Players[0]->score, 0);
-	string Player2Score = FormatPacketString(PlayerScore, 0, PlayerManager::Players[1]->score, 0);
+	string Player2Score = FormatPacketString(PlayerScore, 1, PlayerManager::Players[1]->score, 0);
 
 	vector<int> clientIDs = server.getClientIDs();
 	for (int i = 0; i < clientIDs.size(); ++i)

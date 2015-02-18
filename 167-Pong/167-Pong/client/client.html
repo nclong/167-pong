@@ -187,7 +187,8 @@
 
 
 	function drawGameBoard() // draws all the static elements.
-		{
+	{
+	    ctx.clearRect(0, 0, cWidth, cHeight);
 			ctx.drawImage(board, 0, 0, 1200, 500); 
 			ctx.drawImage(borderLeft, 0, 0, 20, 500);
 			ctx.drawImage(borderTop, 0, 0, 1200, 20); 
@@ -321,7 +322,12 @@
 	        ballY += ballVelocityY;  // adds velocty per update loop
 	        paddleUpdate();
 	    }
-		// incrementMyTimer(); // increment timer;
+	    // incrementMyTimer(); // increment timer;
+	    drawGameBoard();
+	    drawPaddle1();
+	    drawPaddle2();
+	    drawBall();
+	    refreshStats();
 	}
 
 	$(document).ready(function(){
@@ -329,11 +335,6 @@
 		window.onkeydown = keyPress; // keyPress passed to the onKeyDown
 		window.onkeyup = release; 
 		window.setInterval(update, 33); // run update loop
-		window.setInterval(drawGameBoard, 33); // draw the board.
-		window.setInterval(drawPaddle1, 33);  // draw paddle
-		window.setInterval(drawPaddle2, 33);
-		window.setInterval(drawBall, 33); // draw ball
-		window.setInterval(refreshStats, 33); // refreshes stats.
 		// window.setInterval(connectionToggle, 3000); // updates every 3 s.
 	});
 

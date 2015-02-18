@@ -58,14 +58,14 @@ void Ball::BallUpdate(Paddle* paddle1, Paddle* paddle2, Wall t, Wall b)
 	if (Top() < t.Bottom())
 	{
 		position.y = t.Bottom();
-		velocity.y *= randFactor * -1;
+		velocity.y *= -1;
 	}
 
 	if (Bottom() > b.Top())
 	{
 		//Bottom Wall Collion
 		position.y = b.Top() - height;
-		velocity.y *= randFactor * -1;
+		velocity.y *= -1;
 	}
 
 
