@@ -86,23 +86,30 @@ void openHandler(int clientID){
     //        server.wsSend(clientIDs[i], os.str());
     //}
     //server.wsSend(clientID, "Welcome!");
-	if (clientID == 0)
-	{
-		player1Connected = true;
-		std::string ConnectedStr = "ci[0]{0}";
-		server.wsSend(0, ConnectedStr);
-	}
-	if (clientID == 1)
-	{
-		player2Connected = true;
-		std::string ConnectedStr = "ci[1]{0}";
-		server.wsSend(1, ConnectedStr);
-	}
+	//if (clientID == 0)
+	//{
+		std::string ConnectedStr = "ci["+to_string(clientID)+"]{0}";
+		server.wsSend(clientID, ConnectedStr);
+		if (clientID == 0)
+		{
+			player1Connected = true;
+		}
+		if (clientID == 1)
+		{
+			player2Connected = true;
+		}
+	//}
+	//if (clientID == 1)
+	//{
+	//	player2Connected = true;
+	//	std::string ConnectedStr = "ci[1]{0}";
+	//	server.wsSend(1, ConnectedStr);
+	//}
 
 	if (player1Connected && player2Connected)
 	{
 		server.wsSend(0, "rd[0]{0}");
-		server.wsSend(1, "rd[0]{0}");
+		server.wsSend(1, "rd[1]{0}");
 	}
 
 	cout << "OpenHandler called on client " << clientID << endl;
