@@ -286,11 +286,6 @@ void periodicHandler(){
 
 void startGame()
 {
-	server.wsSend(0, "na[0]{" + PlayerManager::Players[0]->userName + "}");
-	server.wsSend(0, "na[1]{" + PlayerManager::Players[1]->userName + "}");
-	server.wsSend(1, "na[0]{" + PlayerManager::Players[0]->userName + "}");
-	server.wsSend(1, "na[1]{" + PlayerManager::Players[1]->userName + "}");
-
 	//Start the gameplay
 	ball.SetPos(SCREEN_WIDTH / 2, SCREEN_HEIGHT / 3);
 	ball.startingPos.x = SCREEN_WIDTH / 2;
@@ -318,6 +313,11 @@ void startGame()
 	PlayerManager::Players[1]->paddle->SetHeight(PADDLE_HEIGHT);
 	PlayerManager::Players[1]->paddle->SetWidth(PADDLE_WIDTH);
 	PlayerManager::Players[1]->paddle->name = "Paddle2";
+
+	server.wsSend(0, "na[0]{" + PlayerManager::Players[0]->userName + "}");
+	server.wsSend(0, "na[1]{" + PlayerManager::Players[1]->userName + "}");
+	server.wsSend(1, "na[0]{" + PlayerManager::Players[0]->userName + "}");
+	server.wsSend(1, "na[1]{" + PlayerManager::Players[1]->userName + "}");
 	
 	topWall.SetPos(0, 0);
 	topWall.SetHeight(HORIZ_WALL_WIDTH);
