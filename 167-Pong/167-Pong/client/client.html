@@ -436,11 +436,6 @@
 	    	d = new Date();   
 		}
 
-	function getCurrentTime() // returns the current time.
-		{
-			return time;
-		}
-
 
 		// Functions not being used.
 
@@ -456,6 +451,11 @@
 			//console.log("Function: set opportunity.");
 			var oppSet = document.getElementById("opp");
 			opp.innerHTML = o;
+		}
+
+	function getCurrentTime() // returns the current time.
+		{
+			return time;
 		}
 
 
@@ -522,32 +522,20 @@
 	</div>
 </div>
 
-<!-- Hit the button to "begin" -->
-<div class="container valign-wrapper"> <!-- Valign wrapper auto-centers -->
-	<div class="row">
-		<div class="col s6">
-			 <button class="btn red waves-effect waves-light" onclick="incrementOpportunity()" type="submit" name="action"> <i class="mdi-content-send right"></i> 
-			  </button> 
-		</div>
-		<div class="col s6">
-			 <button class="btn red waves-effect waves-light" onclick="incrementOpportunity()" type="submit" name="action">LET US PLAY PONG! <i class="mdi-content-send right"></i> 
-			  </button> 
-		</div>
-	</div>
-</div>
 
 <div class="container grey lighten-2">
 
 <div id="game" class="row">
+	
+	<div class="col s6"> <!-- TODO: change the ID of the score -->
+	<a> <i class="mdi-action-account-circle"></i><span id="p1Name"></span>score<span id="score" class="badge"></span></a></div>
+	<div class="col s6">
+	<a><i class="mdi-action-account-circle"></i><span id="p2Name"></span>score<span id="score" class="badge"></span></a></div>
+	<!--<div class="col s3">
+	 <a>Opportunities<span id="opp" class="new badge"></span></a></div><div class="col s3"> 
 	<div class="col s3">
 	<a>Consecutive Hits<span id="hit" class="badge"></span></a></div>
-	<div class="col s3">
-	<a><span id="p1Name"></span>Score<span id="score" class="badge"></span></a></div>
-	<div class="col s3">
-	<a><span id="p2Name"></span>Score<span id="score" class="badge"></span></a></div>
-	<div class="col s3">
-	<!-- <a>Opportunities<span id="opp" class="new badge"></span></a></div><div class="col s3"> -->
-	<a>Current Time:<span id="timed" class="badge"></span></a></div>
+	<a>Current Time:<span id="timed" class="badge"></span></a></div>-->
 </div>
 </div>
 
