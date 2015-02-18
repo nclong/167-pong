@@ -427,9 +427,9 @@
 
 	function refreshStats() // refreshes stats board (consec Hits, score, opp)
 		{
-			setConsecutiveHits(consecHits)
+			//setConsecutiveHits(consecHits)
 			setScore(score);
-			setOpportunity(opportunity);	
+			//setOpportunity(opportunity);	
 		}
 	function incrementMyTimer() // makes a new date.
 		{
@@ -439,19 +439,19 @@
 
 		// Functions not being used.
 
-	function incrementOpportunity() // fun function. increments opp.
-		{
-			//console.log("Function: increment opportunity.");
-			var oppSet = document.getElementById("opp");
-			oppSet.innerHTML++; 
-		}
+	//function incrementOpportunity() // fun function. increments opp.
+	//	{
+	//		//console.log("Function: increment opportunity.");
+	//		var oppSet = document.getElementById("opp");
+	//		oppSet.innerHTML++; 
+	//	}
 
-	function setOpportunity(o) // sets opportunity (string)
-		{
-			//console.log("Function: set opportunity.");
-			var oppSet = document.getElementById("opp");
-			opp.innerHTML = o;
-		}
+	//function setOpportunity(o) // sets opportunity (string)
+	//	{
+	//		//console.log("Function: set opportunity.");
+	//		var oppSet = document.getElementById("opp");
+	//		opp.innerHTML = o;
+	//	}
 
 	function getCurrentTime() // returns the current time.
 		{
@@ -507,7 +507,7 @@
 
 	      <div class="input-field col s3">
 	        <i class="mdi-communication-phone prefix"></i>
-	        <input id='name' name='name' id="icon_telephone" type="text" class="validate" value="Connor is Awesome">
+	        <input id='name' name='name' id="icon_telephone" type="text" class="validate" value="Jason & Nick are Awesome">
 	        <label for="icon_telephone">User Name: (Uther)</label>
 	      </div>
 
@@ -593,8 +593,10 @@
 		}
 
 		function send( text ) {
-			Server.send( 'message', text );
-			console.log("Message sent:" + text);
+		    if (readyToStart) {
+		        Server.send('message', text);
+		        console.log("Message sent:" + text);
+		    }
 		}
 
 		function connectionToggle() {
@@ -631,9 +633,6 @@
 			//Let the user know we're connected
 			Server.bind('open', function() {
 			    console.log("Connected to server.");
-			    var nameString = FormatPacketString("Name");
-			    nameString += "[" + thisClientID.toString() + "]" + "{" + document.getElementById('name').value + "}";
-			    send(nameString);
 			    connected = true; // set this to true.
 			    var c = document.getElementById("toggleConnection");
 			    c.innerHTML = "Connected! (Press to D/C)"

@@ -643,11 +643,6 @@ void webSocket::wsAddClient(int socket, in_addr ip){
 
 	int clientID = wsGetNextClientID();
     wsClient *newClient = new wsClient(socket, ip);
-	if (clientID >= 1)
-	{
-		wsSend(clientID, "Game Denied: Player already active.");
-		return;
-	}
     if (clientID >= wsClients.size()){
         wsClients.push_back(newClient);
     }
@@ -730,7 +725,7 @@ void webSocket::startServer(int port){
                         if (newfd != -1){
                             /* add new client */
 							wsAddClient(newfd, cli_addr.sin_addr);
-							if (wsClients.size() >= 2)
+							//oif (wsClients.size() >= 2)
 							//{
 							//	printf("Connection Refused from %s. Already two players in game.", inet_ntoa(cli_addr.sin_addr));
 							//	wsSendClientClose(wsClients.size() - 1, WS_STATUS_PROTOCOL_ERROR);
