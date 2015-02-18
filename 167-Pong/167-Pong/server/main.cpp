@@ -178,7 +178,7 @@ void messageHandler(int clientID, string message){
 		PlayerManager::Players[currentClient]->clientMovementDirection = Paddle::NOT_MOVING;
 		PlayerManager::Players[currentClient]->packetReceived = true;
 	}
-	if (typeString.compare("Name:") == 0)
+	if (typeString.compare("name") == 0)
 	{
 		PlayerManager::Players[currentClient]->userName = message.substr(closeBracketIndex + 1);
 	}
@@ -286,6 +286,11 @@ void periodicHandler(){
 
 void startGame()
 {
+	server.wsSend(0, "na[0]{" + PlayerManager::Players[0]->userName + "}");
+	server.wsSend(0, "na[1]{" + PlayerManager::Players[1]->userName + "}");
+	server.wsSend(1, "na[0]{" + PlayerManager::Players[0]->userName + "}");
+	server.wsSend(1, "na[1]{" + PlayerManager::Players[1]->userName + "}");
+
 	//Start the gameplay
 	ball.SetPos(SCREEN_WIDTH / 2, SCREEN_HEIGHT / 3);
 	ball.startingPos.x = SCREEN_WIDTH / 2;
