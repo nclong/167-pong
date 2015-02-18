@@ -143,6 +143,7 @@
 		// Set stepsize here.
 		stepsize = 10; // change as necessary.
 		player1Position = cHeight/2;// always starts at the center.
+		player2Position = cHeight/2;// always starts at the center.
 
 		// initialize stats variables
 
@@ -200,7 +201,7 @@
 
 	function drawPaddle2()
 	{
-	    ctx.drawImage(player2, 50, player2Position, 30, 100);
+	    ctx.drawImage(player2, cWidth-30, player2Position, 30, 100);
 	}
 
 	function movePaddle(i) // takes in an integer. 0 for up, 1 for down.
@@ -279,23 +280,6 @@
 	        }
 	    }
 	} 
-
-	function paddleMoveUpDown()
-	{
-		if(paddleMoving) // while this is true.
-		{
-			if(player1Position-stepsize > 0 
-				&& paddleDirection == 0)
-			{
-				player1Position-=stepsize;
-			}
-			else if(player1Position+stepsize+100 < cHeight 
-				&& paddleDirection == 1) 
-			{
-				player1Position+=stepsize;
-			}
-		}	
-	}	
 
 	function drawBall() // draw da ball. edit values here.
 	{
@@ -403,57 +387,78 @@
 	}
 
 	function setScore(s)
-	{
-		//console.log("Function: set score.");
-		var scoreSet = document.getElementById("score");
-		scoreSet.innerHTML = s;
-	}
+		{
+			//console.log("Function: set score.");
+			var scoreSet = document.getElementById("score");
+			scoreSet.innerHTML = s;
+		}  // 
 
-	function setOpportunity(o)
-	{
-		//console.log("Function: set opportunity.");
-		var oppSet = document.getElementById("opp");
-		opp.innerHTML = o;
-	}
+	function setYourScore(s) //
+		{
+			//console.log("Function: set score.");
+			var scoreSet = document.getElementById("score");
+			scoreSet.innerHTML = s;
+		}  // 
 
-	function setTimeCurrent(t)
-	{
-		var timeSet = document.getElementById("timed");
-		timeSet.innerHTML = t.toString();
-	}
+	function setTheirScore(s)
+		{
+			//console.log("Function: set score.");
+			var scoreSet = document.getElementById("score");
+			scoreSet.innerHTML = s;
+		}  // 
 
-	function incrementScore()
-	{
-		//console.log("Function: increment score.");
-		var oppSet = document.getElementById("score");
-		oppSet.innerHTML++; 
-	}
 
-	function incrementOpportunity()
-	{
-		//console.log("Function: increment opportunity.");
-		var oppSet = document.getElementById("opp");
-		oppSet.innerHTML++; 
-	}
 
-	function refreshStats() // refreshes stats board.
-	{
-		setConsecutiveHits(consecHits)
-		setScore(score);
-		setOpportunity(opportunity);
-		
-	}
 
-	function incrementMyTimer() 
-	{
-    d = new Date();
-   
-	}
+	// TODO: set both player scores.
 
-	function getCurrentTime() // 
-	{
-		return time;
-	}
+	function setTimeCurrent(t) // sets the time (string!)
+		{
+			var timeSet = document.getElementById("timed");
+			timeSet.innerHTML = t.toString();
+		}
+
+	function incrementScore()  // fun function. just increments score.
+		{
+			//console.log("Function: increment score.");
+			var oppSet = document.getElementById("score");
+			oppSet.innerHTML++; 
+		}
+
+	function refreshStats() // refreshes stats board (consec Hits, score, opp)
+		{
+			setConsecutiveHits(consecHits)
+			setScore(score);
+			setOpportunity(opportunity);	
+		}
+	function incrementMyTimer() // makes a new date.
+		{
+	    	d = new Date();   
+		}
+
+	function getCurrentTime() // returns the current time.
+		{
+			return time;
+		}
+
+
+		// Functions not being used.
+
+	function incrementOpportunity() // fun function. increments opp.
+		{
+			//console.log("Function: increment opportunity.");
+			var oppSet = document.getElementById("opp");
+			oppSet.innerHTML++; 
+		}
+
+	function setOpportunity(o) // sets opportunity (string)
+		{
+			//console.log("Function: set opportunity.");
+			var oppSet = document.getElementById("opp");
+			opp.innerHTML = o;
+		}
+
+
 
 </script>
 </head>
@@ -464,7 +469,7 @@
 <!-- PADDLE SPRITE -->
 	<img id="paddle1" src="images/Paddle.png" alt="paddle1"
 	width="0" height="0">
-	<img id="paddle2" src="images/Paddle2.png" alt="paddle1"
+	<img id="paddle2" src="images/Paddle2.png" alt="paddle2"
 	width="0" height="0">
 <!-- BALL SPRITE -->
 	<img id="baller" src="images/Ball.png" alt="ball"
@@ -503,7 +508,7 @@
 	      <div class="input-field col s3">
 	        <i class="mdi-communication-phone prefix"></i>
 	        <input id='name' name='name' id="icon_telephone" type="text" class="validate" value="Connor is Awesome">
-	        <label for="icon_telephone">User Name: (Connor)</label>
+	        <label for="icon_telephone">User Name: (Uther)</label>
 	      </div>
 
 		<div class="col s3">
@@ -519,8 +524,16 @@
 
 <!-- Hit the button to "begin" -->
 <div class="container valign-wrapper"> <!-- Valign wrapper auto-centers -->
- <button class="btn red waves-effect waves-light" onclick="incrementOpportunity()" type="submit" name="action">LET US PLAY PONG! <i class="mdi-content-send right"></i> 
-  </button> 
+	<div class="row">
+		<div class="col s6">
+			 <button class="btn red waves-effect waves-light" onclick="incrementOpportunity()" type="submit" name="action"> <i class="mdi-content-send right"></i> 
+			  </button> 
+		</div>
+		<div class="col s6">
+			 <button class="btn red waves-effect waves-light" onclick="incrementOpportunity()" type="submit" name="action">LET US PLAY PONG! <i class="mdi-content-send right"></i> 
+			  </button> 
+		</div>
+	</div>
 </div>
 
 <div class="container grey lighten-2">
@@ -529,10 +542,11 @@
 	<div class="col s3">
 	<a>Consecutive Hits<span id="hit" class="badge"></span></a></div>
 	<div class="col s3">
-	<a>Score<span id="score" class="badge"></span></a></div>
+	<a><span id="p1Name"></span>Score<span id="score" class="badge"></span></a></div>
 	<div class="col s3">
-	<a>Opportunities<span id="opp" class="new badge"></span></a></div>
+	<a><span id="p2Name"></span>Score<span id="score" class="badge"></span></a></div>
 	<div class="col s3">
+	<!-- <a>Opportunities<span id="opp" class="new badge"></span></a></div><div class="col s3"> -->
 	<a>Current Time:<span id="timed" class="badge"></span></a></div>
 </div>
 </div>
@@ -658,16 +672,16 @@
 			        readyToStart = true;
 			    }
 
-			    if (typeStr === "ci")
+			    if (typeStr === "ci") // client ID
 			    {
-			        if( packetClient === 0)
+			        if( packetClient === 0) // if this is player 1
 			        {
 			            thisClientID = 0;
 			            otherClientID = 1;
 			        }
 			        else
 			        {
-			            thisClientID = 1;
+			            thisClientID = 1; // if this is player 2
 			            otherClientID = 0;
 			        }
 			    }
@@ -703,6 +717,13 @@
 			    }
 			    else if( typeStr === "ps" )
 			    {
+                   /*
+                   if (the string client id is your client ID)
+                   console.log("Updating my score.");
+
+                   else // the client ID is NOT your client ID
+                   console.log("Updating enemy score.");
+					*/
                     //Need to update the appropriate player score
 			    }
 
