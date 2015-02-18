@@ -246,7 +246,7 @@
 		}
 
 	}
-	function paddleUpdate()
+	function paddleUpdate() // displayed
 	{
 	    if( paddle1MovingUp )
 	    {
@@ -687,10 +687,12 @@
 			        {
 			            serverPaddle1Pos = serverPaddlePos;
 			            paddle1PosReceived = true;
+			            console.log("My Paddle position recieved.")
 			        }
 			        else {
 			            serverPaddle2Pos = serverPaddlePos;
 			            paddle2PosReceived = true;
+			            console.log("Opponent Paddle position recieved.")
 			        }
 			    }
 			    else if( typeStr === "bp" )
