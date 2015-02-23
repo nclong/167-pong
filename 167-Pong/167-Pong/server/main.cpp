@@ -94,7 +94,7 @@ void openHandler(int clientID){
 	//if (clientID == 0)
 	//{
 		std::string ConnectedStr = "ci["+to_string(clientID)+"]{0}";
-		server.wsSend(clientID, ConnectedStr);
+		PacketBuffer::wsSend(clientID, ConnectedStr);
 		if (clientID == 0)
 		{
 			player1Connected = true;
@@ -113,8 +113,8 @@ void openHandler(int clientID){
 
 	if (player1Connected && player2Connected)
 	{
-		server.wsSend(0, "rd[0]{0}");
-		server.wsSend(1, "rd[1]{0}");
+		PacketBuffer::wsSend(0, "rd[0]{0}");
+		PacketBuffer::wsSend(1, "rd[1]{0}");
 	}
 
 	cout << "OpenHandler called on client " << clientID << endl;
@@ -242,12 +242,12 @@ void sendPlayerInfo()
 	vector<int> clientIDs = server.getClientIDs();
 	for (int i = 0; i < clientIDs.size(); ++i)
 	{
-		server.wsSend(i, Player1Paddle);
-		server.wsSend(i, Player2Paddle);
-		server.wsSend(i, ballPos);
-		server.wsSend(i, ballVel);
-		server.wsSend(i, Player1Score);
-		server.wsSend(i, Player2Score);
+		PacketBuffer::wsSend(i, Player1Paddle);
+		PacketBuffer::wsSend(i, Player2Paddle);
+		PacketBuffer::wsSend(i, ballPos);
+		PacketBuffer::wsSend(i, ballVel);
+		PacketBuffer::wsSend(i, Player1Score);
+		PacketBuffer::wsSend(i, Player2Score);
 	}
 }
 
@@ -336,10 +336,10 @@ void startGame()
 	PlayerManager::Players[1]->paddle->name = "Paddle2";
 	PlayerManager::Players[1]->userName = player2Name;
 
-	server.wsSend(0, "na[0]{" + PlayerManager::Players[0]->userName + "}");
-	server.wsSend(0, "na[1]{" + PlayerManager::Players[1]->userName + "}");
-	server.wsSend(1, "na[0]{" + PlayerManager::Players[0]->userName + "}");
-	server.wsSend(1, "na[1]{" + PlayerManager::Players[1]->userName + "}");
+	PacketBuffer::wsSend(0, "na[0]{" + PlayerManager::Players[0]->userName + "}");
+	PacketBuffer::wsSend(0, "na[1]{" + PlayerManager::Players[1]->userName + "}");
+	PacketBuffer::wsSend(1, "na[0]{" + PlayerManager::Players[0]->userName + "}");
+	PacketBuffer::wsSend(1, "na[1]{" + PlayerManager::Players[1]->userName + "}");
 	
 	topWall.SetPos(0, 0);
 	topWall.SetHeight(HORIZ_WALL_WIDTH);

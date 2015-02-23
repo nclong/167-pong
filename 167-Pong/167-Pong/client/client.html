@@ -13,6 +13,7 @@
   	<link rel="icon" type="image/png" href="favicon.ico"/> 
   	<!-- REPLACE WITH YOUR OWN-->
 	<script src="https://code.jquery.com/jquery-2.1.1.min.js"></script>
+    <script src="http://code.stephenmorley.org/javascript/queues/Queue.js"></script>
 
  	<script>        // Drawing script!
         //HERE ARE SOME THINGS TO DO
@@ -66,8 +67,37 @@
  		var name;
 
  		// Buffer.
+ 		var START_DATE = new Date();
+ 		var PacketBuffer = 
+ 		{
+ 		    queue: new Queue(),
+ 		    timeToSend: 33,
+ 		    minRange: 30,
+ 		    maxRange: 200,
+            message: 'message',
+ 		    SendPacket: function () {
+ 		        if (!queue.isEmpty()) {
+ 		            var toSend = queue.dequeue();
+ 		            Server.send('message', toSend)
+ 		            this.timeToSend = Math.floor(Math.random() * 1000) % this.maxRange + this.minRange;
+ 		        }
+ 		    },
+ 		    AddPacket: function(message)
+ 		    {
+ 		        queue.enqueue(message);
+ 		    }
+            
 
- 		var packetBuffer; // this will store our packets until we process them.
+ 		}
+ 		function TestPacketBuffer()
+ 		{
+ 		    var now = new Date();
+ 		    if( now - START_DATE >= PacketBuffer.timeToSend)
+ 		    {
+ 		        PacketBuffer.SendPacket();
+ 		        START_DATE = new Date();
+ 		    }
+ 		}
 
  		var d; // date item
  		var timer; // time item
@@ -123,7 +153,7 @@
 		startString += "[" + thisClientID.toString() + "]";
 		return startString;
 	}
-	function initialize() { 
+	function initialize() {
 
 		connected = false; // you are not connected to server
 
@@ -148,7 +178,7 @@
 	 	cHeight = 500;
 
 	 	// Bind display to the canvas, and get my brush.
-	 	display = document.getElementById("myCanvas"); // myCanvas 
+	 	display = document.getElementById("myCanvas"); // myCanvas
 	 	ctx = display.getContext("2d"); // 2D, display.
 
 		// Set stepsize here.
@@ -160,12 +190,12 @@
 
 		consecHits = 0; // consecutive hits
 		score = 0; // the score of the players
-		opportunity = 9000; // opportunities 
+		opportunity = 9000; // opportunities
 
 		// Get my sprites.
  		board = document.getElementById("bg");
  		borderTop = document.getElementById("top-Border");
- 		//borderRight = document.getElementById("right-Border"); 
+ 		//borderRight = document.getElementById("right-Border");
  		borderLeft = document.getElementById("right-Border"); // use the same!
  		borderBottom = document.getElementById("bottom-Border");
  		player1 = document.getElementById("paddle1");
@@ -189,24 +219,24 @@
 		keyDown = false;
 
 		// Draw the game board.
-		drawGameBoard(); 
+		drawGameBoard();
 
 		// Update the initial connection status.
 		//connectionToggle();
 }
-// 	
+//
 
 
 	function drawGameBoard() // draws all the static elements.
 	{
 	    ctx.clearRect(0, 0, cWidth, cHeight);
-			ctx.drawImage(board, 0, 0, 1200, 500); 
+			ctx.drawImage(board, 0, 0, 1200, 500);
 			ctx.drawImage(borderLeft, 0, 0, 20, 500);
-			ctx.drawImage(borderTop, 0, 0, 1200, 20); 
+			ctx.drawImage(borderTop, 0, 0, 1200, 20);
 			ctx.drawImage(borderBottom, 0, 480, 1200, 20);
 		}
 
-	function drawPaddle1() // the value we get 
+	function drawPaddle1() // the value we get
 	{
 		//console.log("Paddle 1 drawn");
 		ctx.drawImage(player1, 20, player1Position, 30, 100);
@@ -272,7 +302,7 @@
 
 	    else if( paddle1MovingDown )
 	    {
-	        if(player1Position+stepsize+100 < cHeight ) 
+	        if(player1Position+stepsize+100 < cHeight )
 	        {
 	            player1Position+=stepsize;
 	        }
@@ -288,12 +318,12 @@
 
 	    else if( paddle2MovingDown )
 	    {
-	        if(player2Position+stepsize+100 < cHeight ) 
+	        if(player2Position+stepsize+100 < cHeight )
 	        {
 	            player2Position+=stepsize;
 	        }
 	    }
-	} 
+	}
 
 	function drawBall() // draw da ball. edit values here.
 	{
@@ -307,9 +337,9 @@
 
 	    if (paddle1PosReceived
         && paddle2PosReceived
-	    && ballPosReceived 
-	    && ballVelReceived 
-	    && score1Received 
+	    && ballPosReceived
+	    && ballVelReceived
+	    && score1Received
 	    && score2Received
         && readyToStart)
 	    {
@@ -344,9 +374,10 @@
 	$(document).ready(function(){
 		initialize(); // run once.
 		window.onkeydown = keyPress; // keyPress passed to the onKeyDown
-		window.onkeyup = release; 
+		window.onkeyup = release;
 		window.setInterval(update, 33); // run update loop
-		// window.setInterval(connectionToggle, 3000); // updates every 3 s.
+	    // window.setInterval(connectionToggle, 3000); // updates every 3 s.
+		window.setInterval(TestPacketBuffer, 1);
 	});
 
 	function keyPress(e)
@@ -362,7 +393,7 @@
 	        	paddleMoving = true;
 	        	movePaddle(0); // 0 is up.
 	        	keyDown = true;
-	    	}      
+	    	}
 	    }
 	    else if(e.keyCode == 40) {
 	        if (!keyDown)
@@ -376,7 +407,7 @@
 
 	function release(e) // on key release.
 	{
-		paddleMoving = false; 
+		paddleMoving = false;
 		keyDown = false;
 		if (thisClientID === 0)
 		{
@@ -396,7 +427,7 @@
 	{
 		//console.log("Function: set consecutive hits.");
 		var consecHitsSet = document.getElementById("hit");
-		consecHitsSet.innerHTML = i; 
+		consecHitsSet.innerHTML = i;
 	}
 
 	function setScore(s)
@@ -404,21 +435,21 @@
 			//console.log("Function: set score.");
 			var scoreSet = document.getElementById("score");
 			scoreSet.innerHTML = s;
-		}  // 
+		}  //
 
 	function setP1Score(s) //
 		{
 			//console.log("Function: set score.");
 			var scoreSet = document.getElementById("p1Score");
 			scoreSet.innerHTML = s;
-		}  // 
+		}  //
 
 	function setP2Score(s)
 		{
 			//console.log("Function: set score.");
 			var scoreSet = document.getElementById("p2Score");
 			scoreSet.innerHTML = s;
-		}  // 
+		}  //
 
 
 
@@ -435,20 +466,20 @@
 		{
 			//console.log("Function: increment score.");
 			var oppSet = document.getElementById("score");
-			oppSet.innerHTML++; 
+			oppSet.innerHTML++;
 		}
 
 	function refreshStats() // refreshes stats board (consec Hits, score, opp)
 		{
 			//setConsecutiveHits(consecHits)
 			//setScore(score);
-			//setOpportunity(opportunity);	
+			//setOpportunity(opportunity);
 			setP1Score(player1Score);
 			setP2Score(player2Score);
 		}
 	function incrementMyTimer() // makes a new date.
 		{
-	    	d = new Date();   
+	    	d = new Date();
 		}
 
 
@@ -458,7 +489,7 @@
 	//	{
 	//		//console.log("Function: increment opportunity.");
 	//		var oppSet = document.getElementById("opp");
-	//		oppSet.innerHTML++; 
+	//		oppSet.innerHTML++;
 	//	}
 
 	//function setOpportunity(o) // sets opportunity (string)
@@ -620,7 +651,8 @@
 
 		function send( text ) {
 		    if (readyToStart) {
-		        Server.send('message', text);
+		        //Server.send('message', text);
+		        PacketBuffer.AddPacket(text);
 		        console.log("Message sent:" + text);
 		    }
 		}
