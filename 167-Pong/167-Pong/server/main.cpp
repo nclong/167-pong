@@ -268,6 +268,8 @@ void sendPlayerInfo()
 
 /* called once per select() loop */
 void periodicHandler(){
+	static clock_t startClock = clock();
+	clock_t gameClock;
 	if (player1Ready && player2Ready && !gameStarted)
 	{
 		startGame();
@@ -275,21 +277,30 @@ void periodicHandler(){
 
 	if (gameStarted)
 	{
-		for (int i = 0; i < PlayerManager::playerCount; ++i)
+		gameClock = clock();
+		if ((gameClock - startClock) % REFRESH_RATE <= 2)
 		{
-			if (PlayerManager::Players[i]->packetReceived)
+			for (int i = 0; i < PlayerManager::playerCount; ++i)
 			{
-				PlayerManager::Players[i]->paddle->dir = PlayerManager::Players[i]->clientMovementDirection;
-				PlayerManager::Players[i]->packetReceived = false;
+				if (PlayerManager::Players[i]->packetReceived)
+				{
+					PlayerManager::Players[i]->paddle->dir = PlayerManager::Players[i]->clientMovementDirection;
+					PlayerManager::Players[i]->packetReceived = false;
+				}
 			}
+
+			for (int i = 0; i < PlayerManager::playerCount; ++i)
+			{
+				PlayerManager::Players[i]->paddle->Update();
+			}
+			ball.BallUpdate(PlayerManager::Players[0]->paddle, PlayerManager::Players[1]->paddle, topWall, bottomWall);
+			sendPlayerInfo();
 		}
 
-		for (int i = 0; i < PlayerManager::playerCount; ++i)
+		if ((gameClock - startClock) % PacketBuffer::timeToSend <= 2)
 		{
-			PlayerManager::Players[i]->paddle->Update();
+			PacketBuffer::SendPacket(server);
 		}
-		ball.BallUpdate(PlayerManager::Players[0]->paddle, PlayerManager::Players[1]->paddle, topWall, bottomWall);
-		sendPlayerInfo();
 	}
 }
 

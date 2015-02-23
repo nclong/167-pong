@@ -41,7 +41,7 @@ void Paddle::Update()
 		position.y = SCREEN_HEIGHT - HORIZ_WALL_HEIGHT - PADDLE_HEIGHT;
 	}
 
-	std::cout << "Paddle Direction: " << dir << "  |  Pos: " << position.y << std::endl;
+	//std::cout << "Paddle Direction: " << dir << "  |  Pos: " << position.y << std::endl;
 }
 
 Vector2 Paddle::GetPos()
