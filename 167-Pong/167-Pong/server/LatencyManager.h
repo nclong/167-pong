@@ -1,5 +1,6 @@
 //Bad class
 #pragma once
+#include <queue>
 class LatencyManager
 {
 public:
@@ -7,15 +8,16 @@ public:
 	~LatencyManager();
 	static int CurrentServerToClientLatency;
 	static int CurrentClientToServerLatency;
-	static float AverageServerToClientLatency;
-	static float AverageClientToServerLatency;
-	static void AddServerToClientLatency(int lat);
-	static void AddClientToServerLatency(int lat);
+	static int AverageServerToClientLatency[2];
+	static int AverageClientToServerLatency[2];
+	static void AddServerToClientLatency(int clientID, int lat);
+	static void AddClientToServerLatency(int clientID, int lat);
 
 private:
-	static int ServerToClientLatencies[60];
-	static int ClientToServerLatencies[60];
-	static int ServerToClientSize;
-	static int ClientToServerSize;
+	static std::queue<int> ServerToClientLatencies[2];
+	static std::queue<int> ClientToServerLatencies[2];
+	static int ServerToClientSize[2];
+	static int ClientToServerSize[2];
+	static int QueueMaxSize;
 };
 

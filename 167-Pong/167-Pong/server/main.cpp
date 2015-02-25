@@ -266,6 +266,19 @@ void sendPlayerInfo()
 //	//packetSent = true;
 //}
 
+
+void SendTimePing()
+{
+	SYSTEMTIME currentTime;
+	GetSystemTime(&currentTime);
+	std::string timePacket = "Ti";
+	vector<int> clients = server.getClientIDs();
+	for (int i = 0; i < clients.size(); ++i)
+	{
+
+	}
+}
+
 /* called once per select() loop */
 void periodicHandler(){
 	static clock_t startClock = clock();
@@ -301,6 +314,11 @@ void periodicHandler(){
 		{
 			PacketBuffer::SendPacket(server);
 		}
+
+		if ((gameClock - startClock) % 500 <= 2)
+		{
+			SendTimePing();
+		}
 	}
 }
 
@@ -310,10 +328,10 @@ void startGame()
 	ball.SetPos(SCREEN_WIDTH / 2, SCREEN_HEIGHT / 3);
 	ball.startingPos.x = SCREEN_WIDTH / 2;
 	ball.startingPos.y = SCREEN_WIDTH / 3;
-	ball.startingVel.x = -7;
-	ball.startingVel.y = 3;
-	ball.velocity.x = -7;
-	ball.velocity.y = 3;
+	ball.startingVel.x = -17; //changed the values slightly - J
+	ball.startingVel.y = 13;
+	ball.velocity.x = -17;
+	ball.velocity.y = 13;
 	ball.name = "Ball";
 
 	player1.paddle = &paddle1;

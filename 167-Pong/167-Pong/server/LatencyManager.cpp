@@ -10,58 +10,64 @@ LatencyManager::~LatencyManager()
 {
 }
 
-int LatencyManager::ServerToClientSize = 0;
-int LatencyManager::ClientToServerSize = 0;
+int LatencyManager::QueueMaxSize = 60;
+int LatencyManager::ServerToClientSize[2];
+int LatencyManager::ClientToServerSize[2];
 int LatencyManager::CurrentServerToClientLatency = 0;
 int LatencyManager::CurrentClientToServerLatency = 0;
-float LatencyManager::AverageServerToClientLatency = 0;
-float LatencyManager::AverageClientToServerLatency = 0;
-int LatencyManager::ServerToClientLatencies[60];
-int LatencyManager::ClientToServerLatencies[60];
+int LatencyManager::AverageServerToClientLatency[2];
+int LatencyManager::AverageClientToServerLatency[2];
+std::queue<int> LatencyManager::ServerToClientLatencies[2];
+std::queue<int> LatencyManager::ClientToServerLatencies[2];
 
-void LatencyManager::AddServerToClientLatency(int lat)
+void LatencyManager::AddServerToClientLatency(int clientID, int lat)
 {
-	if (ServerToClientSize < 60)
+	if (ServerToClientSize[clientID] >= QueueMaxSize)
 	{
-		++ServerToClientSize;
-		ServerToClientLatencies[ServerToClientSize - 1] = lat;
+		ServerToClientLatencies[clientID].pop();
+		ServerToClientLatencies[clientID].push(lat);
 	}
 	else
 	{
-		for (int i = 1; i < ServerToClientSize; ++i)
-		{
-			ServerToClientLatencies[i - 1] = ServerToClientLatencies[i];
-		}
-		ServerToClientLatencies[59] = lat;
+		ServerToClientLatencies[clientID].push(lat);
+		ServerToClientSize[clientID]++;
 	}
 
 	int sum = 0;
-	for (int i = 0; i < ServerToClientSize; ++i)
+	std::queue<int> qCopy = ServerToClientLatencies[clientID];
+	for (int i = 0; i < ServerToClientSize[clientID]; ++i)
 	{
-		sum += ServerToClientLatencies[i];
+		sum += qCopy.front();
+		qCopy.pop();
 	}
-	AverageServerToClientLatency = (float)sum / (float)ServerToClientSize;
+
+	int average = sum / ServerToClientSize[clientID];
+	AverageServerToClientLatency[clientID] = average;
 }
-void LatencyManager::AddClientToServerLatency(int lat)
+
+
+void LatencyManager::AddClientToServerLatency(int clientID, int lat)
 {
-	if (ClientToServerSize < 60)
+	if (ClientToServerSize[clientID] >= QueueMaxSize)
 	{
-		++ClientToServerSize;
-		ClientToServerLatencies[ClientToServerSize - 1] = lat;
+		ClientToServerLatencies[clientID].pop();
+		ClientToServerLatencies[clientID].push(lat);
 	}
 	else
 	{
-		for (int i = 1; i < ClientToServerSize; ++i)
-		{
-			ClientToServerLatencies[i - 1] = ClientToServerLatencies[i];
-		}
-		ClientToServerLatencies[59] = lat;
+		ClientToServerLatencies[clientID].push(lat);
+		ClientToServerSize[clientID]++;
 	}
 
 	int sum = 0;
-	for (int i = 0; i < ClientToServerSize; ++i)
+	std::queue<int> qCopy = ClientToServerLatencies[clientID];
+	for (int i = 0; i < ClientToServerSize[clientID]; ++i)
 	{
-		sum += ClientToServerLatencies[i];
+		sum += qCopy.front();
+		qCopy.pop();
 	}
-	AverageClientToServerLatency = (float)sum / (float)ClientToServerSize;
+
+	int average = sum / ClientToServerSize[clientID];
+	AverageClientToServerLatency[clientID] = average;
+
 }
