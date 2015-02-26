@@ -32,7 +32,8 @@ Wall bottomWall;
 
 string player1Name;
 string player2Name;
-
+SYSTEMTIME serverSendTime;
+bool pingSent = false;
 bool packetSent = false;
 
 bool player1Connected = false;
@@ -135,6 +136,35 @@ void closeHandler(int clientID){
 	gameStarted = false;
 }
 
+SYSTEMTIME TimeFromString(string s)
+{
+	//FORMAT: HH:MM:SS:MS
+	int colonIndex = s.find_first_of(':');
+	string hourStr = s.substr(0, colonIndex);
+	s = s.substr(colonIndex + 1);
+	colonIndex = s.find_first_of(':');
+	string minuteStr = s.substr(0, colonIndex);
+	s = s.substr(colonIndex + 1);
+	colonIndex = s.find_first_of(':');
+	string secondStr = s.substr(0, colonIndex);
+	s = s.substr(colonIndex + 1);
+	colonIndex = s.find_first_of(':');
+	string msStr = s;
+
+	istringstream hoursstream(hourStr);
+	istringstream minutesstream(minuteStr);
+	istringstream secondsstream(secondStr);
+	istringstream mssstream(msStr);
+	SYSTEMTIME result;
+	GetSystemTime(&result);
+	hoursstream >> result.wHour;
+	minutesstream >> result.wMinute;
+	secondsstream >> result.wSecond;
+	mssstream >> result.wMilliseconds;
+
+	return result;
+}
+
 /* called when a client sends a message to the server */
 void messageHandler(int clientID, string message){
     //ostringstream os;
@@ -152,6 +182,68 @@ void messageHandler(int clientID, string message){
 	istringstream clientIDsstream(message.substr(openBracketIndex + 1, closeBracketIndex - 1));
 	int currentClient;
 	clientIDsstream >> currentClient;
+
+	if (typeString.compare("time") == 0)
+	{
+		SYSTEMTIME serverReceiveTime;
+		GetSystemTime(&serverReceiveTime);
+		string dataStr = message.substr(closeBracketIndex + 1);
+		int commaIndex = dataStr.find_first_of(',');
+		string receiveTimeStr = dataStr.substr(0, commaIndex);
+		string sendTimeStr = dataStr.substr(commaIndex + 1);
+		SYSTEMTIME receiveTime = TimeFromString(receiveTimeStr);
+		receiveTime.wDay = serverReceiveTime.wDay;
+		receiveTime.wDayOfWeek = serverReceiveTime.wDayOfWeek;
+		receiveTime.wMonth = serverReceiveTime.wMonth;
+		receiveTime.wYear = serverReceiveTime.wYear;
+
+		SYSTEMTIME sendTime = TimeFromString(sendTimeStr);
+		sendTime.wDay = serverReceiveTime.wDay;
+		sendTime.wDayOfWeek = serverReceiveTime.wDayOfWeek;
+		sendTime.wMonth = serverReceiveTime.wMonth;
+		sendTime.wYear = serverReceiveTime.wYear;
+
+		FILETIME serverSendTimef, receiveTimef, sendTimef, serverReceiveTimef;
+		SystemTimeToFileTime(&serverSendTime, &serverSendTimef);
+		std::cout << " Server Send: " << serverSendTime.wMilliseconds << std::endl;
+		SystemTimeToFileTime(&receiveTime, &receiveTimef);
+		std::cout << "Client Receive: " << receiveTime.wMilliseconds << std::endl;
+		SystemTimeToFileTime(&sendTime, &sendTimef);
+		std::cout << "Client Send: " << sendTime.wMilliseconds << std::endl;
+		SystemTimeToFileTime(&serverReceiveTime, &serverReceiveTimef);
+		std::cout << "Server Receive: " << serverReceiveTime.wMilliseconds << std::endl;
+		ULARGE_INTEGER serverSendTimeui, receiveTimeui, sendTimeui, serverReceiveTimeui;
+		unsigned long long int serverSendTimei, receiveTimei, sendTimei, serverReceiveTimei;
+		serverSendTimeui.LowPart = serverSendTimef.dwLowDateTime;
+		serverSendTimeui.HighPart = serverSendTimef.dwHighDateTime;
+		receiveTimeui.LowPart = receiveTimef.dwLowDateTime;
+		receiveTimeui.HighPart = receiveTimef.dwHighDateTime;
+		sendTimeui.LowPart = sendTimef.dwLowDateTime;
+		sendTimeui.HighPart = sendTimef.dwHighDateTime;
+		serverReceiveTimeui.LowPart = serverReceiveTimef.dwLowDateTime;
+		serverReceiveTimeui.HighPart = serverReceiveTimef.dwHighDateTime;
+		serverSendTimei = serverSendTimeui.QuadPart;
+		receiveTimei = receiveTimeui.QuadPart;
+		sendTimei = receiveTimeui.QuadPart;
+		serverReceiveTimei = serverReceiveTimeui.QuadPart;
+
+		int ServerToClient = 0;
+		int ClientToServer = 0;
+		ServerToClient = (int)((receiveTimei - serverSendTimei) / 10000);
+		ClientToServer = (int)((serverReceiveTimei - sendTimei) / 10000);
+
+		//SUBTRACT THE TIMES!
+		LatencyManager::AddServerToClientLatency(currentClient, ServerToClient);
+		LatencyManager::AddClientToServerLatency(currentClient, ClientToServer);
+
+		//LatencyManager::AddServerToClientLatency(currentClient, receiveTime.wMilliseconds - serverSendTime.wMilliseconds);
+		//LatencyManager::AddClientToServerLatency(currentClient, serverReceiveTime.wMilliseconds - sendTime.wMilliseconds);
+
+		cout << "ServerToClient[" << currentClient << "]: " << LatencyManager::AverageServerToClientLatency[currentClient] << endl;
+		cout << "ClientToServer[" << currentClient << "]: " << LatencyManager::AverageClientToServerLatency[currentClient] << endl;
+		pingSent = false;
+
+	}
 
 	if (typeString.compare("ready") == 0)
 	{
@@ -269,28 +361,35 @@ void sendPlayerInfo()
 
 void SendTimePing()
 {
-	SYSTEMTIME currentTime;
-	GetSystemTime(&currentTime);
-	std::string timePacket = "Ti";
-	vector<int> clients = server.getClientIDs();
-	for (int i = 0; i < clients.size(); ++i)
+	if (!pingSent)
 	{
-
+		GetSystemTime(&serverSendTime);
+		ostringstream ostream;
+		ostream << serverSendTime.wHour << ":" << serverSendTime.wMinute << ":";
+		ostream << serverSendTime.wSecond << ":" << serverSendTime.wMilliseconds;
+		std::string timePacket = "pg[0]{";
+		timePacket += ostream.str() + "}";
+		vector<int> clients = server.getClientIDs();
+		for (int i = 0; i < clients.size(); ++i)
+		{
+			PacketBuffer::wsSend(i, timePacket);
+		}
+		pingSent = true;
 	}
 }
 
 /* called once per select() loop */
 void periodicHandler(){
 	static clock_t startClock = clock();
-	clock_t gameClock;
+	clock_t gameClock = clock();
 	if (player1Ready && player2Ready && !gameStarted)
 	{
 		startGame();
 	}
 
+	//cout << " % 33 " << (gameClock - startClock) % 33 << endl;
 	if (gameStarted)
 	{
-		gameClock = clock();
 		if ((gameClock - startClock) % REFRESH_RATE <= 2)
 		{
 			for (int i = 0; i < PlayerManager::playerCount; ++i)
@@ -309,16 +408,16 @@ void periodicHandler(){
 			ball.BallUpdate(PlayerManager::Players[0]->paddle, PlayerManager::Players[1]->paddle, topWall, bottomWall);
 			sendPlayerInfo();
 		}
+	}
 
-		if ((gameClock - startClock) % PacketBuffer::timeToSend <= 2)
-		{
-			PacketBuffer::SendPacket(server);
-		}
+	if ((gameClock - startClock) % PacketBuffer::timeToSend <= 2)
+	{
+		PacketBuffer::SendPacket(server);
+	}
 
-		if ((gameClock - startClock) % 500 <= 2)
-		{
-			SendTimePing();
-		}
+	if ((gameClock - startClock) % 500 <= 2)
+	{
+		SendTimePing();
 	}
 }
 
@@ -375,6 +474,7 @@ void startGame()
 	//EntityManager::AddEntity((Entity*)&bottomWall);
 	//EntityManager::AddEntity((Entity*)&rightWall);
 	gameStarted = true;
+	pingSent = false;
 }
 
 int main(int argc, char *argv[]){

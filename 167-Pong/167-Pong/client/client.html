@@ -73,21 +73,19 @@
  		    queue: new Queue(),
  		    timeToSend: 33,
  		    minRange: 30,
- 		    maxRange: 200,
+ 		    maxRange: 90,
             message: 'message',
  		    SendPacket: function () {
- 		        if (!queue.isEmpty()) {
- 		            var toSend = queue.dequeue();
+ 		        if (!this.queue.isEmpty()) {
+ 		            var toSend = this.queue.dequeue();
  		            Server.send('message', toSend)
  		            this.timeToSend = Math.floor(Math.random() * 1000) % this.maxRange + this.minRange;
  		        }
  		    },
  		    AddPacket: function(message)
  		    {
- 		        queue.enqueue(message);
+ 		        this.queue.enqueue(message);
  		    }
-            
-
  		}
  		function TestPacketBuffer()
  		{
@@ -371,7 +369,8 @@
 	    refreshStats();
 	}
 
-	$(document).ready(function(){
+	$(document).ready(function () {
+
 		initialize(); // run once.
 		window.onkeydown = keyPress; // keyPress passed to the onKeyDown
 		window.onkeyup = release;
@@ -563,7 +562,7 @@
 
 	      <div class="input-field col s3">
 	        <i class="mdi-communication-phone prefix"></i>
-	        <input name='name' id="myNameIs" type="text" class="validate" value="Jason & Nick are Awesome">
+	        <input name='name' id="myNameIs" type="text" class="validate" value="a">
 	        <label for="icon_telephone">User Name: (Uther)</label>
 	      </div>
 
@@ -681,7 +680,15 @@
 			 Server.send("close");
 			 connected = false;
 			 Server.disconnect();
-			}
+		}
+
+		function DateToPingTime(date)
+		{
+		    var result = "";
+		    result = date.getUTCHours().toString() + ":" + date.getUTCMinutes().toString() +
+                ":" + date.getUTCSeconds().toString() + ":" + date.getUTCMilliseconds().toString();
+		    return result;
+		}
 
        	 function connect(){
             console.log("Connecting...to server.");
@@ -712,6 +719,7 @@
 
 			//Log any messages sent from server
 			Server.bind('message', function (payload) {
+			    var ReceiveTime = new Date();
 			    console.log("Received Message: " + payload);
 			    typeStr = payload.substring(0, 2);
 			    var leftBracketIndex = payload.indexOf("[");
@@ -720,6 +728,13 @@
 			    var rightBraceIndex = payload.indexOf("}");
 			    var packetClient = parseInt(payload.substring(leftBracketIndex + 1, rightBracketIndex));
 			    dataStr = payload.substring(leftBraceIndex + 1, rightBraceIndex);
+			    if (typeStr == "pg")
+			    {
+			        var ReceiveTimeString = DateToPingTime(ReceiveTime);
+			        var SendTimeString = DateToPingTime(new Date());
+			        send("time[" + thisClientID.toString() + "]" + ReceiveTimeString +"," + SendTimeString);
+			    }
+
 			    if (typeStr === "rd")
 			    {
 			        readyToStart = true;

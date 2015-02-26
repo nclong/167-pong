@@ -11,11 +11,11 @@ PacketBuffer::~PacketBuffer()
 }
 
 std::queue<Packet> PacketBuffer::PacketQueue;
-int PacketBuffer::timeToSend;
+int PacketBuffer::timeToSend = rand() % PACKET_MAX_TIME + PACKET_MIN_TIME;
 
 void PacketBuffer::SendPacket(webSocket server)
 {
-	if ( !PacketQueue.empty())
+	while ( !PacketQueue.empty())
 	{
 		Packet p = PacketQueue.front();
 		server.wsSend(p.clientID, p.message);

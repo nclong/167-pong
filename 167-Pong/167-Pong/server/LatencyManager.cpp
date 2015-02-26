@@ -33,15 +33,15 @@ void LatencyManager::AddServerToClientLatency(int clientID, int lat)
 		ServerToClientSize[clientID]++;
 	}
 
-	int sum = 0;
+	unsigned long long int sum = 0;
 	std::queue<int> qCopy = ServerToClientLatencies[clientID];
 	for (int i = 0; i < ServerToClientSize[clientID]; ++i)
 	{
-		sum += qCopy.front();
+		sum += (unsigned long long int)(qCopy.front());
 		qCopy.pop();
 	}
 
-	int average = sum / ServerToClientSize[clientID];
+	int average = (unsigned long long int)(sum / (unsigned long long int)ServerToClientSize[clientID]);
 	AverageServerToClientLatency[clientID] = average;
 }
 
@@ -59,15 +59,15 @@ void LatencyManager::AddClientToServerLatency(int clientID, int lat)
 		ClientToServerSize[clientID]++;
 	}
 
-	int sum = 0;
+	unsigned long long int sum = 0;
 	std::queue<int> qCopy = ClientToServerLatencies[clientID];
 	for (int i = 0; i < ClientToServerSize[clientID]; ++i)
 	{
-		sum += qCopy.front();
+		sum += (unsigned long long int)(qCopy.front());
 		qCopy.pop();
 	}
 
-	int average = sum / ClientToServerSize[clientID];
+	int average = (int)(sum / (unsigned long long int)ClientToServerSize[clientID]);
 	AverageClientToServerLatency[clientID] = average;
 
 }

@@ -1,6 +1,6 @@
 #pragma once
 #define PACKET_MIN_TIME 30
-#define PACKET_MAX_TIME 171
+#define PACKET_MAX_TIME 90
 #define PERIODIC_CALL_RATE 1
 #define REFRESH_RATE 33
 #define LATENCY_POLL_RATE 500

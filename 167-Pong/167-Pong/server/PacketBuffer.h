@@ -2,6 +2,7 @@
 #include <queue>
 #include <random>
 #include <string>
+#include <iostream>
 #include "websocket.h"
 
 struct t_packet
