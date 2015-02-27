@@ -22,6 +22,7 @@ public:
 	static int timeToSend;
 	static void SendPacket(webSocket);
 	static void wsSend(int, std::string);
+	static normal_distribution<> distr;
 
 private:
 	static std::queue<Packet> PacketQueue;

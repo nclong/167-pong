@@ -165,6 +165,33 @@ SYSTEMTIME TimeFromString(string s)
 	return result;
 }
 
+int TimeDifference(SYSTEMTIME a, SYSTEMTIME b)
+{
+	if (a.wSecond == b.wSecond && a.wMilliseconds > b.wMilliseconds)
+	{
+		return (int)(a.wMilliseconds - b.wMilliseconds);
+	}
+
+	//a must be the later time
+	if (a.wHour != b.wHour && b.wHour != 59)
+	{
+		return -1;
+	}
+	int hourDifference;
+	if (a.wHour < b.wHour)
+	{
+		hourDifference = (24 + a.wHour) - b.wHour;
+	}
+	else
+	{
+		hourDifference = a.wHour - b.wHour;
+	}
+	int minuteDifference = (a.wMinute + 60 * hourDifference) - b.wMinute;
+	int secondDifference = (a.wSecond + 60 * minuteDifference) - b.wSecond;
+	int msDifference = (a.wMilliseconds + 1000 * secondDifference) - b.wMilliseconds;
+	return msDifference;
+}
+
 /* called when a client sends a message to the server */
 void messageHandler(int clientID, string message){
     //ostringstream os;
@@ -203,38 +230,40 @@ void messageHandler(int clientID, string message){
 		sendTime.wMonth = serverReceiveTime.wMonth;
 		sendTime.wYear = serverReceiveTime.wYear;
 
-		FILETIME serverSendTimef, receiveTimef, sendTimef, serverReceiveTimef;
-		SystemTimeToFileTime(&serverSendTime, &serverSendTimef);
-		std::cout << " Server Send: " << serverSendTime.wMilliseconds << std::endl;
-		SystemTimeToFileTime(&receiveTime, &receiveTimef);
-		std::cout << "Client Receive: " << receiveTime.wMilliseconds << std::endl;
-		SystemTimeToFileTime(&sendTime, &sendTimef);
-		std::cout << "Client Send: " << sendTime.wMilliseconds << std::endl;
-		SystemTimeToFileTime(&serverReceiveTime, &serverReceiveTimef);
-		std::cout << "Server Receive: " << serverReceiveTime.wMilliseconds << std::endl;
-		ULARGE_INTEGER serverSendTimeui, receiveTimeui, sendTimeui, serverReceiveTimeui;
-		unsigned long long int serverSendTimei, receiveTimei, sendTimei, serverReceiveTimei;
-		serverSendTimeui.LowPart = serverSendTimef.dwLowDateTime;
-		serverSendTimeui.HighPart = serverSendTimef.dwHighDateTime;
-		receiveTimeui.LowPart = receiveTimef.dwLowDateTime;
-		receiveTimeui.HighPart = receiveTimef.dwHighDateTime;
-		sendTimeui.LowPart = sendTimef.dwLowDateTime;
-		sendTimeui.HighPart = sendTimef.dwHighDateTime;
-		serverReceiveTimeui.LowPart = serverReceiveTimef.dwLowDateTime;
-		serverReceiveTimeui.HighPart = serverReceiveTimef.dwHighDateTime;
-		serverSendTimei = serverSendTimeui.QuadPart;
-		receiveTimei = receiveTimeui.QuadPart;
-		sendTimei = receiveTimeui.QuadPart;
-		serverReceiveTimei = serverReceiveTimeui.QuadPart;
+		
+
+		//FILETIME serverSendTimef, receiveTimef, sendTimef, serverReceiveTimef;
+		//SystemTimeToFileTime(&serverSendTime, &serverSendTimef);
+		//std::cout << " Server Send: " << serverSendTime.wMilliseconds << std::endl;
+		//SystemTimeToFileTime(&receiveTime, &receiveTimef);
+		//std::cout << "Client Receive: " << receiveTime.wMilliseconds << std::endl;
+		//SystemTimeToFileTime(&sendTime, &sendTimef);
+		//std::cout << "Client Send: " << sendTime.wMilliseconds << std::endl;
+		//SystemTimeToFileTime(&serverReceiveTime, &serverReceiveTimef);
+		//std::cout << "Server Receive: " << serverReceiveTime.wMilliseconds << std::endl;
+		//ULARGE_INTEGER serverSendTimeui, receiveTimeui, sendTimeui, serverReceiveTimeui;
+		//unsigned long long int serverSendTimei, receiveTimei, sendTimei, serverReceiveTimei;
+		//serverSendTimeui.LowPart = serverSendTimef.dwLowDateTime;
+		//serverSendTimeui.HighPart = serverSendTimef.dwHighDateTime;
+		//receiveTimeui.LowPart = receiveTimef.dwLowDateTime;
+		//receiveTimeui.HighPart = receiveTimef.dwHighDateTime;
+		//sendTimeui.LowPart = sendTimef.dwLowDateTime;
+		//sendTimeui.HighPart = sendTimef.dwHighDateTime;
+		//serverReceiveTimeui.LowPart = serverReceiveTimef.dwLowDateTime;
+		//serverReceiveTimeui.HighPart = serverReceiveTimef.dwHighDateTime;
+		//serverSendTimei = serverSendTimeui.QuadPart;
+		//receiveTimei = receiveTimeui.QuadPart;
+		//sendTimei = receiveTimeui.QuadPart;
+		//serverReceiveTimei = serverReceiveTimeui.QuadPart;
 
 		int ServerToClient = 0;
 		int ClientToServer = 0;
-		ServerToClient = (int)((receiveTimei - serverSendTimei) / 10000);
-		ClientToServer = (int)((serverReceiveTimei - sendTimei) / 10000);
+		//ServerToClient = (int)((receiveTimei - serverSendTimei) / 10000);
+		//ClientToServer = (int)((serverReceiveTimei - sendTimei) / 10000);
 
 		//SUBTRACT THE TIMES!
-		LatencyManager::AddServerToClientLatency(currentClient, ServerToClient);
-		LatencyManager::AddClientToServerLatency(currentClient, ClientToServer);
+		LatencyManager::AddServerToClientLatency(currentClient, TimeDifference(receiveTime, serverSendTime));
+		LatencyManager::AddClientToServerLatency(currentClient, TimeDifference(serverReceiveTime, sendTime));
 
 		//LatencyManager::AddServerToClientLatency(currentClient, receiveTime.wMilliseconds - serverSendTime.wMilliseconds);
 		//LatencyManager::AddClientToServerLatency(currentClient, serverReceiveTime.wMilliseconds - sendTime.wMilliseconds);

@@ -71,7 +71,7 @@
  		var PacketBuffer = 
  		{
  		    queue: new Queue(),
- 		    timeToSend: 33,
+ 		    timeToSend: Math.round(Math.random() * 7 + 30),
  		    minRange: 30,
  		    maxRange: 90,
             message: 'message',
@@ -79,7 +79,7 @@
  		        if (!this.queue.isEmpty()) {
  		            var toSend = this.queue.dequeue();
  		            Server.send('message', toSend)
- 		            this.timeToSend = Math.floor(Math.random() * 1000) % this.maxRange + this.minRange;
+ 		            this.timeToSend = Math.round(Math.random() * 7 + 30);
  		        }
  		    },
  		    AddPacket: function(message)
