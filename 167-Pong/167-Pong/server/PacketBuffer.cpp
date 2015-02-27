@@ -11,16 +11,17 @@ PacketBuffer::~PacketBuffer()
 }
 
 normal_distribution<> PacketBuffer::distr(30.0, 7.0);
+int PacketBuffer::timer = 0;
 
 std::queue<Packet> PacketBuffer::PacketQueue;
 int PacketBuffer::timeToSend = rand() % PACKET_MAX_TIME + PACKET_MIN_TIME;
 
-void PacketBuffer::SendPacket(webSocket server)
+void PacketBuffer::SendPacket(webSocket* server)
 {
 	while ( !PacketQueue.empty())
 	{
 		Packet p = PacketQueue.front();
-		server.wsSend(p.clientID, p.message);
+		server->wsSend(p.clientID, p.message);
 		PacketQueue.pop();
 	}
 	std::random_device rd;
@@ -42,5 +43,15 @@ void PacketBuffer::wsSend(int client, std::string clientMessage)
 	p.clientID = client;
 	p.message = clientMessage;
 	PacketQueue.push(p);
+}
+
+void PacketBuffer::TickBuffer(webSocket* server)
+{
+	++timer;
+	if (timer > timeToSend)
+	{
+		SendPacket(server);
+		timer = 0;
+	}
 }
 

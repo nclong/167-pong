@@ -19,10 +19,12 @@ public:
 	PacketBuffer();
 	~PacketBuffer();
 
+	static int timer;
 	static int timeToSend;
-	static void SendPacket(webSocket);
+	static void SendPacket(webSocket*);
 	static void wsSend(int, std::string);
 	static normal_distribution<> distr;
+	static void TickBuffer(webSocket*);
 
 private:
 	static std::queue<Packet> PacketQueue;
