@@ -40,6 +40,10 @@ bool player1Connected = false;
 bool player2Connected = false;
 bool player1Ready = false;
 bool player2Ready = false;
+bool ping1Received = false;
+bool ping2Received = false;
+
+bool bufferInitiated = false;
 
 bool gameStarted;
 
@@ -64,6 +68,9 @@ string FormatPacketString(SendTypes sendType, int clientId, int value1, int valu
 		case PlayerScore:
 			result += "ps";
 			break;
+		case PlayerLatency:
+			result += "pl";
+			break;
 		default:
 			break;
 	}
@@ -83,34 +90,23 @@ string FormatPacketString(SendTypes sendType, int clientId, int value1, int valu
 }
 /* called when a client connects */
 void openHandler(int clientID){
-    //ostringstream os;
-    //os << "Stranger " << clientID << " has joined.";
+	if (!bufferInitiated)
+	{
+		PacketBuffer::StartBuffer();
+		PacketBuffer::SetServer((void*)&server);
+		bufferInitiated = true;
+	}
 
-    //vector<int> clientIDs = server.getClientIDs();
-    //for (int i = 0; i < clientIDs.size(); i++){
-    //    if (clientIDs[i] != clientID)
-    //        server.wsSend(clientIDs[i], os.str());
-    //}
-    //server.wsSend(clientID, "Welcome!");
-	//if (clientID == 0)
-	//{
-		std::string ConnectedStr = "ci["+to_string(clientID)+"]{0}";
-		PacketBuffer::wsSend(clientID, ConnectedStr);
-		if (clientID == 0)
-		{
-			player1Connected = true;
-		}
-		if (clientID == 1)
-		{
-			player2Connected = true;
-		}
-	//}
-	//if (clientID == 1)
-	//{
-	//	player2Connected = true;
-	//	std::string ConnectedStr = "ci[1]{0}";
-	//	server.wsSend(1, ConnectedStr);
-	//}
+	std::string ConnectedStr = "ci["+to_string(clientID)+"]{0}";
+	PacketBuffer::wsSend(clientID, ConnectedStr);
+	if (clientID == 0)
+	{
+		player1Connected = true;
+	}
+	if (clientID == 1)
+	{
+		player2Connected = true;
+	}
 
 	if (player1Connected && player2Connected)
 	{
@@ -194,15 +190,6 @@ int TimeDifference(SYSTEMTIME a, SYSTEMTIME b)
 
 /* called when a client sends a message to the server */
 void messageHandler(int clientID, string message){
-    //ostringstream os;
-    //os << "Testing the Message Handler";
-
-    //vector<int> clientIDs = server.getClientIDs();
-    //for (int i = 0; i < clientIDs.size(); i++){
-    //    if (clientIDs[i] != clientID)
-    //        server.wsSend(clientIDs[i], os.str());
-	cout << "Received Message: " << message << endl;
-
 	int openBracketIndex = message.find_first_of('[');
 	int closeBracketIndex = message.find_first_of(']');
 	string typeString = message.substr(0, openBracketIndex);
@@ -212,66 +199,76 @@ void messageHandler(int clientID, string message){
 
 	if (typeString.compare("time") == 0)
 	{
-		SYSTEMTIME serverReceiveTime;
-		GetSystemTime(&serverReceiveTime);
-		string dataStr = message.substr(closeBracketIndex + 1);
-		int commaIndex = dataStr.find_first_of(',');
-		string receiveTimeStr = dataStr.substr(0, commaIndex);
-		string sendTimeStr = dataStr.substr(commaIndex + 1);
-		SYSTEMTIME receiveTime = TimeFromString(receiveTimeStr);
-		receiveTime.wDay = serverReceiveTime.wDay;
-		receiveTime.wDayOfWeek = serverReceiveTime.wDayOfWeek;
-		receiveTime.wMonth = serverReceiveTime.wMonth;
-		receiveTime.wYear = serverReceiveTime.wYear;
+		if ((currentClient == 0 && !ping1Received)
+			|| (currentClient == 1 && !ping2Received))
+		{
+			SYSTEMTIME serverReceiveTime;
+			GetSystemTime(&serverReceiveTime);
+			string dataStr = message.substr(closeBracketIndex + 1);
+			int commaIndex = dataStr.find_first_of(',');
+			string receiveTimeStr = dataStr.substr(0, commaIndex);
+			string sendTimeStr = dataStr.substr(commaIndex + 1);
+			SYSTEMTIME receiveTime = TimeFromString(receiveTimeStr);
+			receiveTime.wDay = serverReceiveTime.wDay;
+			receiveTime.wDayOfWeek = serverReceiveTime.wDayOfWeek;
+			receiveTime.wMonth = serverReceiveTime.wMonth;
+			receiveTime.wYear = serverReceiveTime.wYear;
 
-		SYSTEMTIME sendTime = TimeFromString(sendTimeStr);
-		sendTime.wDay = serverReceiveTime.wDay;
-		sendTime.wDayOfWeek = serverReceiveTime.wDayOfWeek;
-		sendTime.wMonth = serverReceiveTime.wMonth;
-		sendTime.wYear = serverReceiveTime.wYear;
+			SYSTEMTIME sendTime = TimeFromString(sendTimeStr);
+			sendTime.wDay = serverReceiveTime.wDay;
+			sendTime.wDayOfWeek = serverReceiveTime.wDayOfWeek;
+			sendTime.wMonth = serverReceiveTime.wMonth;
+			sendTime.wYear = serverReceiveTime.wYear;
 
-		
 
-		//FILETIME serverSendTimef, receiveTimef, sendTimef, serverReceiveTimef;
-		//SystemTimeToFileTime(&serverSendTime, &serverSendTimef);
-		//std::cout << " Server Send: " << serverSendTime.wMilliseconds << std::endl;
-		//SystemTimeToFileTime(&receiveTime, &receiveTimef);
-		//std::cout << "Client Receive: " << receiveTime.wMilliseconds << std::endl;
-		//SystemTimeToFileTime(&sendTime, &sendTimef);
-		//std::cout << "Client Send: " << sendTime.wMilliseconds << std::endl;
-		//SystemTimeToFileTime(&serverReceiveTime, &serverReceiveTimef);
-		//std::cout << "Server Receive: " << serverReceiveTime.wMilliseconds << std::endl;
-		//ULARGE_INTEGER serverSendTimeui, receiveTimeui, sendTimeui, serverReceiveTimeui;
-		//unsigned long long int serverSendTimei, receiveTimei, sendTimei, serverReceiveTimei;
-		//serverSendTimeui.LowPart = serverSendTimef.dwLowDateTime;
-		//serverSendTimeui.HighPart = serverSendTimef.dwHighDateTime;
-		//receiveTimeui.LowPart = receiveTimef.dwLowDateTime;
-		//receiveTimeui.HighPart = receiveTimef.dwHighDateTime;
-		//sendTimeui.LowPart = sendTimef.dwLowDateTime;
-		//sendTimeui.HighPart = sendTimef.dwHighDateTime;
-		//serverReceiveTimeui.LowPart = serverReceiveTimef.dwLowDateTime;
-		//serverReceiveTimeui.HighPart = serverReceiveTimef.dwHighDateTime;
-		//serverSendTimei = serverSendTimeui.QuadPart;
-		//receiveTimei = receiveTimeui.QuadPart;
-		//sendTimei = receiveTimeui.QuadPart;
-		//serverReceiveTimei = serverReceiveTimeui.QuadPart;
 
-		int ServerToClient = 0;
-		int ClientToServer = 0;
-		//ServerToClient = (int)((receiveTimei - serverSendTimei) / 10000);
-		//ClientToServer = (int)((serverReceiveTimei - sendTimei) / 10000);
+			//FILETIME serverSendTimef, receiveTimef, sendTimef, serverReceiveTimef;
+			//SystemTimeToFileTime(&serverSendTime, &serverSendTimef);
+			//std::cout << " Server Send: " << serverSendTime.wMilliseconds << std::endl;
+			//SystemTimeToFileTime(&receiveTime, &receiveTimef);
+			//std::cout << "Client Receive: " << receiveTime.wMilliseconds << std::endl;
+			//SystemTimeToFileTime(&sendTime, &sendTimef);
+			//std::cout << "Client Send: " << sendTime.wMilliseconds << std::endl;
+			//SystemTimeToFileTime(&serverReceiveTime, &serverReceiveTimef);
+			//std::cout << "Server Receive: " << serverReceiveTime.wMilliseconds << std::endl;
+			//ULARGE_INTEGER serverSendTimeui, receiveTimeui, sendTimeui, serverReceiveTimeui;
+			//unsigned long long int serverSendTimei, receiveTimei, sendTimei, serverReceiveTimei;
+			//serverSendTimeui.LowPart = serverSendTimef.dwLowDateTime;
+			//serverSendTimeui.HighPart = serverSendTimef.dwHighDateTime;
+			//receiveTimeui.LowPart = receiveTimef.dwLowDateTime;
+			//receiveTimeui.HighPart = receiveTimef.dwHighDateTime;
+			//sendTimeui.LowPart = sendTimef.dwLowDateTime;
+			//sendTimeui.HighPart = sendTimef.dwHighDateTime;
+			//serverReceiveTimeui.LowPart = serverReceiveTimef.dwLowDateTime;
+			//serverReceiveTimeui.HighPart = serverReceiveTimef.dwHighDateTime;
+			//serverSendTimei = serverSendTimeui.QuadPart;
+			//receiveTimei = receiveTimeui.QuadPart;
+			//sendTimei = receiveTimeui.QuadPart;
+			//serverReceiveTimei = serverReceiveTimeui.QuadPart;
 
-		//SUBTRACT THE TIMES!
-		LatencyManager::AddServerToClientLatency(currentClient, TimeDifference(receiveTime, serverSendTime));
-		LatencyManager::AddClientToServerLatency(currentClient, TimeDifference(serverReceiveTime, sendTime));
+			int ServerToClient = 0;
+			int ClientToServer = 0;
 
-		//LatencyManager::AddServerToClientLatency(currentClient, receiveTime.wMilliseconds - serverSendTime.wMilliseconds);
-		//LatencyManager::AddClientToServerLatency(currentClient, serverReceiveTime.wMilliseconds - sendTime.wMilliseconds);
+			//SUBTRACT THE TIMES!
+			LatencyManager::AddServerToClientLatency(currentClient, TimeDifference(receiveTime, serverSendTime));
+			LatencyManager::AddClientToServerLatency(currentClient, TimeDifference(serverReceiveTime, sendTime));
 
-		cout << "ServerToClient[" << currentClient << "]: " << LatencyManager::AverageServerToClientLatency[currentClient] << endl;
-		cout << "ClientToServer[" << currentClient << "]: " << LatencyManager::AverageClientToServerLatency[currentClient] << endl;
-		pingSent = false;
+			if (currentClient == 0)
+			{
+				ping1Received = true;
+			}
+			else
+			{
+				ping2Received = true;
+			}
 
+			if (ping1Received && ping2Received)
+			{
+				pingSent = false;
+				ping1Received = false;
+				ping2Received = false;
+			}
+		}
 	}
 
 	if (typeString.compare("ready") == 0)
@@ -312,41 +309,6 @@ void messageHandler(int clientID, string message){
 			player2Name = message.substr(closeBracketIndex + 1);
 		}
 	}
-//	if (message.substr(0, 5).compare("Time:") == 0)
-//	{
-//		char packetIdChar = message.at(5);
-//		int packetId = packetIdChar - '0';
-//		PacketReceivedAtServer.GetNow();
-//		std::string times = message.substr(6);
-//		int commaIndex = times.find_first_of(",");
-//		std::string clientRecived = times.substr(0, commaIndex);
-//		std::string clientSent = times.substr(commaIndex + 1);
-//		PacketReceivedAtClient.SetFromString(clientRecived);
-//		PacketSentFromClient.SetFromString(clientSent);
-//
-//		PacketBuffer::EnqueueById(PacketReceivedAtClient, 1, packetId);
-//		PacketBuffer::EnqueueById(PacketSentFromClient, 2, packetId);
-//		PacketBuffer::EnqueueById(PacketReceivedAtServer, 3, packetId);
-//
-//	}
-//
-//
-//		//if (packetSent && packetReceived)
-//		//{
-//		//	LatencyManager::CurrentServerToClientLatency = PacketReceivedAtClient - PacketSentFromServer;
-//		//	LatencyManager::CurrentClientToServerLatency = PacketReceivedAtServer - PacketSentFromClient;
-//		//	LatencyManager::AddServerToClientLatency(PacketReceivedAtClient - PacketSentFromServer);
-//		//	LatencyManager::AddClientToServerLatency(PacketReceivedAtServer - PacketSentFromClient);
-//
-//		//	cout << endl;
-//		//	cout << "Current Server To Client: " << LatencyManager::CurrentServerToClientLatency << endl;
-//		//	cout << "Current Client To Server: " << LatencyManager::CurrentClientToServerLatency << endl;
-//		//	cout << "Estimated Server To Client: " << LatencyManager::AverageServerToClientLatency << endl;
-//		//	cout << "Estimated Client To Server: " << LatencyManager::AverageClientToServerLatency << endl;
-//		//	cout << endl;
-//		//	packetSent = false;
-//		//	packetReceived = false;
-//		//}
 }
 
 
@@ -359,6 +321,8 @@ void sendPlayerInfo()
 	string ballVel = FormatPacketString(BallVelocity, 0, ball.velocity.x, ball.velocity.y);
 	string Player1Score = FormatPacketString(PlayerScore, 0, PlayerManager::Players[0]->score, 0);
 	string Player2Score = FormatPacketString(PlayerScore, 1, PlayerManager::Players[1]->score, 0);
+	string Player1Lag = FormatPacketString(PlayerLatency, 0, LatencyManager::AverageClientToServerLatency[0] + LatencyManager::AverageServerToClientLatency[0], 0);
+	string Player2Lag = FormatPacketString(PlayerLatency, 1, LatencyManager::AverageClientToServerLatency[1] + LatencyManager::AverageServerToClientLatency[1], 0);
 
 	vector<int> clientIDs = server.getClientIDs();
 	for (int i = 0; i < clientIDs.size(); ++i)
@@ -369,24 +333,10 @@ void sendPlayerInfo()
 		PacketBuffer::wsSend(i, ballVel);
 		PacketBuffer::wsSend(i, Player1Score);
 		PacketBuffer::wsSend(i, Player2Score);
+		PacketBuffer::wsSend(i, Player1Lag);
+		PacketBuffer::wsSend(i, Player2Lag);
 	}
 }
-
-//void sendLatencyTest()
-//{
-//	PacketSentFromServer.GetNow();
-//	std::string timeStamp = "ti";
-//	int packetId = PacketBuffer::GetNewPacketId();
-//	//if (!PacketBuffer::hasId(packetId) && )
-//	timeStamp += PacketSentFromServer.ToString();
-//	vector<int> clientIDs = server.getClientIDs();
-//	for (int i = 0; i < clientIDs.size(); ++i)
-//	{
-//		server.wsSend(clientIDs[i], timeStamp);
-//	}
-//	//packetSent = true;
-//}
-
 
 void SendTimePing()
 {
@@ -409,8 +359,6 @@ void SendTimePing()
 
 /* called once per select() loop */
 void periodicHandler(){
-	static clock_t startClock = clock();
-	clock_t gameClock = clock();
 	if (player1Ready && player2Ready && !gameStarted)
 	{
 		startGame();
@@ -419,33 +367,21 @@ void periodicHandler(){
 	//cout << " % 33 " << (gameClock - startClock) % 33 << endl;
 	if (gameStarted)
 	{
-		if ((gameClock - startClock) % REFRESH_RATE <= 2)
+		for (int i = 0; i < PlayerManager::playerCount; ++i)
 		{
-			for (int i = 0; i < PlayerManager::playerCount; ++i)
+			if (PlayerManager::Players[i]->packetReceived)
 			{
-				if (PlayerManager::Players[i]->packetReceived)
-				{
-					PlayerManager::Players[i]->paddle->dir = PlayerManager::Players[i]->clientMovementDirection;
-					PlayerManager::Players[i]->packetReceived = false;
-				}
+				PlayerManager::Players[i]->paddle->dir = PlayerManager::Players[i]->clientMovementDirection;
+				PlayerManager::Players[i]->packetReceived = false;
 			}
-
-			for (int i = 0; i < PlayerManager::playerCount; ++i)
-			{
-				PlayerManager::Players[i]->paddle->Update();
-			}
-			ball.BallUpdate(PlayerManager::Players[0]->paddle, PlayerManager::Players[1]->paddle, topWall, bottomWall);
-			sendPlayerInfo();
 		}
-	}
 
-	if ((gameClock - startClock) % PacketBuffer::timeToSend <= 2)
-	{
-		PacketBuffer::SendPacket(server);
-	}
-
-	if ((gameClock - startClock) % 500 <= 2)
-	{
+		for (int i = 0; i < PlayerManager::playerCount; ++i)
+		{
+			PlayerManager::Players[i]->paddle->Update();
+		}
+		ball.BallUpdate(PlayerManager::Players[0]->paddle, PlayerManager::Players[1]->paddle, topWall, bottomWall);
+		sendPlayerInfo();
 		SendTimePing();
 	}
 }
@@ -523,4 +459,6 @@ int main(int argc, char *argv[]){
     server.startServer(port);
 
     return 1;
+	PacketBuffer::StartBuffer();
+	PacketBuffer::SetServer((void*)&server);
 }

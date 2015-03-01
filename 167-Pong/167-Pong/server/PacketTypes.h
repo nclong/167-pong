@@ -3,5 +3,6 @@ enum SendTypes {
 	BallPosition,
 	BallVelocity,
 	PlayerScore,
-	PlayerName
+	PlayerName,
+	PlayerLatency
 };

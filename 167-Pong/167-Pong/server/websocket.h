@@ -8,11 +8,13 @@
 #include <ws2tcpip.h>
 #endif
 
+#pragma once
 #include <string>
 #include <vector>
 #include <map>
 #include <time.h>
 #include "Constants.h"
+#include "PacketBuffer.h"
 
 using namespace std;
 

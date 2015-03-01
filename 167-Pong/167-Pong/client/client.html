@@ -79,7 +79,7 @@
  		        if (!this.queue.isEmpty()) {
  		            var toSend = this.queue.dequeue();
  		            Server.send('message', toSend)
- 		            this.timeToSend = Math.round(Math.random() * 7 + 30);
+ 		            this.timeToSend = Math.round((Math.random() * (Math.random() < 0.5 ? -1 : 1)) * 7 + 30);
  		        }
  		    },
  		    AddPacket: function(message)
@@ -584,14 +584,19 @@
 	
 	<div class="col s6"> <!-- TODO: change the ID of the score -->
 	<a> <i class="mdi-action-account-circle"></i>
-	<span id="p1Name">???</span> score
+	<span id="p1Name">???</span>
 	<span id="p1Score" class="badge"></span></a>
+        <span id="p1Lag">Latency:</span>
 	</div>
+    
 	<div class="col s6">
 	<a><i class="mdi-action-account-circle"></i>
-	<span id="p2Name">???</span> score
-	<span id="p2Score" class="badge"></span></a>
+	<span id="p2Name">???</span>
+	<span id="p2Score" class="badge"></span>
+    </a>
+        <span id="p2Lag">Latency:</span>
 	</div>
+   
 </div>
 </div>
 
@@ -823,6 +828,19 @@
 			        {
 			            serverPlayer2Score = parseInt(dataStr);
 			            score2Received = true;
+			        }
+			    }
+			    else if( typeStr == "pl" )
+			    {
+			        if( packetClient === 0 )
+			        {
+			            var temp = document.getElementById("p1Lag");
+			            temp.innerHTML = "Latency: " + dataStr;
+			        }
+			        else
+			        {
+			            var temp = document.getElementById("p2Lag");
+			            temp.innerHTML = "Latency: " + dataStr;
 			        }
 			    }
 

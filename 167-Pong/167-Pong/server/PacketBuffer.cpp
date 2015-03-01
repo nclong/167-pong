@@ -10,31 +10,25 @@ PacketBuffer::~PacketBuffer()
 {
 }
 
-normal_distribution<> PacketBuffer::distr(30.0, 7.0);
 int PacketBuffer::timer = 0;
+void* PacketBuffer::server = NULL;
+bool PacketBuffer::gameStarted = false;
 
 std::queue<Packet> PacketBuffer::PacketQueue;
 int PacketBuffer::timeToSend = rand() % PACKET_MAX_TIME + PACKET_MIN_TIME;
 
-void PacketBuffer::SendPacket(webSocket* server)
+void PacketBuffer::SendPacket()
 {
-	while ( !PacketQueue.empty())
+	if (gameStarted)
 	{
-		Packet p = PacketQueue.front();
-		server->wsSend(p.clientID, p.message);
-		PacketQueue.pop();
+		while (!PacketQueue.empty())
+		{
+			Packet p = PacketQueue.front();
+			((webSocket*)server)->wsSend(p.clientID, p.message);
+			PacketQueue.pop();
+		}
+		
 	}
-	std::random_device rd;
-	std::mt19937 gen(rd());
-	timeToSend = (int)round(distr(gen));
-	int x = rand();
-	int y = rand();
-	while (x < y)
-	{
-		x = rand();
-		y = rand();
-	}
-	timeToSend = (int)((float)x / (float)y * 7.0 + 30.0);
 }
 
 void PacketBuffer::wsSend(int client, std::string clientMessage)
@@ -45,13 +39,31 @@ void PacketBuffer::wsSend(int client, std::string clientMessage)
 	PacketQueue.push(p);
 }
 
-void PacketBuffer::TickBuffer(webSocket* server)
+void PacketBuffer::TickBuffer()
 {
 	++timer;
 	if (timer > timeToSend)
 	{
-		SendPacket(server);
+		SendPacket();
 		timer = 0;
 	}
+}
+
+void PacketBuffer::SetServer(void* s)
+{
+	server = s;
+}
+
+void PacketBuffer::StartBuffer()
+{
+	gameStarted = true;
+	int x;
+	int y;
+	do
+	{
+		x = rand();
+		y = rand();
+	} while (x < y);
+	timeToSend = ((int)((float)x / (float)y) * (rand() % 1 == 0 ? -1 : 1) * 7.0 + 30.0);
 }
 

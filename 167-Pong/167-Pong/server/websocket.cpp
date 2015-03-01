@@ -758,12 +758,14 @@ void webSocket::startServer(int port){
         }
 
 		if (callPeriodic != NULL &&
-			periodicCallTimer - periodicCallStart >= PERIODIC_CALL_RATE )
+			periodicCallTimer - periodicCallStart >= REFRESH_RATE )
 		{
 			callPeriodic();
 			//Start Both timers over
 			periodicCallTimer = periodicCallStart = clock();
 		}
+
+		PacketBuffer::TickBuffer();
     }
 }
 

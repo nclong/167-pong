@@ -21,13 +21,16 @@ public:
 
 	static int timer;
 	static int timeToSend;
-	static void SendPacket(webSocket*);
+	static void SetServer(void*);
 	static void wsSend(int, std::string);
-	static normal_distribution<> distr;
-	static void TickBuffer(webSocket*);
+	static void TickBuffer();
+	static void StartBuffer();
 
 private:
 	static std::queue<Packet> PacketQueue;
+	static void* server;
+	static void SendPacket();
+	static bool gameStarted;
 
 };
 
