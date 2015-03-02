@@ -426,12 +426,12 @@ void startGame()
 	PacketBuffer::wsSend(1, "na[0]{" + PlayerManager::Players[0]->userName + "}");
 	PacketBuffer::wsSend(1, "na[1]{" + PlayerManager::Players[1]->userName + "}");
 	
-	topWall.SetPos(0, 0);
+	topWall.SetPos(0, -100);			// offset seems to fix the borders issue.
 	topWall.SetHeight(HORIZ_WALL_WIDTH);
 	topWall.SetWidth(HORIZ_WALL_HEIGHT);
 	topWall.name = "TopWall";
 
-	bottomWall.SetPos(0, SCREEN_HEIGHT - HORIZ_WALL_HEIGHT);
+	bottomWall.SetPos(0, SCREEN_HEIGHT - HORIZ_WALL_HEIGHT - 50);
 	bottomWall.SetHeight(HORIZ_WALL_HEIGHT);
 	bottomWall.SetWidth(HORIZ_WALL_WIDTH);
 	bottomWall.name = "BottomWall";
