@@ -85,7 +85,19 @@ string FormatPacketString(SendTypes sendType, int clientId, int value1, int valu
 		result += ",";
 		result += to_string(value2);
 	}
-	result += "}";
+	result += "}#";
+	SYSTEMTIME st;
+	GetSystemTime(&st);
+	std::ostringstream ossMessage;
+
+	ossMessage << st.wYear << "-"
+		<< std::setw(2) << std::setfill('0') << st.wMonth << "-"
+		<< std::setw(2) << std::setfill('0') << st.wDay << " "
+		<< std::setw(2) << std::setfill('0') << st.wHour << ":"
+		<< std::setw(2) << std::setfill('0') << st.wMinute << ":"
+		<< std::setw(2) << std::setfill('0') << st.wSecond << "."
+		<< std::setw(3) << std::setfill('0') << st.wMilliseconds;
+	result += ossMessage.str();
 	return result;
 }
 /* called when a client connects */
@@ -321,8 +333,12 @@ void sendPlayerInfo()
 	string ballVel = FormatPacketString(BallVelocity, 0, ball.velocity.x, ball.velocity.y);
 	string Player1Score = FormatPacketString(PlayerScore, 0, PlayerManager::Players[0]->score, 0);
 	string Player2Score = FormatPacketString(PlayerScore, 1, PlayerManager::Players[1]->score, 0);
-	string Player1Lag = FormatPacketString(PlayerLatency, 0, LatencyManager::AverageClientToServerLatency[0] + LatencyManager::AverageServerToClientLatency[0], 0);
-	string Player2Lag = FormatPacketString(PlayerLatency, 1, LatencyManager::AverageClientToServerLatency[1] + LatencyManager::AverageServerToClientLatency[1], 0);
+	//string Player1Lag = FormatPacketString(PlayerLatency, 0, LatencyManager::AverageClientToServerLatency[0] + LatencyManager::AverageServerToClientLatency[0], 0);
+	//string Player2Lag = FormatPacketString(PlayerLatency, 1, LatencyManager::AverageClientToServerLatency[1] + LatencyManager::AverageServerToClientLatency[1], 0);
+	string Player1Lag = FormatPacketString(PlayerLatency, 0, LatencyManager::GetCurrentServerToClientLatency(0) + LatencyManager::GetCurrentClientToServerLatency(0), 0);
+	string Player2Lag = FormatPacketString(PlayerLatency, 1, LatencyManager::GetCurrentClientToServerLatency(1) + LatencyManager::GetCurrentServerToClientLatency(1), 0);
+
+
 
 	vector<int> clientIDs = server.getClientIDs();
 	for (int i = 0; i < clientIDs.size(); ++i)

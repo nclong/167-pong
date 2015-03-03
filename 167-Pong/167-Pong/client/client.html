@@ -71,7 +71,7 @@
  		var PacketBuffer = 
  		{
  		    queue: new Queue(),
- 		    timeToSend: Math.round(Math.random() * 7 + 30),
+ 		    timeToSend: Math.round(Math.random() * 25 + 75),
  		    minRange: 30,
  		    maxRange: 90,
             message: 'message',
@@ -79,7 +79,12 @@
  		        if (!this.queue.isEmpty()) {
  		            var toSend = this.queue.dequeue();
  		            Server.send('message', toSend)
- 		            this.timeToSend = Math.round((Math.random() * (Math.random() < 0.5 ? -1 : 1)) * 7 + 30);
+ 		            var runningTotal = 0;
+ 		            for (var i = 0; i < 50; i += 1)
+ 		            {
+ 		                runningTotal += Math.random();
+ 		            }
+ 		            this.timeToSend = Math.round(((runningTotal - 25) / 25) + 75);
  		        }
  		    },
  		    AddPacket: function(message)
@@ -359,7 +364,7 @@
 	    {
 	        ballX += ballVelocityX; // adds velocity per update loop
 	        ballY += ballVelocityY;  // adds velocty per update loop
-	        paddleUpdate();
+	        //paddleUpdate();
 	    }
 	    // incrementMyTimer(); // increment timer;
 	    drawGameBoard();
@@ -731,6 +736,8 @@
 			    var rightBracketIndex = payload.indexOf("]");
 			    var leftBraceIndex = payload.indexOf("{");
 			    var rightBraceIndex = payload.indexOf("}");
+			    var hashIndex = payload.indexOf("#");
+			    var timeCode = payload.substring(hashIndex + 1);
 			    var packetClient = parseInt(payload.substring(leftBracketIndex + 1, rightBracketIndex));
 			    dataStr = payload.substring(leftBraceIndex + 1, rightBraceIndex);
 			    if (typeStr == "pg")

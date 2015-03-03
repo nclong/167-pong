@@ -71,3 +71,27 @@ void LatencyManager::AddClientToServerLatency(int clientID, int lat)
 	AverageClientToServerLatency[clientID] = average;
 
 }
+
+int LatencyManager::GetCurrentClientToServerLatency(int client)
+{
+	if (!ClientToServerLatencies[client].empty())
+	{
+		return ClientToServerLatencies[client].back();
+	}
+	else
+	{
+		return 9999;
+	}
+}
+
+int LatencyManager::GetCurrentServerToClientLatency(int client)
+{
+	if (!ServerToClientLatencies[client].empty())
+	{
+		return ServerToClientLatencies[client].back();
+	}
+	else
+	{
+		return 9999;
+	}
+}

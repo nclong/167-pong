@@ -12,6 +12,8 @@ public:
 	static int AverageClientToServerLatency[2];
 	static void AddServerToClientLatency(int clientID, int lat);
 	static void AddClientToServerLatency(int clientID, int lat);
+	static int GetCurrentServerToClientLatency(int client);
+	static int GetCurrentClientToServerLatency(int client);
 
 private:
 	static std::queue<int> ServerToClientLatencies[2];

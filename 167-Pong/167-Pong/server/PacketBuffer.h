@@ -23,7 +23,7 @@ public:
 	static int timeToSend;
 	static void SetServer(void*);
 	static void wsSend(int, std::string);
-	static void TickBuffer();
+	static void TickBuffer(int time);
 	static void StartBuffer();
 
 private:

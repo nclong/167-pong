@@ -711,6 +711,7 @@ void webSocket::startServer(int port){
     time_t nextPingTime = time(NULL) + 1;
 	clock_t periodicCallStart = clock();
 	clock_t periodicCallTimer;
+	clock_t lastCallTimer = clock();
     while (FD_ISSET(listenfd, &fds)){
 		periodicCallTimer = clock();
         read_fds = fds;
@@ -752,6 +753,8 @@ void webSocket::startServer(int port){
             }
         }
 
+		cout << "Time between cycle calls: " << periodicCallTimer - lastCallTimer << endl;
+
         if (time(NULL) >= nextPingTime){
             wsCheckIdleClients();
             nextPingTime = time(NULL) + 1;
@@ -765,7 +768,9 @@ void webSocket::startServer(int port){
 			periodicCallTimer = periodicCallStart = clock();
 		}
 
-		PacketBuffer::TickBuffer();
+		PacketBuffer::TickBuffer(periodicCallTimer - lastCallTimer);
+
+		lastCallTimer = periodicCallTimer;
     }
 }
 

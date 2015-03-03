@@ -39,13 +39,18 @@ void PacketBuffer::wsSend(int client, std::string clientMessage)
 	PacketQueue.push(p);
 }
 
-void PacketBuffer::TickBuffer()
+void PacketBuffer::TickBuffer(int time)
 {
-	++timer;
-	if (timer > timeToSend)
+	timer += time;
+	bool packetSent = false;
+	while (timer > timeToSend)
 	{
-		SendPacket();
-		timer = 0;
+		if (!packetSent)
+		{
+			SendPacket();
+			packetSent = true;
+		}
+		timer = timer - timeToSend;
 	}
 }
 
@@ -57,13 +62,21 @@ void PacketBuffer::SetServer(void* s)
 void PacketBuffer::StartBuffer()
 {
 	gameStarted = true;
-	int x;
-	int y;
-	do
+	int range = 50;
+	float runningRandom = 0.0;
+	for (int i = 0; i < range; i++)
 	{
-		x = rand();
-		y = rand();
-	} while (x < y);
-	timeToSend = ((int)((float)x / (float)y) * (rand() % 1 == 0 ? -1 : 1) * 7.0 + 30.0);
+		int x;
+		int y;
+		do
+		{
+			x = rand();
+			y = rand();
+		} while (x < y);
+
+		runningRandom += (float)x / (float)y;
+	}
+	float normalizedRand = (runningRandom - ((float)range / 2.0)) / ((float)range / 2.0);
+	timeToSend = round(normalizedRand + 75);
 }
 
