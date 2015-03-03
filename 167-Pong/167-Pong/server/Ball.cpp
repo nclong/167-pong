@@ -43,15 +43,15 @@ void Ball::BallUpdate(Paddle* paddle1, Paddle* paddle2, Wall t, Wall b)
 	position += velocity;
 	int randFactor = rand() % 3 + 1;
 
-	if (Left() < paddle1->Right() && ((position.y > paddle1->Top() && position.y < paddle1->Bottom()) || Bottom() > paddle1->Top() && Bottom() < paddle1->Bottom()))
+	if (position.x < paddle1->position.x + PADDLE_WIDTH && ((position.y > paddle1->Top() && position.y < paddle1->Bottom()) || Bottom() > paddle1->Top() && Bottom() < paddle1->Bottom()))
 	{
-		position.x = paddle1->Right();
+		position.x = position.x + PADDLE_WIDTH;
 		velocity.x *= randFactor * -1;
 	}
 
-	if (Right() > paddle2->Left() && ((position.y > paddle2->Top() && position.y < paddle2->Bottom()) || Bottom() > paddle2->Top() && Bottom() < paddle2->Bottom()))
+	if (position.x + 60 > paddle2->position.x && ((position.y > paddle2->Top() && position.y < paddle2->Bottom()) || Bottom() > paddle2->Top() && Bottom() < paddle2->Bottom()))
 	{
-		position.x = paddle2->Left() - BALL_WIDTH;
+		position.x = paddle2->position.x - 60;
 		velocity.x *= randFactor * -1;
 	}
 
@@ -61,10 +61,10 @@ void Ball::BallUpdate(Paddle* paddle1, Paddle* paddle2, Wall t, Wall b)
 		velocity.y *= -1;
 	}
 
-	if (position.y + 90 > b.Top())
+	if (position.y + 80 >SCREEN_HEIGHT)
 	{
 		//Bottom Wall Collion
-		position.y = b.Top() - 90;
+		position.y = SCREEN_HEIGHT - 80;
 		velocity.y *= -1;
 	}
 
@@ -92,5 +92,10 @@ void Ball::BallUpdate(Paddle* paddle1, Paddle* paddle2, Wall t, Wall b)
 		}
 		velocity.y = rand() % 3 + 1;
 		PlayerManager::Players[0]->score++;
+	}
+
+	if (velocity.y == 0)
+	{
+		velocity.y = 1;
 	}
 }
