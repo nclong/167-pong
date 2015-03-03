@@ -27,8 +27,8 @@
         var PacketSentFromClient;
         var PacketReceivedAtServer;
 
-        var myName;
-        var theirName;
+        var myName;     // Your name
+        var theirName;  // Their name
 
         var paddle1PosReceived = false;
         var paddle2PosReceived = false;
@@ -56,8 +56,8 @@
         var paddle2MovingDown = false;
         var paddle2Stopped = true;
 
-        var thisClientID = 0;
-        var otherClientID = 1;
+        var thisClientID = 0; // set them both to 0, temporarily.
+        var otherClientID = 0; // set them both to 0, temporarily.
 
         var clientIDReceived = false;
 
@@ -163,7 +163,7 @@
        // setPlayer1Name("itHurtsWhenIP");
        // setPlayer2Name("itHurtsWhenIP");
 
-       	myName = "";
+       	myName = ""; // let my name be empty.
 
         player1Score = 0; // init
 		player2Score = 0; // init
@@ -508,12 +508,12 @@
 			return time;
 		}
 
-	function setPlayer1Name(n) // should be run only once.
+	function setPlayer1Name(n) // should be run only once server gets back to me.
 		{
 			var temp = document.getElementById("p1Name");
 			temp.innerHTML = n.toString();
 		}
-	function setPlayer2Name(n) // should be run only once.
+	function setPlayer2Name(n) // should be run only once server gets back to me.
 		{
 			var temp = document.getElementById("p2Name");
 			temp.innerHTML = n.toString();
@@ -705,9 +705,9 @@
 
             varMyName = document.getElementById("myNameIs");
             myName = varMyName.value;
-           	console.log("myName" + myName);
-            setPlayer1Name("connecting..."); // change
-            setPlayer2Name("connecting..."); // change
+           	console.log("My Name is..." + myName);
+            setPlayer1Name("P1 connecting..."); // change
+            setPlayer2Name("P2 connecting..."); // change
 
             // save my name.
           
@@ -718,7 +718,7 @@
 			    console.log("Connected to server.");
 			    connected = true; // set this to true.
 			    var c = document.getElementById("toggleConnection");
-			    c.innerHTML = "Connected! (Press to D/C)"
+			    c.innerHTML = "Connected! (Press to D/C)";
 
 			});
 
@@ -730,7 +730,7 @@
 			//Log any messages sent from server
 			Server.bind('message', function (payload) {
 			    var ReceiveTime = new Date();
-			    console.log("Received Message: " + payload);
+			    // console.log("Received Message: " + payload);
 			    typeStr = payload.substring(0, 2);
 			    var leftBracketIndex = payload.indexOf("[");
 			    var rightBracketIndex = payload.indexOf("]");
@@ -750,7 +750,7 @@
 			    if (typeStr === "rd")
 			    {
 			        readyToStart = true;
-                    send("ready["+thisClientID.toString()+"]");
+                    send("ready["+thisClientID.toString()+"]"); // sends this clientID to the server.
                     send("name["+thisClientID.toString()+"]" + myName);
                     // sends my name to the server.
 			    }
@@ -776,11 +776,13 @@
 			        {
 			            thisClientID = 0;
 			            otherClientID = 1;
+			            console.log("I am player[1]");
 			        }
 			        else if ( packetClient === 1)
 			        {
 			            thisClientID = 1; // if this is player 2
 			            otherClientID = 0;
+			            console.log("I am player[2]");
 			        }
 			    }
 

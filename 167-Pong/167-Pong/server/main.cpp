@@ -269,7 +269,7 @@ void messageHandler(int clientID, string message){
 			{
 				ping1Received = true;
 			}
-			else
+			else if (currentClient == 1)
 			{
 				ping2Received = true;
 			}
@@ -289,7 +289,7 @@ void messageHandler(int clientID, string message){
 		{
 			player1Ready = true;
 		}
-		if (currentClient == 1)
+		else if (currentClient == 1)
 		{
 			player2Ready = true;
 		}
@@ -311,14 +311,17 @@ void messageHandler(int clientID, string message){
 		PlayerManager::Players[currentClient]->clientMovementDirection = Paddle::NOT_MOVING;
 		PlayerManager::Players[currentClient]->packetReceived = true;
 	}
-	if (typeString.compare("name") == 0)
+	if (typeString.compare("name") == 0) 
 	{
+		
 		if (currentClient == 0){
-			player1Name = message.substr(closeBracketIndex + 1);
+			player1Name = message.substr(closeBracketIndex + 1); // sets player 1 name here; evidently is not being called when needed.
+			Sleep(2000);
 		}
-		else
+		else if (currentClient == 1)
 		{
 			player2Name = message.substr(closeBracketIndex + 1);
+			Sleep(2000);
 		}
 	}
 }
@@ -439,12 +442,12 @@ void startGame()
 	PacketBuffer::wsSend(1, "na[0]{" + PlayerManager::Players[0]->userName + "}");
 	PacketBuffer::wsSend(1, "na[1]{" + PlayerManager::Players[1]->userName + "}");
 	
-	topWall.SetPos(0, 0);
+	topWall.SetPos(0, -100);			// offset seems to fix the borders issue.
 	topWall.SetHeight(HORIZ_WALL_WIDTH);
 	topWall.SetWidth(HORIZ_WALL_HEIGHT);
 	topWall.name = "TopWall";
 
-	bottomWall.SetPos(0, SCREEN_HEIGHT - HORIZ_WALL_HEIGHT);
+	bottomWall.SetPos(0, SCREEN_HEIGHT - HORIZ_WALL_HEIGHT - 50);
 	bottomWall.SetHeight(HORIZ_WALL_HEIGHT);
 	bottomWall.SetWidth(HORIZ_WALL_WIDTH);
 	bottomWall.name = "BottomWall";
