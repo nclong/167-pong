@@ -753,7 +753,7 @@ void webSocket::startServer(int port){
             }
         }
 
-		cout << "Time between cycle calls: " << periodicCallTimer - lastCallTimer << endl;
+		//cout << "Time between cycle calls: " << periodicCallTimer - lastCallTimer << endl;
 
         if (time(NULL) >= nextPingTime){
             wsCheckIdleClients();
