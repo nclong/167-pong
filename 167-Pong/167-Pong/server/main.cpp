@@ -21,6 +21,8 @@
 
 using namespace std;
 
+// Game elements //
+
 webSocket server;
 Ball ball;
 Paddle paddle1;
@@ -29,12 +31,16 @@ PlayerInfo player1;
 PlayerInfo player2;
 Wall topWall;
 Wall bottomWall;
-
 string player1Name;
 string player2Name;
+
+
 SYSTEMTIME serverSendTime;
+
 bool pingSent = false;
 bool packetSent = false;
+bool bufferInitiated = false;
+bool gameStarted;
 
 bool player1Connected = false;
 bool player2Connected = false;
@@ -43,9 +49,7 @@ bool player2Ready = false;
 bool ping1Received = false;
 bool ping2Received = false;
 
-bool bufferInitiated = false;
 
-bool gameStarted;
 
 void startGame();
 
@@ -53,21 +57,29 @@ string FormatPacketString(SendTypes sendType, int clientId, int value1, int valu
 {
 	//Packet Format
 	//<function>[<clientID>]{<data>}
-	string result = "";
-	switch (sendType)
+	// We'll append specific string args 
+	// to a packet sent so the recieving client can decipher them.
+
+	string result = ""; 
+	switch (sendType) // Use switch statement and break upon appending
 	{
+		// send packet indicating that paddle position is changing
 		case PaddlePosition:
 			result += "pp";
 			break;
+		// send packet indicating that ball position is changing
 		case BallPosition:
 			result += "bp";
 			break;
+		// send packet indicating that ball velocity is changing
 		case BallVelocity:
 			result += "bv";
 			break;
+		// send packet indicating that player score is changing
 		case PlayerScore:
 			result += "ps";
 			break;
+		// send packet indicating that paddle latency is changing
 		case PlayerLatency:
 			result += "pl";
 			break;
@@ -75,21 +87,32 @@ string FormatPacketString(SendTypes sendType, int clientId, int value1, int valu
 			break;
 	}
 
+	// We want to format the packet for the client.
+	// Sample format: pp[1]{}#SystemTime
+
 	result += "[";
-	result += to_string(clientId);
+	result += to_string(clientId); // We add the clientID
 	result += "]";
 	result += "{";
 	result += to_string(value1);
+
+	// For Ballposition and velocity, we need to have additional param
+	// Since we have the X and Y parameters that we need to send.
+
 	if (sendType == BallPosition || sendType == BallVelocity)
 	{
 		result += ",";
 		result += to_string(value2);
 	}
 	result += "}#";
+
+	// Send the exact system time over to the client.
+
 	SYSTEMTIME st;
 	GetSystemTime(&st);
 	std::ostringstream ossMessage;
 
+	// Some complex stuff magic here. Nick!
 	ossMessage << st.wYear << "-"
 		<< std::setw(2) << std::setfill('0') << st.wMonth << "-"
 		<< std::setw(2) << std::setfill('0') << st.wDay << " "
@@ -98,10 +121,13 @@ string FormatPacketString(SendTypes sendType, int clientId, int value1, int valu
 		<< std::setw(2) << std::setfill('0') << st.wSecond << "."
 		<< std::setw(3) << std::setfill('0') << st.wMilliseconds;
 	result += ossMessage.str();
-	return result;
+	return result; 
 }
 /* called when a client connects */
 void openHandler(int clientID){
+
+	 // Init the buffer if it hasn't been already
+
 	if (!bufferInitiated)
 	{
 		PacketBuffer::StartBuffer();
@@ -111,21 +137,27 @@ void openHandler(int clientID){
 
 	std::string ConnectedStr = "ci["+to_string(clientID)+"]{0}";
 	PacketBuffer::wsSend(clientID, ConnectedStr);
+
+	// Checks connectivity for the players here
+
 	if (clientID == 0)
 	{
-		player1Connected = true;
+		player1Connected = true; 
 	}
 	if (clientID == 1)
 	{
 		player2Connected = true;
 	}
 
-	if (player1Connected && player2Connected)
+	// Once both clients connected, send packet to both indicating "ready"
+
+	if (player1Connected && player2Connected) 
 	{
 		PacketBuffer::wsSend(0, "rd[0]{0}");
 		PacketBuffer::wsSend(1, "rd[1]{0}");
 	}
 
+	// Print 
 	cout << "OpenHandler called on client " << clientID << endl;
 }
 
