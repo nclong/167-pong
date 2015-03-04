@@ -76,7 +76,7 @@
  		    maxRange: 90,
             message: 'message',
  		    SendPacket: function () {
- 		        if (!this.queue.isEmpty()) {
+ 		        while (!this.queue.isEmpty()) {
  		            var toSend = this.queue.dequeue();
  		            Server.send('message', toSend)
  		            var runningTotal = 0;
@@ -92,6 +92,18 @@
  		        this.queue.enqueue(message);
  		    }
  		}
+    
+    function TimedValue(value, time)
+    {
+        var result = 
+        {
+          val: value,
+          timeStamp: time
+        }
+        
+        return result;
+    }
+     
  		function TestPacketBuffer()
  		{
  		    var now = new Date();
@@ -133,6 +145,8 @@
 		var ballY; // Ball location Y
 		var ballOffsetX; // Offset for ball sprite X
 		var ballOffsetY; // Offset for ball sprite Y
+		var player1Latency;
+		var player2Latency;
 
 		// game statistics
 
@@ -335,36 +349,69 @@
 	    //console.log("BallY: " + ballY);
 	}
 
+	function NewPosition(oldPos, velocity, timeDiff)
+	{
+		return oldPos + velocity * (timeDiff / 33);
+	}
+
 	function update()
 	{
 
-	    if (paddle1PosReceived
-        && paddle2PosReceived
-	    && ballPosReceived
-	    && ballVelReceived
-	    && score1Received
-	    && score2Received
-        && readyToStart)
+	    // if (paddle1PosReceived
+     //    	&& paddle2PosReceived
+	    //   	&& ballPosReceived
+	    //   	&& ballVelReceived
+	    //   	&& score1Received
+	    //   	&& score2Received
+     //    	&& readyToStart)
+	    // {
+	    //     player1Position = serverPaddle1Pos;
+	    //     player2Position = serverPaddle2Pos;
+	    //     ballX = serverBallPosX;
+	    //     ballY = serverBallPosY;
+     //      ballVelocityX = serverBallVelX;
+     //      ballVelocityY = serverBallVelY;
+	    //     player1Score = serverPlayer1Score;
+	    //     player2Score = serverPlayer2Score;
+	    //     //Set stuff from server
+	    //     paddle1PosReceived = false;
+	    //     paddle2PosReceived = false;
+	    //     ballPosReceived = false;
+	    //     ballVelReceived = false;
+	    //     score1Received = false;
+	    //     score2Received = false;
+	    // }
+	    if( readyToStart )
 	    {
-	        player1Position = serverPaddle1Pos;
-	        player2Position = serverPaddle2Pos;
-	        ballX = serverBallPosX;
-	        ballY = serverBallPosY;
-	        player1Score = serverPlayer1Score;
-	        player2Score = serverPlayer2Score;
-	        //Set stuff from server
-	        paddle1PosReceived = false;
-	        paddle2PosReceived = false;
-	        ballPosReceived = false;
-	        ballVelReceived = false;
-	        score1Received = false;
-	        score2Received = false;
+	    	player1Score = serverPlayer1Score.val;
+	    	player2Score = serverPlayer2Score.val;
+		}
+
+
+	    if( ballPosReceived && ballVelReceived && readyToStart)
+	    {
+	    	ballVelocityX = serverBallVelX.val;
+	    	ballVelocityY = serverBallVelY.val;
+	    	var now = Date.now();
+	    	ballX = NewPosition(serverBallPosX.val, ballVelocityX, now - serverBallPosX.timeStamp );
+	    	ballY = NewPosition(serverBallPosY.val, ballVelocityY, now - serverBallPosY.timeStamp);
 	    }
 	    else
 	    {
 	        ballX += ballVelocityX; // adds velocity per update loop
 	        ballY += ballVelocityY;  // adds velocty per update loop
 	        //paddleUpdate();
+	    }
+
+	    if(paddle1PosReceived && readyToStart)
+	    {
+	    	player1Position = serverPaddle1Pos.val;
+	    	paddle1PosReceived = false;
+	    }
+	    if(paddle2PosReceived && readyToStart)
+	    {
+	    	player2Position = serverPaddle2Pos.val;
+	    	paddle2PosReceived = false;
 	    }
 	    // incrementMyTimer(); // increment timer;
 	    drawGameBoard();
@@ -795,12 +842,12 @@
 			        serverPaddlePos = parseInt(dataStr);
 			        if (packetClient === 0) // if this is player 1
 			        {
-			            serverPaddle1Pos = serverPaddlePos;
+			            serverPaddle1Pos = new TimedValue(serverPaddlePos, Date.parse(timeCode));
 			            paddle1PosReceived = true;
 			            //console.log("My Paddle position recieved.")
 			        }
 			        else {
-			            serverPaddle2Pos = serverPaddlePos;
+			            serverPaddle2Pos = new TimedValue(serverPaddlePos, Date.parse(timeCode));
 			            paddle2PosReceived = true;
 			            //console.log("Opponent Paddle position recieved.")
 			        }
@@ -811,8 +858,8 @@
 			    	//console.log("Message: Ball Position Update");
 			        var xStr = dataStr.substring(0, dataStr.indexOf(","));
 			        var yStr = dataStr.substring(dataStr.indexOf(",")+1);
-			        serverBallPosX = parseInt(xStr);
-			        serverBallPosY = parseInt(yStr);
+			        serverBallPosX = new TimedValue(parseInt(xStr), Date.parse(timeCode));
+			        serverBallPosY = new TimedValue(parseInt(yStr), Date.parse(timeCode));
 			        ballPosReceived = true;
 			    }
 			    else if( typeStr === "bv" )
@@ -821,8 +868,8 @@
 			    	//console.log("Message: Ball Velocity Update");
 			        var xStr = dataStr.substring(0, dataStr.indexOf(","));
 			        var yStr = dataStr.substring(dataStr.indexOf(",")+1);
-			        serverBallVelX = parseInt(xStr);
-			        serverBallVelY = parseInt(yStr);
+			        serverBallVelX = new TimedValue(parseInt(xStr), Date.parse(timeCode));
+			        serverBallVelY = new TimedValue(parseInt(yStr), Date.parse(timeCode));
 			        ballVelReceived = true;
 			    }
 			    else if( typeStr === "ps" )
@@ -845,11 +892,13 @@
 			        {
 			            var temp = document.getElementById("p1Lag");
 			            temp.innerHTML = "Latency: " + dataStr;
+			            player1Latency = parseInt(dataStr);
 			        }
 			        else
 			        {
 			            var temp = document.getElementById("p2Lag");
 			            temp.innerHTML = "Latency: " + dataStr;
+			            player2Latency = parseInt(dataStr);
 			        }
 			    }
 

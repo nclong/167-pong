@@ -100,6 +100,62 @@ string FormatPacketString(SendTypes sendType, int clientId, int value1, int valu
 	result += ossMessage.str();
 	return result;
 }
+
+string DayOfWeekFromNum(int x)
+{
+	switch (x)
+	{
+	case 0:
+		return "Sun";
+	case 1:
+		return "Mon";
+	case 2:
+		return "Tue";
+	case 3:
+		return "Wed";
+	case 4:
+		return "Thu";
+	case 5:
+		return "Fri";
+	case 6:
+		return "Sat";
+	default:
+		return "NO STOP IT";
+	}
+}
+
+string MonthFromNum(int x)
+{
+	switch (x)
+	{
+		case 0:
+			return "Jan";
+		case 1:
+			return "Feb";
+		case 2:
+			return "Mar";
+		case 3:
+			return "Apr";
+		case 4:
+			return "May";
+		case 5:
+			return "Jun";
+		case 6:
+			return "Jul";
+		case 7:
+			return "Aug";
+		case 8:
+			return "Sep";
+		case 9:
+			return "Oct";
+		case 10:
+			return "Nov";
+		case 11:
+			return "Dec";
+		default:
+			"NO STOP IT";
+	}
+}
 /* called when a client connects */
 void openHandler(int clientID){
 	if (!bufferInitiated)
