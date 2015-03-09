@@ -6,20 +6,21 @@
 #include <sstream>
 #include <time.h>
 #include <chrono>
+#include <iomanip>
 #include "websocket.h"
 #include "Entity.h"
-#include "EntityManager.h"
 #include "Paddle.h"
 #include "Ball.h"
 #include "Wall.h"
 #include "Constants.h"
 #include "PlayerManager.h"
-#include "PongTime.h"
 #include "LatencyManager.h"
 #include "PacketBuffer.h"
 #include "PacketTypes.h"
 
 using namespace std;
+
+// Game elements //
 
 webSocket server;
 Ball ball;
@@ -29,12 +30,16 @@ PlayerInfo player1;
 PlayerInfo player2;
 Wall topWall;
 Wall bottomWall;
-
 string player1Name;
 string player2Name;
+
+
 SYSTEMTIME serverSendTime;
+
 bool pingSent = false;
 bool packetSent = false;
+bool bufferInitiated = false;
+bool gameStarted;
 
 bool player1Connected = false;
 bool player2Connected = false;
@@ -43,9 +48,7 @@ bool player2Ready = false;
 bool ping1Received = false;
 bool ping2Received = false;
 
-bool bufferInitiated = false;
 
-bool gameStarted;
 
 void startGame();
 
@@ -53,21 +56,29 @@ string FormatPacketString(SendTypes sendType, int clientId, int value1, int valu
 {
 	//Packet Format
 	//<function>[<clientID>]{<data>}
-	string result = "";
-	switch (sendType)
+	// We'll append specific string args 
+	// to a packet sent so the recieving client can decipher them.
+
+	string result = ""; 
+	switch (sendType) // Use switch statement and break upon appending
 	{
+		// send packet indicating that paddle position is changing
 		case PaddlePosition:
 			result += "pp";
 			break;
+		// send packet indicating that ball position is changing
 		case BallPosition:
 			result += "bp";
 			break;
+		// send packet indicating that ball velocity is changing
 		case BallVelocity:
 			result += "bv";
 			break;
+		// send packet indicating that player score is changing
 		case PlayerScore:
 			result += "ps";
 			break;
+		// send packet indicating that paddle latency is changing
 		case PlayerLatency:
 			result += "pl";
 			break;
@@ -75,90 +86,47 @@ string FormatPacketString(SendTypes sendType, int clientId, int value1, int valu
 			break;
 	}
 
+	// We want to format the packet for the client.
+	// Sample format: pp[1]{}#SystemTime
+
 	result += "[";
-	result += to_string(clientId);
+	result += to_string(clientId); // We add the clientID
 	result += "]";
 	result += "{";
 	result += to_string(value1);
+
+	// For Ballposition and velocity, we need to have additional param
+	// Since we have the X and Y parameters that we need to send.
+
 	if (sendType == BallPosition || sendType == BallVelocity)
 	{
 		result += ",";
 		result += to_string(value2);
 	}
 	result += "}#";
+
+	// Send the exact system time over to the client.
+
 	SYSTEMTIME st;
 	GetSystemTime(&st);
 	std::ostringstream ossMessage;
 
+	// Some complex stuff magic here. Nick!
 	ossMessage << st.wYear << "-"
 		<< std::setw(2) << std::setfill('0') << st.wMonth << "-"
-		<< std::setw(2) << std::setfill('0') << st.wDay << "T"
+		<< std::setw(2) << std::setfill('0') << st.wDay << " "
 		<< std::setw(2) << std::setfill('0') << st.wHour << ":"
 		<< std::setw(2) << std::setfill('0') << st.wMinute << ":"
 		<< std::setw(2) << std::setfill('0') << st.wSecond << "."
-		<< std::setw(3) << std::setfill('0') << st.wMilliseconds
-		<< "+00:00";
+		<< std::setw(3) << std::setfill('0') << st.wMilliseconds;
 	result += ossMessage.str();
-	return result;
+	return result; 
 }
-
-//string DayOfWeekFromNum(int x)
-//{
-//	switch (x)
-//	{
-//	case 0:
-//		return "Sun";
-//	case 1:
-//		return "Mon";
-//	case 2:
-//		return "Tue";
-//	case 3:
-//		return "Wed";
-//	case 4:
-//		return "Thu";
-//	case 5":
-//		return "Fri";
-//	case "6":
-//		return "Sat";
-//	default:
-//		return "NO STOP IT";
-//	}
-//}
-//
-//string MonthFromNum(int x)
-//{
-//	switch (x)
-//	{
-//		case 0:
-//			return "Jan";
-//		case 1:
-//			return "Feb";
-//		case 2:
-//			return "Mar";
-//		case 3:
-//			return "Apr";
-//		case 4:
-//			return "May";
-//		case 5:
-//			return "Jun";
-//		case 6:
-//			return "Jul";
-//		case 7:
-//			return "Aug";
-//		case 8:
-//			return "Sep";
-//		case 9:
-//			return "Oct";
-//		case 10:
-//			return "Nov";
-//		case 11:
-//			return "Dec";
-//		default:
-//			"NO STOP IT";
-//	}
-//}
 /* called when a client connects */
 void openHandler(int clientID){
+
+	 // Init the buffer if it hasn't been already
+
 	if (!bufferInitiated)
 	{
 		PacketBuffer::StartBuffer();
@@ -168,21 +136,27 @@ void openHandler(int clientID){
 
 	std::string ConnectedStr = "ci["+to_string(clientID)+"]{0}";
 	PacketBuffer::wsSend(clientID, ConnectedStr);
+
+	// Checks connectivity for the players here
+
 	if (clientID == 0)
 	{
-		player1Connected = true;
+		player1Connected = true; 
 	}
 	if (clientID == 1)
 	{
 		player2Connected = true;
 	}
 
-	if (player1Connected && player2Connected)
+	// Once both clients connected, send packet to both indicating "ready"
+
+	if (player1Connected && player2Connected) 
 	{
 		PacketBuffer::wsSend(0, "rd[0]{0}");
 		PacketBuffer::wsSend(1, "rd[1]{0}");
 	}
 
+	// Print 
 	cout << "OpenHandler called on client " << clientID << endl;
 }
 
@@ -322,6 +296,8 @@ void messageHandler(int clientID, string message){
 			LatencyManager::AddServerToClientLatency(currentClient, TimeDifference(receiveTime, serverSendTime));
 			LatencyManager::AddClientToServerLatency(currentClient, TimeDifference(serverReceiveTime, sendTime));
 
+			// Wait for ping 1 and ping 2.
+
 			if (currentClient == 0)
 			{
 				ping1Received = true;
@@ -331,6 +307,7 @@ void messageHandler(int clientID, string message){
 				ping2Received = true;
 			}
 
+			// If both pings are recieved, set them back to false
 			if (ping1Received && ping2Received)
 			{
 				pingSent = false;
@@ -370,7 +347,7 @@ void messageHandler(int clientID, string message){
 	}
 	if (typeString.compare("name") == 0) 
 	{
-		
+		// Have the client sleep for 2000 ms to compensate for latency
 		if (currentClient == 0){
 			player1Name = message.substr(closeBracketIndex + 1); // sets player 1 name here; evidently is not being called when needed.
 			Sleep(2000);
@@ -387,18 +364,24 @@ void messageHandler(int clientID, string message){
 void sendPlayerInfo()
 {
 
+	// For player info, send PlayerPaddlePositions, score, ball pos/vel, and their lag.
+
 	string Player1Paddle = FormatPacketString(PaddlePosition, 0, PlayerManager::Players[0]->paddle->position.y, 0);
 	string Player2Paddle = FormatPacketString(PaddlePosition, 1, PlayerManager::Players[1]->paddle->position.y, 0);
+	
 	string ballPos = FormatPacketString(BallPosition, 0, ball.position.x, ball.position.y);
 	string ballVel = FormatPacketString(BallVelocity, 0, ball.velocity.x, ball.velocity.y);
+	
 	string Player1Score = FormatPacketString(PlayerScore, 0, PlayerManager::Players[0]->score, 0);
 	string Player2Score = FormatPacketString(PlayerScore, 1, PlayerManager::Players[1]->score, 0);
+	
 	//string Player1Lag = FormatPacketString(PlayerLatency, 0, LatencyManager::AverageClientToServerLatency[0] + LatencyManager::AverageServerToClientLatency[0], 0);
 	//string Player2Lag = FormatPacketString(PlayerLatency, 1, LatencyManager::AverageClientToServerLatency[1] + LatencyManager::AverageServerToClientLatency[1], 0);
+	
 	string Player1Lag = FormatPacketString(PlayerLatency, 0, LatencyManager::GetCurrentServerToClientLatency(0) + LatencyManager::GetCurrentClientToServerLatency(0), 0);
 	string Player2Lag = FormatPacketString(PlayerLatency, 1, LatencyManager::GetCurrentClientToServerLatency(1) + LatencyManager::GetCurrentServerToClientLatency(1), 0);
 
-
+	// Send the same packets to all clients
 
 	vector<int> clientIDs = server.getClientIDs();
 	for (int i = 0; i < clientIDs.size(); ++i)
@@ -435,6 +418,9 @@ void SendTimePing()
 
 /* called once per select() loop */
 void periodicHandler(){
+
+	// Start the game! Is run every .33 seconds.
+
 	if (player1Ready && player2Ready && !gameStarted)
 	{
 		startGame();

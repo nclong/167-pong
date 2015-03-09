@@ -162,6 +162,7 @@
 		var borderLeft; // left border sprite
 		var borderBottom;  // bottom border sprite
 		var ball; // ball sprite
+		var ballGlow; // ball glowing sprite
 
     // Initialize all variables.
 
@@ -218,6 +219,7 @@
  		player1 = document.getElementById("paddle1");
  		player2 = document.getElementById("paddle2"); //Needs to be made
  		ball = document.getElementById("baller");
+ 		ballGlow = document.getElementById("ballGlow");
 
  		// Set my sprite offsets here.
 		paddleOffset = 100;
@@ -344,7 +346,10 @@
 
 	function drawBall() // draw da ball. edit values here.
 	{
+	    // Draws ball
 	    ctx.drawImage(ball, ballX - ballOffsetX, ballY - ballOffsetY, 90, 90);
+	    // Draws ballGlow
+	    ctx.drawImage(ballGlow, ballX - ballOffsetX, ballY - ballOffsetY, 90, 90);
 	    //console.log("BallX: " + ballX);
 	    //console.log("BallY: " + ballY);
 	}
@@ -579,7 +584,9 @@
 	<img id="paddle2" src="images/Paddle2.png" alt="paddle2"
 	width="0" height="0">
 <!-- BALL SPRITE -->
-	<img id="baller" src="images/Ball.png" alt="ball"
+	<img id="baller" src="images/Ball.gif" alt="ball"
+	width="0" height="0">
+	<img id="ballGlow" src="images/Ball_glow.gif" alt="ballG"
 	width="0" height="0">
 <!-- CANVAS BACKGROUND -->
 	<img id="bg" src="images/background.png" alt="bg"
@@ -709,7 +716,7 @@
 		    if (readyToStart) {
 		        //Server.send('message', text);
 		        PacketBuffer.AddPacket(text);
-		        console.log("Message sent:" + text);
+		        //console.log("Message sent:" + text);
 		    }
 		}
 
@@ -777,7 +784,7 @@
 			//Log any messages sent from server
 			Server.bind('message', function (payload) {
 			    var ReceiveTime = new Date();
-			    // console.log("Received Message: " + payload);
+			    console.log("Received Message: " + payload);
 			    typeStr = payload.substring(0, 2);
 			    var leftBracketIndex = payload.indexOf("[");
 			    var rightBracketIndex = payload.indexOf("]");
