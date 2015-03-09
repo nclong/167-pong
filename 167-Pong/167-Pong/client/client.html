@@ -709,7 +709,7 @@
 		    if (readyToStart) {
 		        //Server.send('message', text);
 		        PacketBuffer.AddPacket(text);
-		        console.log("Message sent:" + text);
+		        //console.log("Message sent:" + text);
 		    }
 		}
 
@@ -777,7 +777,7 @@
 			//Log any messages sent from server
 			Server.bind('message', function (payload) {
 			    var ReceiveTime = new Date();
-			    // console.log("Received Message: " + payload);
+			    console.log("Received Message: " + payload);
 			    typeStr = payload.substring(0, 2);
 			    var leftBracketIndex = payload.indexOf("[");
 			    var rightBracketIndex = payload.indexOf("]");

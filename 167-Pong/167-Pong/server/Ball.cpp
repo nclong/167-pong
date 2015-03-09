@@ -81,7 +81,7 @@ void Ball::BallUpdate(Paddle* paddle1, Paddle* paddle2, Wall t, Wall b)
 		PlayerManager::Players[1]->score++;
 	}
 	
-	if (position.x /*+ BALL_WIDTH*/ > SCREEN_WIDTH)
+	if (position.x > SCREEN_WIDTH)
 	{
 		//Player 1 Needs to score
 		position = startingPos;

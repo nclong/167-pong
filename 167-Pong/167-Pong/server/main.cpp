@@ -6,15 +6,14 @@
 #include <sstream>
 #include <time.h>
 #include <chrono>
+#include <iomanip>
 #include "websocket.h"
 #include "Entity.h"
-#include "EntityManager.h"
 #include "Paddle.h"
 #include "Ball.h"
 #include "Wall.h"
 #include "Constants.h"
 #include "PlayerManager.h"
-#include "PongTime.h"
 #include "LatencyManager.h"
 #include "PacketBuffer.h"
 #include "PacketTypes.h"
@@ -102,61 +101,6 @@ string FormatPacketString(SendTypes sendType, int clientId, int value1, int valu
 	return result;
 }
 
-//string DayOfWeekFromNum(int x)
-//{
-//	switch (x)
-//	{
-//	case 0:
-//		return "Sun";
-//	case 1:
-//		return "Mon";
-//	case 2:
-//		return "Tue";
-//	case 3:
-//		return "Wed";
-//	case 4:
-//		return "Thu";
-//	case 5":
-//		return "Fri";
-//	case "6":
-//		return "Sat";
-//	default:
-//		return "NO STOP IT";
-//	}
-//}
-//
-//string MonthFromNum(int x)
-//{
-//	switch (x)
-//	{
-//		case 0:
-//			return "Jan";
-//		case 1:
-//			return "Feb";
-//		case 2:
-//			return "Mar";
-//		case 3:
-//			return "Apr";
-//		case 4:
-//			return "May";
-//		case 5:
-//			return "Jun";
-//		case 6:
-//			return "Jul";
-//		case 7:
-//			return "Aug";
-//		case 8:
-//			return "Sep";
-//		case 9:
-//			return "Oct";
-//		case 10:
-//			return "Nov";
-//		case 11:
-//			return "Dec";
-//		default:
-//			"NO STOP IT";
-//	}
-//}
 /* called when a client connects */
 void openHandler(int clientID){
 	if (!bufferInitiated)
@@ -188,14 +132,6 @@ void openHandler(int clientID){
 
 /* called when a client disconnects */
 void closeHandler(int clientID){
-    //ostringstream os;
-    //os << "Stranger " << clientID << " has leaved.";
-
-    //vector<int> clientIDs = server.getClientIDs();
-    //for (int i = 0; i < clientIDs.size(); i++){
-    //    if (clientIDs[i] != clientID)
-    //        server.wsSend(clientIDs[i], os.str());
-    //}
 
 	startGame();
 	gameStarted = false;
@@ -289,32 +225,6 @@ void messageHandler(int clientID, string message){
 			sendTime.wMonth = serverReceiveTime.wMonth;
 			sendTime.wYear = serverReceiveTime.wYear;
 
-
-
-			//FILETIME serverSendTimef, receiveTimef, sendTimef, serverReceiveTimef;
-			//SystemTimeToFileTime(&serverSendTime, &serverSendTimef);
-			//std::cout << " Server Send: " << serverSendTime.wMilliseconds << std::endl;
-			//SystemTimeToFileTime(&receiveTime, &receiveTimef);
-			//std::cout << "Client Receive: " << receiveTime.wMilliseconds << std::endl;
-			//SystemTimeToFileTime(&sendTime, &sendTimef);
-			//std::cout << "Client Send: " << sendTime.wMilliseconds << std::endl;
-			//SystemTimeToFileTime(&serverReceiveTime, &serverReceiveTimef);
-			//std::cout << "Server Receive: " << serverReceiveTime.wMilliseconds << std::endl;
-			//ULARGE_INTEGER serverSendTimeui, receiveTimeui, sendTimeui, serverReceiveTimeui;
-			//unsigned long long int serverSendTimei, receiveTimei, sendTimei, serverReceiveTimei;
-			//serverSendTimeui.LowPart = serverSendTimef.dwLowDateTime;
-			//serverSendTimeui.HighPart = serverSendTimef.dwHighDateTime;
-			//receiveTimeui.LowPart = receiveTimef.dwLowDateTime;
-			//receiveTimeui.HighPart = receiveTimef.dwHighDateTime;
-			//sendTimeui.LowPart = sendTimef.dwLowDateTime;
-			//sendTimeui.HighPart = sendTimef.dwHighDateTime;
-			//serverReceiveTimeui.LowPart = serverReceiveTimef.dwLowDateTime;
-			//serverReceiveTimeui.HighPart = serverReceiveTimef.dwHighDateTime;
-			//serverSendTimei = serverSendTimeui.QuadPart;
-			//receiveTimei = receiveTimeui.QuadPart;
-			//sendTimei = receiveTimeui.QuadPart;
-			//serverReceiveTimei = serverReceiveTimeui.QuadPart;
-
 			int ServerToClient = 0;
 			int ClientToServer = 0;
 
@@ -393,8 +303,6 @@ void sendPlayerInfo()
 	string ballVel = FormatPacketString(BallVelocity, 0, ball.velocity.x, ball.velocity.y);
 	string Player1Score = FormatPacketString(PlayerScore, 0, PlayerManager::Players[0]->score, 0);
 	string Player2Score = FormatPacketString(PlayerScore, 1, PlayerManager::Players[1]->score, 0);
-	//string Player1Lag = FormatPacketString(PlayerLatency, 0, LatencyManager::AverageClientToServerLatency[0] + LatencyManager::AverageServerToClientLatency[0], 0);
-	//string Player2Lag = FormatPacketString(PlayerLatency, 1, LatencyManager::AverageClientToServerLatency[1] + LatencyManager::AverageServerToClientLatency[1], 0);
 	string Player1Lag = FormatPacketString(PlayerLatency, 0, LatencyManager::GetCurrentServerToClientLatency(0) + LatencyManager::GetCurrentClientToServerLatency(0), 0);
 	string Player2Lag = FormatPacketString(PlayerLatency, 1, LatencyManager::GetCurrentClientToServerLatency(1) + LatencyManager::GetCurrentServerToClientLatency(1), 0);
 
@@ -509,11 +417,6 @@ void startGame()
 	bottomWall.SetWidth(HORIZ_WALL_WIDTH);
 	bottomWall.name = "BottomWall";
 
-	//EntityManager::AddEntity((Entity*)&ball);
-	//EntityManager::AddEntity((Entity*)&paddle1);
-	//EntityManager::AddEntity((Entity*)&topWall);
-	//EntityManager::AddEntity((Entity*)&bottomWall);
-	//EntityManager::AddEntity((Entity*)&rightWall);
 	gameStarted = true;
 	pingSent = false;
 }
