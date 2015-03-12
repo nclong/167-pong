@@ -143,6 +143,7 @@
 		var ballVelocityY; // Velocity of the ball
 		var ballX; // Ball location X
 		var ballY; // Ball location Y
+		var ballRot; // Ball rotation
 		var ballOffsetX; // Offset for ball sprite X
 		var ballOffsetY; // Offset for ball sprite Y
 		var player1Latency;
@@ -221,6 +222,8 @@
  		ball = document.getElementById("baller");
  		ballGlow = document.getElementById("ballGlow");
 
+ 		ballRot = 1;
+
  		// Set my sprite offsets here.
 		paddleOffset = 100;
 		ballOffsetX = 10;
@@ -248,7 +251,7 @@
 
 	function drawGameBoard() // draws all the static elements.
 	{
-	    ctx.clearRect(0, 0, cWidth, cHeight);
+	    	ctx.clearRect(0, 0, cWidth, cHeight);
 			ctx.drawImage(board, 0, 0, 1200, 500);
 			ctx.drawImage(borderLeft, 0, 0, 20, 500);
 			ctx.drawImage(borderTop, 0, 0, 1200, 20);
@@ -346,10 +349,21 @@
 
 	function drawBall() // draw da ball. edit values here.
 	{
+	   
+		// Draws ballGlow
+	    ctx.drawImage(ballGlow, ballX - ballOffsetX - 7, ballY - ballOffsetY - 7, 55, 55);
 	    // Draws ball
-	    ctx.drawImage(ball, ballX - ballOffsetX, ballY - ballOffsetY, 90, 90);
-	    // Draws ballGlow
-	    ctx.drawImage(ballGlow, ballX - ballOffsetX, ballY - ballOffsetY, 90, 90);
+	    ball = document.getElementById("baller" + ballRot);
+	    console.log("baller" + ballRot);
+	    ctx.drawImage(ball, ballX - ballOffsetX, ballY - ballOffsetY, 40, 40);
+
+	    // Code to make ball "spin"
+	    ballRot++;
+	    if (ballRot > 3)
+	    {
+	    	ballRot = 1;
+	    }
+	    
 	    //console.log("BallX: " + ballX);
 	    //console.log("BallY: " + ballY);
 	}
@@ -361,6 +375,17 @@
 
 	function update()
 	{
+
+		// TEST VARIABLES FOR CLIENT SIDE EDITING //
+		 /*
+		 ballX = serverBallPosX = 200;
+	     ballY = serverBallPosY = 200;
+		 ballVelocityX = serverBallVelX = -1;
+         ballVelocityY = serverBallVelY = -1;
+         readyToStart = true;
+         serverPlayer1Score = 100;
+         serverPlayer2Score = 200;
+         */
 
 	    // if (paddle1PosReceived
      //    	&& paddle2PosReceived
@@ -374,8 +399,7 @@
 	    //     player2Position = serverPaddle2Pos;
 	    //     ballX = serverBallPosX;
 	    //     ballY = serverBallPosY;
-     //      ballVelocityX = serverBallVelX;
-     //      ballVelocityY = serverBallVelY;
+          
 	    //     player1Score = serverPlayer1Score;
 	    //     player2Score = serverPlayer2Score;
 	    //     //Set stuff from server
@@ -388,8 +412,11 @@
 	    // }
 	    if( readyToStart )
 	    {
-	    	player1Score = serverPlayer1Score.val;
-	    	player2Score = serverPlayer2Score.val;
+	    	//player1Score = serverPlayer1Score.val;
+	    	//player2Score = serverPlayer2Score.val;
+
+	    	player1Score = serverPlayer1Score;
+	    	player2Score = serverPlayer2Score;
 		}
 
 
@@ -404,8 +431,7 @@
 	    else
 	    {
 	        ballX += ballVelocityX; // adds velocity per update loop
-	        ballY += ballVelocityY;  // adds velocty per update loop
-	        //paddleUpdate();
+	        ballY += ballVelocityY; // adds velocty per update loop
 	    }
 
 	    if(paddle1PosReceived && readyToStart)
@@ -420,9 +446,10 @@
 	    }
 	    // incrementMyTimer(); // increment timer;
 	    drawGameBoard();
+	    drawBall();
+	    console.log("Ball drawn");
 	    drawPaddle1();
 	    drawPaddle2();
-	    drawBall();
 	    refreshStats();
 	}
 
@@ -505,9 +532,7 @@
 			//console.log("Function: set score.");
 			var scoreSet = document.getElementById("p2Score");
 			scoreSet.innerHTML = s;
-		}  //
-
-
+		}  
 
 
 	// TODO: set both player scores.
@@ -538,23 +563,6 @@
 	    	d = new Date();
 		}
 
-
-		// Functions not being used.
-
-	//function incrementOpportunity() // fun function. increments opp.
-	//	{
-	//		//console.log("Function: increment opportunity.");
-	//		var oppSet = document.getElementById("opp");
-	//		oppSet.innerHTML++;
-	//	}
-
-	//function setOpportunity(o) // sets opportunity (string)
-	//	{
-	//		//console.log("Function: set opportunity.");
-	//		var oppSet = document.getElementById("opp");
-	//		opp.innerHTML = o;
-	//	}
-
 	function getCurrentTime() // returns the current time.
 		{
 			return time;
@@ -583,9 +591,14 @@
 	width="0" height="0">
 	<img id="paddle2" src="images/Paddle2.png" alt="paddle2"
 	width="0" height="0">
-<!-- BALL SPRITE -->
-	<img id="baller" src="images/Ball.gif" alt="ball"
+<!-- BALL SPRITES -->
+	<img id="baller1" src="images/ball1.png" alt="ball"
 	width="0" height="0">
+	<img id="baller2" src="images/ball2.png" alt="ball"
+	width="0" height="0">
+	<img id="baller3" src="images/ball3.png" alt="ball"
+	width="0" height="0">
+
 	<img id="ballGlow" src="images/Ball_glow.gif" alt="ballG"
 	width="0" height="0">
 <!-- CANVAS BACKGROUND -->
