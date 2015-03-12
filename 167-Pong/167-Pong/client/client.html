@@ -110,7 +110,7 @@
  		    if( now - START_DATE >= PacketBuffer.timeToSend)
  		    {
  		        PacketBuffer.SendPacket();
- 		        START_DATE = new Date();
+ 		        START_DATE = Date.now();
  		    }
  		}
 
@@ -385,6 +385,7 @@
 
 	    	player1Score = serverPlayer1Score;
 	    	player2Score = serverPlayer2Score;
+	    	TestPacketBuffer();
 		}
 
 
@@ -539,8 +540,7 @@
 		initialize(); 								// run once.
 		window.onkeydown = keyPress; 				// keyPress passed to onKeyDown
 		window.onkeyup = release;					// RELEASE -> onkeyup
-		window.setInterval(update, 33); 			// run update loop
-		window.setInterval(TestPacketBuffer, 1);	// backbuffer, 1
+		window.setInterval(update, 33); 			// run update loop	// backbuffer, 1
 	});
 
 
