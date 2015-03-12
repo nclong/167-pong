@@ -888,6 +888,8 @@
 			    }
 			    else if( typeStr === "bv" )
 			    {
+			        var time = Date.parse(timeCode);
+			        var now = new Date();
 			    	// Set the ball velocity.
 			    	//console.log("Message: Ball Velocity Update");
 			        var xStr = dataStr.substring(0, dataStr.indexOf(","));

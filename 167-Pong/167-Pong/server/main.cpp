@@ -52,6 +52,19 @@ bool ping2Received = false;
 
 void startGame();
 
+string TimeToString(const SYSTEMTIME* st)
+{
+	std::ostringstream ossTime;
+	ossTime << st->wYear << "-"
+		<< std::setw(2) << std::setfill('0') << st->wMonth << "-"
+		<< std::setw(2) << std::setfill('0') << st->wDay << " "
+		<< std::setw(2) << std::setfill('0') << st->wHour << ":"
+		<< std::setw(2) << std::setfill('0') << st->wMinute << ":"
+		<< std::setw(2) << std::setfill('0') << st->wSecond << "."
+		<< std::setw(3) << std::setfill('0') << st->wMilliseconds;
+	return ossTime.str();
+}
+
 string FormatPacketString(SendTypes sendType, int clientId, int value1, int value2)
 {
 	//Packet Format
@@ -109,19 +122,11 @@ string FormatPacketString(SendTypes sendType, int clientId, int value1, int valu
 
 	SYSTEMTIME st;
 	GetSystemTime(&st);
-	std::ostringstream ossMessage;
-
-	// Some complex stuff magic here. Nick!
-	ossMessage << st.wYear << "-"
-		<< std::setw(2) << std::setfill('0') << st.wMonth << "-"
-		<< std::setw(2) << std::setfill('0') << st.wDay << " "
-		<< std::setw(2) << std::setfill('0') << st.wHour << ":"
-		<< std::setw(2) << std::setfill('0') << st.wMinute << ":"
-		<< std::setw(2) << std::setfill('0') << st.wSecond << "."
-		<< std::setw(3) << std::setfill('0') << st.wMilliseconds;
-	result += ossMessage.str();
+	result += TimeToString(&st);
 	return result; 
 }
+
+
 /* called when a client connects */
 void openHandler(int clientID){
 
@@ -402,11 +407,8 @@ void SendTimePing()
 	if (!pingSent)
 	{
 		GetSystemTime(&serverSendTime);
-		ostringstream ostream;
-		ostream << serverSendTime.wHour << ":" << serverSendTime.wMinute << ":";
-		ostream << serverSendTime.wSecond << ":" << serverSendTime.wMilliseconds;
 		std::string timePacket = "pg[0]{";
-		timePacket += ostream.str() + "}";
+		timePacket += TimeToString(&serverSendTime) + "}";
 		vector<int> clients = server.getClientIDs();
 		for (int i = 0; i < clients.size(); ++i)
 		{
