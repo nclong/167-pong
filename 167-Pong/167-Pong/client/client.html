@@ -353,19 +353,21 @@
 		// Draws ballGlow
 	    ctx.drawImage(ballGlow, ballX - ballOffsetX - 7, ballY - ballOffsetY - 7, 55, 55);
 	    // Draws ball
+	    ballRotation(); // increments ballRot
 	    ball = document.getElementById("baller" + ballRot);
-	    console.log("baller" + ballRot);
 	    ctx.drawImage(ball, ballX - ballOffsetX, ballY - ballOffsetY, 40, 40);
+	    console.log("BallX: " + ballX);
+	    console.log("BallY: " + ballY);
+	}
 
-	    // Code to make ball "spin"
+	function ballRotation() // crude function but it works.
+	{
+		// Code to make ball "spin"
 	    ballRot++;
 	    if (ballRot > 24)
 	    {
 	    	ballRot = 1;
-	    }
-	    
-	    //console.log("BallX: " + ballX);
-	    //console.log("BallY: " + ballY);
+	    }    
 	}
 
 	function NewPosition(oldPos, velocity, timeDiff)
@@ -376,41 +378,7 @@
 	function update()
 	{
 
-		// TEST VARIABLES FOR CLIENT SIDE EDITING //
-		 /*
-		 ballX = serverBallPosX = 200;
-	     ballY = serverBallPosY = 200;
-		 ballVelocityX = serverBallVelX = -1;
-         ballVelocityY = serverBallVelY = -1;
-         readyToStart = true;
-         serverPlayer1Score = 100;
-         serverPlayer2Score = 200;
-         */
-
-	    // if (paddle1PosReceived
-     //    	&& paddle2PosReceived
-	    //   	&& ballPosReceived
-	    //   	&& ballVelReceived
-	    //   	&& score1Received
-	    //   	&& score2Received
-     //    	&& readyToStart)
-	    // {
-	    //     player1Position = serverPaddle1Pos;
-	    //     player2Position = serverPaddle2Pos;
-	    //     ballX = serverBallPosX;
-	    //     ballY = serverBallPosY;
-          
-	    //     player1Score = serverPlayer1Score;
-	    //     player2Score = serverPlayer2Score;
-	    //     //Set stuff from server
-	    //     paddle1PosReceived = false;
-	    //     paddle2PosReceived = false;
-	    //     ballPosReceived = false;
-	    //     ballVelReceived = false;
-	    //     score1Received = false;
-	    //     score2Received = false;
-	    // }
-	    if( readyToStart )
+	    if( readyToStart ) // This just sets player score.
 	    {
 	    	//player1Score = serverPlayer1Score.val;
 	    	//player2Score = serverPlayer2Score.val;
@@ -422,13 +390,15 @@
 
 	    if( ballPosReceived && ballVelReceived && readyToStart)
 	    {
+	    	var now = Date.now();
+
 	    	ballVelocityX = serverBallVelX.val;
 	    	ballVelocityY = serverBallVelY.val;
-	    	var now = Date.now();
+	    	
 	    	ballX = NewPosition(serverBallPosX.val, ballVelocityX, now - serverBallPosX.timeStamp );
 	    	ballY = NewPosition(serverBallPosY.val, ballVelocityY, now - serverBallPosY.timeStamp);
 	    }
-	    else
+	    else // estimate where the ball was going based on last velocity!
 	    {
 	        ballX += ballVelocityX; // adds velocity per update loop
 	        ballY += ballVelocityY; // adds velocty per update loop
@@ -444,24 +414,15 @@
 	    	player2Position = serverPaddle2Pos.val;
 	    	paddle2PosReceived = false;
 	    }
-	    // incrementMyTimer(); // increment timer;
+
+	    // Run our series of drawing sprites/updating other stats.
+
 	    drawGameBoard();
 	    drawBall();
-	    console.log("Ball drawn");
 	    drawPaddle1();
 	    drawPaddle2();
 	    refreshStats();
 	}
-
-	$(document).ready(function () {
-
-		initialize(); // run once.
-		window.onkeydown = keyPress; // keyPress passed to the onKeyDown
-		window.onkeyup = release;
-		window.setInterval(update, 33); // run update loop
-	    // window.setInterval(connectionToggle, 3000); // updates every 3 s.
-		window.setInterval(TestPacketBuffer, 1);
-	});
 
 	function keyPress(e)
 	{
@@ -534,20 +495,10 @@
 			scoreSet.innerHTML = s;
 		}  
 
-
-	// TODO: set both player scores.
-
 	function setTimeCurrent(t) // sets the time (string!)
 		{
 			var timeSet = document.getElementById("timed");
 			timeSet.innerHTML = t.toString();
-		}
-
-	function incrementScore()  // fun function. just increments score.
-		{
-			//console.log("Function: increment score.");
-			var oppSet = document.getElementById("score");
-			oppSet.innerHTML++;
 		}
 
 	function refreshStats() // refreshes stats board (consec Hits, score, opp)
@@ -555,8 +506,8 @@
 			//setConsecutiveHits(consecHits)
 			//setScore(score);
 			//setOpportunity(opportunity);
-			setP1Score(player1Score);
-			setP2Score(player2Score);
+			setP1Score(player1Score);		// draws the score
+			setP2Score(player2Score);		// draws the score
 		}
 	function incrementMyTimer() // makes a new date.
 		{
@@ -578,6 +529,17 @@
 			var temp = document.getElementById("p2Name");
 			temp.innerHTML = n.toString();
 		}
+
+
+		// Document ready function scripts! Placed here for clarity.
+
+	$(document).ready(function () {
+		initialize(); 								// run once.
+		window.onkeydown = keyPress; 				// keyPress passed to onKeyDown
+		window.onkeyup = release;					// RELEASE -> onkeyup
+		window.setInterval(update, 33); 			// run update loop
+		window.setInterval(TestPacketBuffer, 1);	// backbuffer, 1
+	});
 
 
 </script>
