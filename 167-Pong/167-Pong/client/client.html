@@ -25,7 +25,7 @@
         var myName;     					// Your name
         var theirName;  					// Their name
 
-        var timeOffsetSet = false;
+        var timeOffsetSet = 0;
         var timeOffset;
 
         // We haven't recieved any data from server yet; initialize as false.
@@ -933,7 +933,7 @@
 			            player2Latency = parseInt(dataStr);
 			        }
 
-			        if (!timeOffsetSet) {
+			        if (timeOffsetSet <= 5) {
 			            if (thisClientID === 0) {
 			                timeOffset = Date.now() - Date.parse(timeCode) - player1Latency / 2;
 			            }
@@ -941,7 +941,7 @@
 			                timeOffset = Date.now() - Date.parse(timeCode) - player2Latency / 2;
 			            }
 
-			            timeOffsetSet = true;
+			            timeOffsetSet+=1;
 			        }
 			    }
 
