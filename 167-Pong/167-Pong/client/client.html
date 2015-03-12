@@ -933,7 +933,7 @@
 			            player2Latency = parseInt(dataStr);
 			        }
 
-			        if (timeOffsetSet <= 5) {
+			        if (timeOffsetSet <= 10) {
 			            if (thisClientID === 0) {
 			                timeOffset = Date.now() - Date.parse(timeCode) - player1Latency / 2;
 			            }
