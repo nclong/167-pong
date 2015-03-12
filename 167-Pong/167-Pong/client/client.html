@@ -934,11 +934,11 @@
 
 			        if( thisClientID === 0 )
 			        {
-			            timeOffset = Date.now() - Date.parse(timeCode) - player1Latency;
+			            timeOffset = Date.now() - Date.parse(timeCode) - player1Latency / 2;
 			        }
 			        else
 			        {
-			            timeOffset = Date.now() - Date.parse(timeCode) - player2Latency;
+			            timeOffset = Date.now() - Date.parse(timeCode) - player2Latency / 2;
 			        }
 			    }
 
