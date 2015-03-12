@@ -57,11 +57,12 @@ string TimeToString(const SYSTEMTIME* st)
 	std::ostringstream ossTime;
 	ossTime << st->wYear << "-"
 		<< std::setw(2) << std::setfill('0') << st->wMonth << "-"
-		<< std::setw(2) << std::setfill('0') << st->wDay << " "
+		<< std::setw(2) << std::setfill('0') << st->wDay << "T"
 		<< std::setw(2) << std::setfill('0') << st->wHour << ":"
 		<< std::setw(2) << std::setfill('0') << st->wMinute << ":"
 		<< std::setw(2) << std::setfill('0') << st->wSecond << "."
-		<< std::setw(3) << std::setfill('0') << st->wMilliseconds;
+		<< std::setw(3) << std::setfill('0') << st->wMilliseconds
+		<<"+00:00";
 	return ossTime.str();
 }
 
@@ -355,12 +356,12 @@ void messageHandler(int clientID, string message){
 		// Have the client sleep for 2000 ms to compensate for latency
 		if (currentClient == 0){
 			player1Name = message.substr(closeBracketIndex + 1); // sets player 1 name here; evidently is not being called when needed.
-			Sleep(2000);
+			//Sleep(2000);
 		}
 		else if (currentClient == 1)
 		{
 			player2Name = message.substr(closeBracketIndex + 1);
-			Sleep(2000);
+			//Sleep(2000);
 		}
 	}
 }
