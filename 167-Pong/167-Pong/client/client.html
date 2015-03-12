@@ -15,51 +15,51 @@
 	<script src="https://code.jquery.com/jquery-2.1.1.min.js"></script>
     <script src="http://code.stephenmorley.org/javascript/queues/Queue.js"></script>
 
- 	<script>        // Drawing script!
-        //HERE ARE SOME THINGS TO DO
-        //IMPLIMENT THE SECOND PADDLE
-        //DISPLAY BOTH USER NAMES
-        //DISPLAY BOTH SCORES
-        //GAME SHOULD NOT START readyToPlay === true
+ 	<script>
         //Strings
         var PacketSentFromServer;
         var PacketReceivedAtClient;
         var PacketSentFromClient;
         var PacketReceivedAtServer;
 
-        var myName;     // Your name
-        var theirName;  // Their name
+        var myName;     					// Your name
+        var theirName;  					// Their name
 
-        var paddle1PosReceived = false;
-        var paddle2PosReceived = false;
+        // We haven't recieved any data from server yet; initialize as false.
+
+        var paddle1PosReceived = false;		
+        var paddle2PosReceived = false;		
         var ballPosReceived = false;
         var ballVelReceived = false;
         var score1Received = false;
         var score2Received = false;
+        var readyToStart = false;			//Ready to start = P1/P2 connect. 
 
-        var readyToStart = false;
+        // Data from server is declared but not defined here.
 
-        var serverPaddle1Pos;
+        var serverPaddle1Pos;				// Paddle1 pos from server...
         var serverPaddle2Pos;
-        var serverBallPosX;
+        var serverBallPosX;					// Ball pos X from server...
         var serverBallPosY;
-        var serverBallVelX;
+        var serverBallVelX;					// Ball vel X from server..
         var serverBallVelY;
-        var serverPlayer1Score;
+        var serverPlayer1Score;				// P1 score from server..
         var serverPlayer2Score;
 
-        var paddle1MovingUp = false;
+        // This is what the client needs to know in terms of paddle movement.
+
+        var paddle1MovingUp = false;		// Paddle is not up or down.
         var paddle1MovingDown = false;
-        var paddle1Stopped = true;
+        var paddle1Stopped = true;			// Starts as not moving.
 
         var paddle2MovingUp = false;
         var paddle2MovingDown = false;
         var paddle2Stopped = true;
 
-        var thisClientID = 0; // set them both to 0, temporarily.
-        var otherClientID = 0; // set them both to 0, temporarily.
+        var thisClientID = 0; 				// set them both to 0, temporarily.
+        var otherClientID = 0; 				// We'll let server decide who is 0/1.
 
-        var clientIDReceived = false;
+        var clientIDReceived = false;		// We haven't yet recieved it!
 
  		// Temporary server variables:
  		var tempIP;
@@ -93,16 +93,16 @@
  		    }
  		}
     
-    function TimedValue(value, time)
-    {
-        var result = 
-        {
-          val: value,
-          timeStamp: time
-        }
-        
-        return result;
-    }
+	    function TimedValue(value, time)
+	    {
+	        var result = 
+	        {
+	          val: value,
+	          timeStamp: time
+	        }
+	        
+	        return result;
+	    }
      
  		function TestPacketBuffer()
  		{
@@ -359,7 +359,7 @@
 
 	    // Code to make ball "spin"
 	    ballRot++;
-	    if (ballRot > 3)
+	    if (ballRot > 24)
 	    {
 	    	ballRot = 1;
 	    }
@@ -591,12 +591,54 @@
 	width="0" height="0">
 	<img id="paddle2" src="images/Paddle2.png" alt="paddle2"
 	width="0" height="0">
-<!-- BALL SPRITES -->
-	<img id="baller1" src="images/ball1.png" alt="ball"
+<!-- BALL SPRITESHEET -->
+	<img id="baller1" src="images/ballAnim/ball1.png" alt="ball"
 	width="0" height="0">
-	<img id="baller2" src="images/ball2.png" alt="ball"
+	<img id="baller2" src="images/ballAnim/ball2.png" alt="ball"
 	width="0" height="0">
-	<img id="baller3" src="images/ball3.png" alt="ball"
+	<img id="baller3" src="images/ballAnim/ball3.png" alt="ball"
+	width="0" height="0">
+	<img id="baller4" src="images/ballAnim/ball4.png" alt="ball"
+	width="0" height="0">
+	<img id="baller5" src="images/ballAnim/ball5.png" alt="ball"
+	width="0" height="0">
+	<img id="baller6" src="images/ballAnim/ball6.png" alt="ball"
+	width="0" height="0">
+	<img id="baller7" src="images/ballAnim/ball7.png" alt="ball"
+	width="0" height="0">
+	<img id="baller8" src="images/ballAnim/ball8.png" alt="ball"
+	width="0" height="0">
+	<img id="baller9" src="images/ballAnim/ball9.png" alt="ball"
+	width="0" height="0">
+	<img id="baller10" src="images/ballAnim/ball10.png" alt="ball"
+	width="0" height="0">
+	<img id="baller11" src="images/ballAnim/ball11.png" alt="ball"
+	width="0" height="0">
+	<img id="baller12" src="images/ballAnim/ball12.png" alt="ball"
+	width="0" height="0">
+	<img id="baller13" src="images/ballAnim/ball13.png" alt="ball"
+	width="0" height="0">
+	<img id="baller14" src="images/ballAnim/ball14.png" alt="ball"
+	width="0" height="0">
+	<img id="baller15" src="images/ballAnim/ball15.png" alt="ball"
+	width="0" height="0">
+	<img id="baller16" src="images/ballAnim/ball16.png" alt="ball"
+	width="0" height="0">
+	<img id="baller17" src="images/ballAnim/ball17.png" alt="ball"
+	width="0" height="0">
+	<img id="baller18" src="images/ballAnim/ball18.png" alt="ball"
+	width="0" height="0">
+	<img id="baller19" src="images/ballAnim/ball19.png" alt="ball"
+	width="0" height="0">
+	<img id="baller20" src="images/ballAnim/ball20.png" alt="ball"
+	width="0" height="0">
+	<img id="baller21" src="images/ballAnim/ball21.png" alt="ball"
+	width="0" height="0">
+	<img id="baller22" src="images/ballAnim/ball22.png" alt="ball"
+	width="0" height="0">
+	<img id="baller23" src="images/ballAnim/ball23.png" alt="ball"
+	width="0" height="0">
+	<img id="baller24" src="images/ballAnim/ball24.png" alt="ball"
 	width="0" height="0">
 
 	<img id="ballGlow" src="images/Ball_glow.gif" alt="ballG"
