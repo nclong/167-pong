@@ -390,7 +390,9 @@
 
 	    if( ballPosReceived && ballVelReceived && readyToStart)
 	    {
-	    	var now = Date.now();
+	        var now = Date.now();
+	        var timeStamp = serverBallPosX.timeStamp;
+	        var timeDiff = timeStamp - now;
 
 	    	ballVelocityX = serverBallVelX.val;
 	    	ballVelocityY = serverBallVelY.val;
