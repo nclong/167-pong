@@ -44,14 +44,17 @@ void Ball::BallUpdate(Paddle* paddle1, Paddle* paddle2, Wall t, Wall b)
 
 	if (position.x < paddle1->position.x + PADDLE_WIDTH && ((position.y > paddle1->Top() && position.y < paddle1->Bottom()) || Bottom() > paddle1->Top() && Bottom() < paddle1->Bottom()))
 	{
-		position.x = position.x + PADDLE_WIDTH;
-		velocity.x *= randFactor * -1;
+		position.x = paddle1->position.x + PADDLE_WIDTH;
+		velocity.x *= -1;
+		velocity.x += randFactor;
 	}
 
 	if (position.x + 60 > paddle2->position.x && ((position.y > paddle2->Top() && position.y < paddle2->Bottom()) || Bottom() > paddle2->Top() && Bottom() < paddle2->Bottom()))
 	{
 		position.x = paddle2->position.x - 60;
-		velocity.x *= randFactor * -1;
+		velocity.x *= -1;
+		velocity.x -= randFactor;
+
 	}
 
 	if (Top() < 0)
@@ -72,9 +75,9 @@ void Ball::BallUpdate(Paddle* paddle1, Paddle* paddle2, Wall t, Wall b)
 	{
 		//Player 2 Needs to score
 		position = startingPos;
-		while (velocity.x == 0)
+		while (velocity.x >= -1 && velocity.x <= 1)
 		{
-			velocity.x = rand() % 6 - 3;
+			velocity.x = rand() % 7 - 3;
 		}
 		velocity.y = rand() % 2 + 1;
 		PlayerManager::Players[1]->score++;
@@ -84,8 +87,8 @@ void Ball::BallUpdate(Paddle* paddle1, Paddle* paddle2, Wall t, Wall b)
 	{
 		//Player 1 Needs to score
 		position = startingPos;
-		velocity.x = rand() % 6 - 3;
-		while (velocity.x == 0)
+		velocity.x = rand() % 7 - 3;
+		while (velocity.x >= -1 && velocity.x <= 1)
 		{
 			velocity.x = rand() % 6 - 3;
 		}

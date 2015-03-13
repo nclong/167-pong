@@ -257,6 +257,7 @@ void messageHandler(int clientID, string message){
 			int commaIndex = dataStr.find_first_of(',');
 			string receiveTimeStr = dataStr.substr(0, commaIndex);
 			string sendTimeStr = dataStr.substr(commaIndex + 1);
+			
 			SYSTEMTIME receiveTime = TimeFromString(receiveTimeStr);
 			receiveTime.wDay = serverReceiveTime.wDay;
 			receiveTime.wDayOfWeek = serverReceiveTime.wDayOfWeek;
@@ -268,32 +269,6 @@ void messageHandler(int clientID, string message){
 			sendTime.wDayOfWeek = serverReceiveTime.wDayOfWeek;
 			sendTime.wMonth = serverReceiveTime.wMonth;
 			sendTime.wYear = serverReceiveTime.wYear;
-
-
-
-			//FILETIME serverSendTimef, receiveTimef, sendTimef, serverReceiveTimef;
-			//SystemTimeToFileTime(&serverSendTime, &serverSendTimef);
-			//std::cout << " Server Send: " << serverSendTime.wMilliseconds << std::endl;
-			//SystemTimeToFileTime(&receiveTime, &receiveTimef);
-			//std::cout << "Client Receive: " << receiveTime.wMilliseconds << std::endl;
-			//SystemTimeToFileTime(&sendTime, &sendTimef);
-			//std::cout << "Client Send: " << sendTime.wMilliseconds << std::endl;
-			//SystemTimeToFileTime(&serverReceiveTime, &serverReceiveTimef);
-			//std::cout << "Server Receive: " << serverReceiveTime.wMilliseconds << std::endl;
-			//ULARGE_INTEGER serverSendTimeui, receiveTimeui, sendTimeui, serverReceiveTimeui;
-			//unsigned long long int serverSendTimei, receiveTimei, sendTimei, serverReceiveTimei;
-			//serverSendTimeui.LowPart = serverSendTimef.dwLowDateTime;
-			//serverSendTimeui.HighPart = serverSendTimef.dwHighDateTime;
-			//receiveTimeui.LowPart = receiveTimef.dwLowDateTime;
-			//receiveTimeui.HighPart = receiveTimef.dwHighDateTime;
-			//sendTimeui.LowPart = sendTimef.dwLowDateTime;
-			//sendTimeui.HighPart = sendTimef.dwHighDateTime;
-			//serverReceiveTimeui.LowPart = serverReceiveTimef.dwLowDateTime;
-			//serverReceiveTimeui.HighPart = serverReceiveTimef.dwHighDateTime;
-			//serverSendTimei = serverSendTimeui.QuadPart;
-			//receiveTimei = receiveTimeui.QuadPart;
-			//sendTimei = receiveTimeui.QuadPart;
-			//serverReceiveTimei = serverReceiveTimeui.QuadPart;
 
 			int ServerToClient = 0;
 			int ClientToServer = 0;
@@ -498,11 +473,6 @@ void startGame()
 	bottomWall.SetWidth(HORIZ_WALL_WIDTH);
 	bottomWall.name = "BottomWall";
 
-	//EntityManager::AddEntity((Entity*)&ball);
-	//EntityManager::AddEntity((Entity*)&paddle1);
-	//EntityManager::AddEntity((Entity*)&topWall);
-	//EntityManager::AddEntity((Entity*)&bottomWall);
-	//EntityManager::AddEntity((Entity*)&rightWall);
 	gameStarted = true;
 	pingSent = false;
 }

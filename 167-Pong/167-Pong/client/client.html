@@ -395,8 +395,6 @@
 	    if( ballPosReceived && ballVelReceived && readyToStart)
 	    {
 	        var now = Date.now();
-	        var timeStamp = serverBallPosX.timeStamp;
-	        var timeDiff = timeStamp - now;
 
 	    	ballVelocityX = serverBallVelX.val;
 	    	ballVelocityY = serverBallVelY.val;
@@ -805,6 +803,7 @@
 
 			//Log any messages sent from server
 			Server.bind('message', function (payload) {
+                //format command[clientID]{data}#timeStamp
 			    var ReceiveTime = new Date();
 			    console.log("Received Message: " + payload);
 			    typeStr = payload.substring(0, 2);
